@@ -49,7 +49,8 @@
 - **Framework:** Next.js 15 (App Router) con TypeScript
 - **Estilos:** Tailwind CSS con animaciones de pulso y radar
 - **Base de Datos:** Prisma ORM con SQLite (fácilmente migrable a PostgreSQL)
-- **Cartografía:** Leaflet + CartoDB Voyager/Positron sin necesidad de claves de API externas
+- **Cartografía:** Leaflet + Capa gratuita CARTO Positron minimalista (`light_all`) con trazado de polígonos GeoJSON a nivel de calles (Casco Histórico Zaragoza, Huesca, etc.) sin necesidad de API Key
+- **Diseño & Paleta:** UI minimalista oscura en tonos negro puro (`#09090b`), gris grafito y acentos naranja (`#f97316`)
 - **Iconografía:** Lucide React
 
 ---
