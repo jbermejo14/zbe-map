@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { findEquivalentEcoCars, VehicleRecord } from '@/lib/zbe-engine';
+import { getVehicleById, getEcoCandidates } from '@/lib/vehicles-repository';
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     };
 
     if (vehicleId) {
-      const v = await prisma.vehicle.findUnique({ where: { id: vehicleId } });
+      const v = getVehicleById(vehicleId);
       if (v) {
         target = {
           id: v.id,
@@ -29,37 +29,51 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Obtener candidatos ECO / CERO de la base de datos
-    const candidates = await prisma.vehicle.findMany({
-      where: {
-        dgtBadge: { in: ['ECO', 'CERO'] },
-      },
-    });
+    // Obtener candidatos ECO / CERO del repositorio en memoria
+    const candidates = getEcoCandidates();
+    const recommendations = findEquivalentEcoCars(target, candidates);
 
-    const recommendations = findEquivalentEcoCars(target, candidates as VehicleRecord[]);
+    // Parámetros de afiliación configurables mediante variables de entorno (sin inventar tags)
+    const clicarsTag = process.env.AFFILIATE_CLICARS_TAG;
+    const rentingTag = process.env.AFFILIATE_RENTING_TAG;
+    const tasacionTag = process.env.AFFILIATE_TASACION_TAG;
 
-    // Generar enlaces de afiliación comerciales simulados
     const enriched = recommendations.map((rec) => {
-      const slugSearch = `${rec.brand}-${rec.model}`.toLowerCase();
+      const query = encodeURIComponent(`${rec.brand} ${rec.model}`);
+
+      // Construcción de URLs limpias sin parámetros ficticios
+      let segundaManoUrl = `https://www.clicars.com/coches-segunda-mano?search=${query}`;
+      if (clicarsTag) {
+        segundaManoUrl += `&tag=${encodeURIComponent(clicarsTag)}`;
+      }
+
+      let rentingUrl = `https://rentingfinders.com/coches/?search=${query}`;
+      if (rentingTag) {
+        rentingUrl += `&ref=${encodeURIComponent(rentingTag)}`;
+      }
+
+      let tasacionUrl = `https://www.compramostucoche.es/`;
+      if (tasacionTag) {
+        tasacionUrl += `?tag=${encodeURIComponent(tasacionTag)}`;
+      }
+
       return {
         ...rec,
         affiliateDeals: {
           segundaMano: {
-            platform: 'Clicars / Coches.net',
-            label: `Comprar ${rec.brand} ${rec.model} de ocasión garantizado`,
-            url: `https://www.clicars.com/coches-segunda-mano?search=${encodeURIComponent(rec.brand + ' ' + rec.model)}&tag=afiliado_zbe`,
-            priceEstimate: rec.dgtBadge === 'CERO' ? 'Desde 24.900 €' : 'Desde 18.500 €',
+            platform: 'Clicars',
+            label: `Ver ${rec.brand} ${rec.model} de segunda mano y ocasión`,
+            url: segundaManoUrl,
           },
           renting: {
-            platform: 'Renting Finders / Arval',
-            label: `Renting sin entrada para particulares`,
-            url: `https://rentingfinders.com/coches/?search=${encodeURIComponent(rec.brand + ' ' + rec.model)}&ref=radar_zbe`,
-            cuotaEstimate: rec.dgtBadge === 'CERO' ? 'Desde 379 €/mes' : 'Desde 295 €/mes',
+            platform: 'Renting Finders',
+            label: `Consultar renting para particulares de ${rec.brand} ${rec.model}`,
+            url: rentingUrl,
           },
           tasacion: {
-            platform: 'Compramostucoche / Auto1',
-            label: `Tasación online inmediata de tu coche actual`,
-            url: `https://www.compramostucoche.es/?utm_source=radar_zbe&badge=ECO`,
+            platform: 'Compramostucoche',
+            label: `Tasación online de vehículo actual`,
+            url: tasacionUrl,
           },
         },
       };

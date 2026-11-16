@@ -413,17 +413,23 @@ export function evaluateCitiesForBadge(
     polygon?: any;
     streets?: any;
     geoJSON?: any;
-    rules?: Array<{ dgtBadge: string; accessStatus: string; reason: string }>;
+    rules?: any;
   }>
 ): CityEvaluationResult[] {
   return cities.map((city) => {
     let status: ZbeAccessStatus = 'allowed';
     let reason = 'Circulación permitida sin restricciones.';
 
-    if (city.rules && Array.isArray(city.rules)) {
-      const rule = city.rules.find((r) => r.dgtBadge === badge);
-      if (rule) {
-        status = rule.accessStatus as ZbeAccessStatus;
+    if (city.rules) {
+      if (Array.isArray(city.rules)) {
+        const rule = city.rules.find((r) => r.dgtBadge === badge);
+        if (rule) {
+          status = rule.accessStatus as ZbeAccessStatus;
+          reason = rule.reason;
+        }
+      } else if (typeof city.rules === 'object' && (city.rules as any)[badge]) {
+        const rule = (city.rules as any)[badge];
+        status = (rule.status || rule.accessStatus) as ZbeAccessStatus;
         reason = rule.reason;
       }
     }

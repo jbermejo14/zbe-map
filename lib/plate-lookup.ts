@@ -1,5 +1,5 @@
-import { DgtBadgeType } from '@/lib/zbe-engine';
-import { prisma } from '@/lib/prisma';
+import { DgtBadgeType } from '@/lib/zbe-engine.ts';
+import { calculateDgtBadge, normalizeFuel } from '@/lib/dgt-rules.ts';
 
 export type FuelType = 'gasolina' | 'diesel' | 'hibrido' | 'electrico' | 'auto';
 
@@ -12,7 +12,8 @@ export interface PlateLookupResult {
   fuelType: FuelType;
   fuelLabel: string;
   explanation: string;
-  confidence: 'official' | 'high_estimation' | 'provincial_vintage';
+  confidence: 'estimation' | 'provincial_vintage';
+  officialDgtUrl: string;
   matchedVehicle?: any;
 }
 
@@ -79,9 +80,10 @@ export function estimateYearFromModernPlate(letters: string): number {
   }
 }
 
+const OFFICIAL_DGT_URL = 'https://sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/';
+
 /**
- * Consulta de matrícula y deducción de distintivo ambiental oficial DGT
- * con soporte para tipo de combustible
+ * Consulta de matrícula y estimación de distintivo ambiental según reglas DGT
  */
 export async function lookupPlate(
   rawPlate: string,
@@ -98,21 +100,18 @@ export async function lookupPlate(
   // 1. Matrículas del sistema provincial (pre-septiembre 2000)
   if (!isModern) {
     const formatted = `${cleaned.slice(0, 2)}-${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
-    const sampleOldCar = await prisma.vehicle.findFirst({
-      where: { dgtBadge: 'SIN_ETIQUETA' },
-    });
-
     return {
       plate: cleaned,
       formattedPlate: formatted,
       badge: 'SIN_ETIQUETA',
       estimatedYear: 1998,
-      badgeLabel: 'Sin Etiqueta (Categoría A)',
+      badgeLabel: 'Sin Distintivo (Categoría A)',
       fuelType,
       fuelLabel: getFuelLabel(fuelType),
-      explanation: 'Matrícula provincial (anterior a septiembre de 2000). Al no cumplir la norma Euro 3 de gasolina ni Euro 4 de diésel, no tiene derecho a distintivo ambiental oficial de la DGT.',
+      explanation:
+        'Estimación: Matrícula provincial (anterior a septiembre de 2000). Al ser anterior a las normas Euro 3 de gasolina y Euro 4 de diésel, no le corresponde distintivo ambiental.',
       confidence: 'provincial_vintage',
-      matchedVehicle: sampleOldCar,
+      officialDgtUrl: OFFICIAL_DGT_URL,
     };
   }
 
@@ -122,73 +121,36 @@ export async function lookupPlate(
   const formattedPlate = `${numbers} ${letters}`;
   const estimatedYear = estimateYearFromModernPlate(letters);
 
-  let deducedBadge: DgtBadgeType = 'C';
-  let badgeLabel = 'Etiqueta C (Verde)';
-  let explanation = '';
+  // Mapear FuelType a la clasificación de dgt-rules
+  const dgtFuel =
+    fuelType === 'electrico'
+      ? 'electrico'
+      : fuelType === 'hibrido'
+      ? 'hibrido'
+      : fuelType === 'diesel'
+      ? 'diesel'
+      : 'gasolina';
 
-  // Reglas oficiales DGT según combustible y año de matriculación
-  if (fuelType === 'electrico') {
-    deducedBadge = 'CERO';
-    badgeLabel = 'Etiqueta 0 CERO (Azul)';
-    explanation = `Matrícula asignada hacia ${estimatedYear}. Por ser vehículo 100% Eléctrico (BEV) o Híbrido Enchufable (PHEV) con autonomía ≥40 km, le corresponde el distintivo 0 CERO oficial.`;
-  } else if (fuelType === 'hibrido') {
-    deducedBadge = 'ECO';
-    badgeLabel = 'Etiqueta ECO (Azul/Verde)';
-    explanation = `Matrícula de ${estimatedYear}. Por incorporar tecnología Híbrida (HEV/MHEV), gas GLP o GNC, le corresponde el distintivo ECO oficial de la DGT.`;
-  } else if (fuelType === 'diesel') {
-    if (estimatedYear >= 2016) {
-      deducedBadge = 'C';
-      badgeLabel = 'Etiqueta C (Verde)';
-      explanation = `Vehículo Diésel matriculado en ${estimatedYear} (serie ${letters}). Al ser posterior a septiembre de 2015, cumple la homologación Euro 6 y le corresponde Etiqueta C.`;
-    } else if (estimatedYear >= 2006 && estimatedYear <= 2015) {
-      deducedBadge = 'B';
-      badgeLabel = 'Etiqueta B (Amarilla)';
-      explanation = `Vehículo Diésel matriculado en ${estimatedYear} (serie ${letters}). Cumple las normativas Euro 4 o Euro 5, por lo que la DGT le otorga la Etiqueta B.`;
-    } else {
-      deducedBadge = 'SIN_ETIQUETA';
-      badgeLabel = 'Sin Etiqueta (Categoría A)';
-      explanation = `Vehículo Diésel matriculado en ${estimatedYear} (anterior a 2006). Al ser Euro 3 o anterior, carece de distintivo ambiental oficial.`;
-    }
-  } else {
-    // Gasolina (o 'auto' por defecto)
-    if (estimatedYear >= 2006) {
-      deducedBadge = 'C';
-      badgeLabel = 'Etiqueta C (Verde)';
-      explanation = `Vehículo Gasolina matriculado en ${estimatedYear} (serie ${letters}). Cumple la normativa Euro 4, Euro 5 o Euro 6, correspondiéndole la Etiqueta C.`;
-    } else if (estimatedYear >= 2001 && estimatedYear <= 2005) {
-      deducedBadge = 'B';
-      badgeLabel = 'Etiqueta B (Amarilla)';
-      explanation = `Vehículo Gasolina matriculado en ${estimatedYear} (serie ${letters}). Cumple la homologación Euro 3, correspondiéndole la Etiqueta B.`;
-    } else {
-      deducedBadge = 'SIN_ETIQUETA';
-      badgeLabel = 'Sin Etiqueta (Categoría A)';
-      explanation = `Vehículo Gasolina matriculado en ${estimatedYear} (anterior a 2001). Al ser Euro 2 o anterior, no le corresponde distintivo ambiental.`;
-    }
-  }
-
-  // Buscar un coche representativo en la BD con la MISMA etiqueta calculada
-  const matchedVehicle = await prisma.vehicle.findFirst({
-    where: {
-      dgtBadge: deducedBadge,
-    },
-    orderBy: { year: 'desc' },
+  const dgtResult = calculateDgtBadge({
+    fuel: dgtFuel,
+    registrationYear: estimatedYear,
   });
 
   return {
     plate: cleaned,
     formattedPlate,
-    badge: deducedBadge,
+    badge: dgtResult.badge,
     estimatedYear,
-    badgeLabel,
+    badgeLabel: dgtResult.badgeName,
     fuelType,
     fuelLabel: getFuelLabel(fuelType),
-    explanation,
-    confidence: 'high_estimation',
-    matchedVehicle: matchedVehicle || null,
+    explanation: `Estimación: Serie ${letters} matriculada aproximadamente en ${estimatedYear}. ${dgtResult.description}`,
+    confidence: 'estimation',
+    officialDgtUrl: OFFICIAL_DGT_URL,
   };
 }
 
-function getFuelLabel(fuel: FuelType): string {
+export function getFuelLabel(fuel: FuelType): string {
   switch (fuel) {
     case 'gasolina':
       return 'Gasolina';
@@ -199,6 +161,6 @@ function getFuelLabel(fuel: FuelType): string {
     case 'electrico':
       return '100% Eléctrico / PHEV';
     default:
-      return 'Combustión';
+      return 'Gasolina';
   }
 }

@@ -213,9 +213,9 @@ export function VehicleSelector({
         <div className="flex items-center justify-between mb-2">
           <label className="text-[11px] font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5" />
-            Búsqueda Oficial por Matrícula
+            Comprobador por Matrícula (Estimación)
           </label>
-          <span className="text-[10px] text-neutral-400">DGT Registro Oficial</span>
+          <span className="text-[10px] text-neutral-400">Estimación por año de serie</span>
         </div>
 
         {/* Fila superior: Placa de Matrícula + Botón */}
@@ -250,10 +250,10 @@ export function VehicleSelector({
             {isPlateLoading ? (
               <>
                 <span className="h-3 w-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                Consultando...
+                Comprobando...
               </>
             ) : (
-              'Consultar DGT'
+              'Calcular Estimación'
             )}
           </button>
         </form>
@@ -266,7 +266,7 @@ export function VehicleSelector({
               Tipo de Motor / Combustible:
             </span>
             <span className="text-[9px] text-neutral-500 hidden sm:inline">
-              Cruza año DGT + combustible oficial
+              Cruza año DGT + combustible
             </span>
           </div>
 
@@ -309,11 +309,11 @@ export function VehicleSelector({
                   {plateSuccess.formattedPlate}
                 </span>
                 <span className="text-[10px] text-neutral-400 bg-neutral-800 px-1.5 py-0.5 rounded">
-                  {plateSuccess.estimatedYear ? `~${plateSuccess.estimatedYear}` : ''} ({plateSuccess.fuelLabel})
+                  {plateSuccess.estimatedYear ? `Año estimado: ~${plateSuccess.estimatedYear}` : ''} ({plateSuccess.fuelLabel})
                 </span>
               </div>
 
-              {/* Distintivo Oficial Badge */}
+              {/* Distintivo Badge */}
               <span
                 className={`text-[11px] font-black uppercase px-2 py-0.5 rounded border ${
                   plateSuccess.badge === 'CERO'
@@ -337,6 +337,19 @@ export function VehicleSelector({
             <p className="text-[11px] text-neutral-300 mt-1.5 leading-relaxed">
               {plateSuccess.explanation}
             </p>
+            <div className="mt-2 pt-2 border-t border-neutral-800 flex items-center justify-between text-[10px]">
+              <span className="text-amber-400/90 font-medium">
+                ⚠️ Es una estimación basada en serie de matriculación.
+              </span>
+              <a
+                href={plateSuccess.officialDgtUrl || 'https://sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/'}
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+                className="text-orange-400 hover:text-orange-300 underline font-semibold inline-flex items-center gap-1"
+              >
+                Confirmar en Sede DGT &rarr;
+              </a>
+            </div>
           </div>
         )}
       </div>

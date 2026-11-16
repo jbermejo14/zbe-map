@@ -1,10 +1,9 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
-import { SplitDashboard } from '@/components/SplitDashboard';
+import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
-import { evaluateCitiesForBadge, DgtBadgeType, getBadgeMetadata } from '@/lib/zbe-engine';
+import { DgtBadgeType } from '@/lib/zbe-engine';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import {
   ChevronRight,
@@ -12,12 +11,12 @@ import {
   Clock,
   AlertOctagon,
   ShieldCheck,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  ParkingCircle,
-  FileText,
   Sparkles,
+  ExternalLink,
+  CalendarCheck2,
+  BellRing,
+  ParkingSquare,
+  ArrowRight,
 } from 'lucide-react';
 
 interface Props {
@@ -26,11 +25,10 @@ interface Props {
   }>;
 }
 
-export async function generateStaticParams() {
-  const cities = await prisma.zbeCity.findMany({
-    select: { slug: true },
-  });
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://radar-zbe.es';
 
+export async function generateStaticParams() {
+  const cities = getAllCities();
   return cities.map((c) => ({
     ciudad: c.slug,
   }));
@@ -38,25 +36,27 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { ciudad } = await params;
-  const city = await prisma.zbeCity.findUnique({
-    where: { slug: ciudad },
-  });
+  const city = getCityBySlug(ciudad);
 
   if (!city) {
     return {
-      title: 'ZBE Ciudad no encontrada | Radar ZBE',
+      title: 'Ciudad no encontrada | Radar ZBE',
     };
   }
 
-  const title = `ZBE ${city.name} 2025: Mapa, Horarios, Multas 200€ y Coches Permitidos`;
-  const description = `Guía completa de la Zona de Bajas Emisiones en ${city.name} (${city.province}). Consulta mapa interactivo, horario (${city.schedule}), excepciones y qué etiquetas DGT pueden entrar sin multa.`;
+  const title = `ZBE ${city.name} 2025: Mapa, Horarios, Multas y Normativa DGT`;
+  const description = `Normativa y restricciones de la Zona de Bajas Emisiones en ${city.name} (${city.province}). Horario (${city.schedule}), multa de ${city.fineAmount} €, exenciones y acceso por etiqueta DGT.`;
 
   return {
     title,
     description,
+    alternates: {
+      canonical: `${siteUrl}/zbe/${city.slug}`,
+    },
     openGraph: {
       title,
       description,
+      url: `${siteUrl}/zbe/${city.slug}`,
       type: 'article',
     },
   };
@@ -64,43 +64,54 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CityZbeSeoPage({ params }: Props) {
   const { ciudad } = await params;
-
-  const [city, allCities, sampleCar] = await Promise.all([
-    prisma.zbeCity.findUnique({
-      where: { slug: ciudad },
-      include: { rules: true },
-    }),
-    prisma.zbeCity.findMany({
-      include: { rules: true },
-      orderBy: { name: 'asc' },
-    }),
-    prisma.vehicle.findFirst({
-      where: { brand: 'Toyota', model: 'Corolla' },
-    }),
-  ]);
+  const city = getCityBySlug(ciudad);
 
   if (!city) {
     notFound();
   }
 
-  let exemptionsList: string[] = [];
-  try {
-    exemptionsList = JSON.parse(city.exemptions);
-  } catch {
-    exemptionsList = [city.exemptions];
-  }
+  const badgesMap: { key: DgtBadgeType; slug: string; name: string }[] = [
+    { key: 'CERO', slug: 'cero', name: '0 CERO' },
+    { key: 'ECO', slug: 'eco', name: 'ECO' },
+    { key: 'C', slug: 'c', name: 'Etiqueta C' },
+    { key: 'B', slug: 'b', name: 'Etiqueta B' },
+    { key: 'SIN_ETIQUETA', slug: 'sin-etiqueta', name: 'Sin Etiqueta (A)' },
+  ];
 
-  const badgesOrder: DgtBadgeType[] = ['CERO', 'ECO', 'C', 'B', 'SIN_ETIQUETA'];
+  const breadcrumbsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Inicio',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'ZBE España',
+        item: `${siteUrl}/#ciudades`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: city.name,
+        item: `${siteUrl}/zbe/${city.slug}`,
+      },
+    ],
+  };
 
-  // JSON-LD Schema
-  const jsonLd = {
+  const serviceJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'GovernmentService',
     name: `Zona de Bajas Emisiones (ZBE) de ${city.name}`,
-    serviceType: 'Regulación de Tráfico y Calidad del Aire',
+    serviceType: 'Regulación de Movilidad Sostenible y Calidad del Aire',
     provider: {
       '@type': 'GovernmentOrganization',
       name: `Ayuntamiento de ${city.name}`,
+      url: city.sourceUrl,
     },
     areaServed: {
       '@type': 'AdministrativeArea',
@@ -109,82 +120,121 @@ export default async function CityZbeSeoPage({ params }: Props) {
     description: city.summary,
   };
 
-  const initialBadge = (sampleCar?.dgtBadge as DgtBadgeType) || 'B';
-  const initialEvaluatedCities = evaluateCitiesForBadge(initialBadge, allCities);
-
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
       />
 
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs text-slate-400 mb-6">
-        <Link href="/" className="hover:text-emerald-400 transition-colors">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-neutral-400 mb-6 flex-wrap">
+        <Link href="/" className="hover:text-orange-400 transition-colors">
           Inicio
         </Link>
         <ChevronRight className="h-3 w-3" />
-        <span className="text-slate-500">Zonas de Bajas Emisiones</span>
+        <span className="text-neutral-500">Zonas de Bajas Emisiones</span>
         <ChevronRight className="h-3 w-3" />
-        <span className="text-slate-300">{city.province}</span>
+        <span className="text-neutral-300">{city.province}</span>
         <ChevronRight className="h-3 w-3" />
-        <span className="text-emerald-400 font-semibold">{city.name}</span>
+        <span className="text-orange-400 font-semibold">{city.name}</span>
       </nav>
 
       {/* Hero Header */}
-      <div className="mb-8 rounded-3xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 backdrop-blur-md">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-800">
+      <div className="mb-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 sm:p-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-neutral-800">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="rounded-full bg-slate-800 border border-slate-700 px-3 py-1 text-xs font-semibold text-slate-300">
+              <span className="rounded-full bg-neutral-800 border border-neutral-700 px-3 py-1 text-xs font-semibold text-neutral-300">
                 {city.province} · {city.region}
               </span>
-              <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                ZBE Activa 2025
+              <span
+                className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border ${
+                  city.status === 'activa'
+                    ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30'
+                    : 'text-amber-400 bg-amber-500/10 border-amber-500/30'
+                }`}
+              >
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    city.status === 'activa' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                  }`}
+                />
+                {city.status === 'activa' ? 'ZBE Activa' : 'En tramitación / Pruebas'}
               </span>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight flex items-center gap-3">
-              <MapPin className="h-8 w-8 text-emerald-400" />
+            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight flex items-center gap-3">
+              <MapPin className="h-7 w-7 text-orange-500" />
               ZBE {city.name}
             </h1>
-            <p className="mt-2 text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+            <p className="mt-2 text-xs sm:text-sm text-neutral-300 max-w-2xl leading-relaxed">
               {city.summary}
             </p>
           </div>
 
-          {/* Multa y Horario Box */}
+          {/* Sanción y Horario */}
           <div className="grid grid-cols-2 gap-3 flex-shrink-0">
-            <div className="rounded-2xl bg-slate-950 border border-slate-800 p-4 text-center">
+            <div className="rounded-xl bg-neutral-950 border border-neutral-800 p-3.5 text-center">
               <span className="flex items-center justify-center gap-1 text-[11px] font-bold text-red-400 uppercase tracking-wider">
                 <AlertOctagon className="h-3.5 w-3.5" />
                 Sanción
               </span>
               <span className="text-2xl font-black text-white mt-1 block">{city.fineAmount} €</span>
-              <span className="text-[10px] text-slate-400">100 € pronto pago</span>
+              <span className="text-[10px] text-neutral-400">según ordenanza</span>
             </div>
 
-            <div className="rounded-2xl bg-slate-950 border border-slate-800 p-4 text-center">
+            <div className="rounded-xl bg-neutral-950 border border-neutral-800 p-3.5 text-center">
               <span className="flex items-center justify-center gap-1 text-[11px] font-bold text-sky-400 uppercase tracking-wider">
                 <Clock className="h-3.5 w-3.5" />
                 Horario
               </span>
-              <span className="text-xs font-bold text-slate-200 mt-2 block line-clamp-2">
+              <span className="text-xs font-bold text-neutral-200 mt-2 block line-clamp-2">
                 {city.schedule}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Mapa Compacto de la ZBE de esta ciudad */}
-        <div className="mt-6 pt-6 border-b border-slate-800 pb-6">
-          <div className="flex items-center justify-between mb-2.5">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 text-emerald-400" />
-              Perímetro y Plano ZBE {city.name}
+        {/* Verificación de Datos Municipales */}
+        <div className="py-3 px-4 mt-4 rounded-lg bg-neutral-950/80 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-neutral-400">
+          <div className="flex items-center gap-2">
+            <CalendarCheck2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+            <span>
+              Verificado el <strong className="text-neutral-200">{city.lastVerified}</strong>
             </span>
-            <span className="text-xs text-slate-400 font-medium">
+            {city.noticePeriod && (
+              <span className="inline-flex items-center gap-1 text-amber-400 bg-amber-950/30 px-2 py-0.5 rounded border border-amber-900/40 text-[11px]">
+                <BellRing className="h-3 w-3" />
+                {city.noticePeriod}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span>Fuente:</span>
+            <a
+              href={city.sourceUrl}
+              target="_blank"
+              rel="nofollow noopener noreferrer"
+              className="text-orange-400 hover:text-orange-300 underline font-medium inline-flex items-center gap-1"
+            >
+              {city.sourceName}
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+        </div>
+
+        {/* Mapa Compacto ZBE */}
+        <div className="mt-6 pt-6 border-b border-neutral-800 pb-6">
+          <div className="flex items-center justify-between mb-2.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-300 flex items-center gap-1.5">
+              <MapPin className="h-4 w-4 text-orange-400" />
+              Perímetro ZBE {city.name}
+            </span>
+            <span className="text-xs text-neutral-400 font-medium">
               {city.perimeterName || `Límites municipales ZBE ${city.name}`}
             </span>
           </div>
@@ -201,33 +251,34 @@ export default async function CityZbeSeoPage({ params }: Props) {
           />
         </div>
 
-        {/* Matriz Completa de Reglas por Etiqueta DGT en esta ciudad */}
+        {/* Matriz de Reglas por Etiqueta DGT con enlaces individuales */}
         <div className="mt-8">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-emerald-400" />
-            Normativa de Acceso según Etiqueta DGT en {city.name}
-          </h3>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-300 mb-4 flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-orange-400" />
+            ¿Puede entrar tu coche en la ZBE de {city.name}? Consulta por etiqueta
+          </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-            {badgesOrder.map((badgeKey) => {
-              const rule = city.rules.find((r) => r.dgtBadge === badgeKey);
-              const status = rule?.accessStatus || 'allowed';
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {badgesMap.map(({ key, slug, name }) => {
+              const rule = city.rules[key];
+              const status = rule?.status || 'allowed';
               const reason = rule?.reason || 'Sin restricciones reportadas.';
 
               return (
-                <div
-                  key={badgeKey}
-                  className={`rounded-2xl p-4 border flex flex-col justify-between ${
+                <Link
+                  key={key}
+                  href={`/zbe/${city.slug}/${slug}`}
+                  className={`group rounded-xl p-4 border flex flex-col justify-between transition-all hover:scale-[1.01] ${
                     status === 'allowed'
-                      ? 'bg-emerald-950/20 border-emerald-500/30'
+                      ? 'bg-emerald-950/20 border-emerald-500/30 hover:border-emerald-400'
                       : status === 'restricted'
-                      ? 'bg-amber-950/20 border-amber-500/30'
-                      : 'bg-red-950/20 border-red-500/30'
+                      ? 'bg-amber-950/20 border-amber-500/30 hover:border-amber-400'
+                      : 'bg-red-950/20 border-red-500/30 hover:border-red-400'
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <DgtSticker badge={badgeKey} size={50} />
+                      <DgtSticker badge={key} size={48} />
                       <span
                         className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider border ${
                           status === 'allowed'
@@ -241,59 +292,59 @@ export default async function CityZbeSeoPage({ params }: Props) {
                       </span>
                     </div>
 
-                    <h4 className="text-xs font-black text-white">
-                      {badgeKey === 'CERO'
-                        ? '0 Emisiones'
-                        : badgeKey === 'SIN_ETIQUETA'
-                        ? 'Sin Etiqueta (A)'
-                        : `Etiqueta ${badgeKey}`}
-                    </h4>
-                    <p className="text-[11px] text-slate-300 mt-2 leading-relaxed">{reason}</p>
+                    <h3 className="text-xs font-black text-white group-hover:text-orange-400 transition-colors">
+                      {name}
+                    </h3>
+                    <p className="text-[11px] text-neutral-300 mt-2 leading-relaxed line-clamp-3">
+                      {reason}
+                    </p>
                   </div>
-                </div>
+
+                  <div className="mt-3 pt-2 border-t border-neutral-800/60 flex items-center justify-between text-[11px] text-orange-400 font-semibold">
+                    <span>Ver detalle</span>
+                    <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                </Link>
               );
             })}
           </div>
         </div>
 
+        {/* Condición de Parking si aplica */}
+        {city.parkingCondition && (
+          <div className="mt-6 p-4 rounded-xl bg-amber-950/20 border border-amber-500/30 flex items-start gap-3">
+            <ParkingSquare className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-xs font-bold text-amber-300 uppercase tracking-wide">
+                Condición de Estacionamiento en Parkings Subterráneos
+              </h3>
+              <p className="text-xs text-neutral-300 mt-1 leading-relaxed">
+                {city.parkingCondition}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Excepciones tasadas */}
-        {exemptionsList.length > 0 && (
-          <div className="mt-8 pt-6 border-t border-slate-800">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-emerald-400" />
-              Excepciones Oficiales y Vehículos Autorizados en {city.name}
+        {city.exemptions && city.exemptions.length > 0 && (
+          <div className="mt-8 pt-6 border-t border-neutral-800">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-3 flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-orange-400" />
+              Excepciones y Vehículos Autorizados en {city.name}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {exemptionsList.map((ex, idx) => (
+              {city.exemptions.map((ex, idx) => (
                 <div
                   key={idx}
-                  className="flex items-start gap-2.5 bg-slate-950/50 border border-slate-800/80 rounded-xl p-3 text-xs text-slate-300"
+                  className="flex items-start gap-2.5 bg-neutral-950/50 border border-neutral-800/80 rounded-xl p-3 text-xs text-neutral-300"
                 >
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 mt-1 flex-shrink-0" />
+                  <span className="h-2 w-2 rounded-full bg-orange-400 mt-1 flex-shrink-0" />
                   <span>{ex}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
-      </div>
-
-      {/* Buscador Interactivo y Mapa Integrado */}
-      <div className="mt-8">
-        <div className="mb-4">
-          <h2 className="text-xl font-bold text-white tracking-tight">
-            Comprobador Interactivo para {city.name}
-          </h2>
-          <p className="text-xs text-slate-400">
-            Elige tu vehículo para ver cómo afecta la ordenanza de {city.name} y el resto de ciudades españolas
-          </p>
-        </div>
-
-        <SplitDashboard
-          initialVehicle={sampleCar}
-          initialBadge={initialBadge}
-          initialCities={initialEvaluatedCities}
-        />
       </div>
     </div>
   );

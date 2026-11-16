@@ -750,7 +750,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.madrid360.es/medio-ambiente/zonas-de-bajas-emisiones/",
+    "sourceName": "Ayuntamiento de Madrid - Estrategia Madrid 360 y Ordenanza de Movilidad Sostenible (BOCM)",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Activa con sanciones automatizadas por cámaras OCR en todo el municipio"
   },
   {
     "id": "barcelona",
@@ -958,7 +962,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.zbe.barcelona/es/",
+    "sourceName": "Àrea Metropolitana de Barcelona (AMB) - Ordenanza ZBE Rondas de Barcelona",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Activa con régimen sancionador plenamente vigente"
   },
   {
     "id": "valencia",
@@ -1104,7 +1112,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.valencia.es/cas/zonas-de-bajas-emisiones",
+    "sourceName": "Ayuntamiento de Valencia - Ordenanza reguladora de la ZBE de Valencia (BOP)",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Fase informativa y de registro previa a sanciones económicas plenas"
   },
   {
     "id": "sevilla",
@@ -1522,7 +1534,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sevilla.org/servicios-movilidad/zona-de-bajas-emisiones",
+    "sourceName": "Ayuntamiento de Sevilla - Ordenanza de ZBE de la Isla de la Cartuja",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Régimen sancionador activo de lunes a viernes en Cartuja Norte y Sur"
   },
   {
     "id": "zaragoza",
@@ -1682,7 +1698,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.zaragoza.es/sede/portal/medioambiente/cambio-climatico/zbe",
+    "sourceName": "Ayuntamiento de Zaragoza - Ordenanza de la Zona de Bajas Emisiones del Casco Histórico (BOPZ)",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Activa en horario de 08:00 a 20:00"
   },
   {
     "id": "malaga",
@@ -2212,7 +2232,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://movilidad.malaga.eu/es/zona-de-bajas-emisiones/",
+    "sourceName": "Ayuntamiento de Málaga - Ordenanza Municipal de Movilidad Sostenible y ZBE",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Periodo transitorio de implantación por fases (año 1 libre con registro, años posteriores por etiqueta)"
   },
   {
     "id": "bilbao",
@@ -2610,7 +2634,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.bilbao.eus/zbe",
+    "sourceName": "Ayuntamiento de Bilbao - Ordenanza reguladora de la Zona de Bajas Emisiones (BOB)",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Activa en Distrito de Abando de lunes a viernes de 07:00 a 20:00"
   },
   {
     "id": "alicante",
@@ -2739,7 +2767,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.alicante.es/es/noticias/alicante-aprueba-ordenanza-zona-bajas-emisiones",
+    "sourceName": "Ayuntamiento de Alicante - Ordenanza de la Zona de Bajas Emisiones",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Periodo de aviso y concienciación sin sanciones pecuniarias inmediatas"
   },
   {
     "id": "cordoba",
@@ -2868,7 +2900,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://movilidad.cordoba.es/zbe",
+    "sourceName": "Ayuntamiento de Córdoba - ZBE Casco Histórico y sistema ACIRE",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Activa con control por cámaras en el centro histórico"
   },
   {
     "id": "valladolid",
@@ -3057,7 +3093,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.valladolid.es/es/temas/movilidad/zona-bajas-emisiones",
+    "sourceName": "Ayuntamiento de Valladolid - Ordenanza de la Zona de Bajas Emisiones (BOP)",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En vigor con perímetro de 1,1 km² en el casco histórico"
   },
   {
     "id": "palma",
@@ -3246,7 +3286,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Palma de Mallorca bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "las-palmas",
@@ -3435,7 +3479,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.laspalmasgc.es/es/areas-tematicas/movilidad/",
+    "sourceName": "Ayuntamiento de Las Palmas de Gran Canaria - Movilidad Sostenible ZBE",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En tramitación técnica y despliegue de cámaras en Las Alcaravaneras y Triana"
   },
   {
     "id": "san-sebastian",
@@ -3564,7 +3612,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.donostia.eus/movilidad",
+    "sourceName": "Donostiako Udala - Ordenanza ZBE Boulevard y Centro Histórico",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Aprobación definitiva de ordenanza con moratoria de aviso"
   },
   {
     "id": "a-coruna",
@@ -3753,7 +3805,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.coruna.gal/mobilidade",
+    "sourceName": "Concello da Coruña - Área de Bajas Emisiones y supermanzanas",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Periodo informativo con cámaras de control de aforos"
   },
   {
     "id": "granada",
@@ -3942,7 +3998,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.granada.org/zbe",
+    "sourceName": "Ayuntamiento de Granada - Plan ZBE y Calidad del Aire (BOP Granada)",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Periodo de pruebas y aviso previo a sanciones definitivas"
   },
   {
     "id": "vigo",
@@ -4391,7 +4451,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://hoxe.vigo.org/movevigo/",
+    "sourceName": "Concello de Vigo - Zonas de Baixas Emisións (Praza de Compostela y Bouzas)",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Fase de prueba de cámaras y sensorización de accesos"
   },
   {
     "id": "gijon",
@@ -4580,7 +4644,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.gijon.es/es/directorio/movilidad",
+    "sourceName": "Ayuntamiento de Gijón - Ordenanza Municipal de Movilidad Sostenible",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Revisión y adecuación de ordenanza municipal"
   },
   {
     "id": "santander",
@@ -4769,7 +4837,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://santander.es/servicios-ciudadano/movilidad-sostenible",
+    "sourceName": "Ayuntamiento de Santander - Proyecto ZBE Casco Urbano",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Despliegue de red de cámaras y sistema de señalización"
   },
   {
     "id": "burgos",
@@ -4958,7 +5030,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.aytoburgos.es/movilidad",
+    "sourceName": "Ayuntamiento de Burgos - Ordenanza reguladora de la Zona de Bajas Emisiones",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En vigor en el centro histórico intramuros"
   },
   {
     "id": "salamanca",
@@ -5391,7 +5467,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://movilidad.aytosalamanca.es/es/zona-bajas-emisiones/",
+    "sourceName": "Ayuntamiento de Salamanca - Ordenanza de Movilidad y ZBE",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Activa en el recinto monumental y zona centro"
   },
   {
     "id": "oviedo",
@@ -5580,7 +5660,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.oviedo.es/areas-municipales/seguridad-ciudadana-y-movilidad",
+    "sourceName": "Ayuntamiento de Oviedo - Proyecto ZBE Oviedo Centro",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En tramitación y señalización perimetral"
   },
   {
     "id": "badalona",
@@ -5769,7 +5853,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Badalona bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "hospitalet",
@@ -6406,7 +6494,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de L'Hospitalet de Llobregat bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "terrassa",
@@ -6595,7 +6687,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Terrassa bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "sabadell",
@@ -7288,7 +7384,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Sabadell bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "cartagena",
@@ -7477,7 +7577,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Cartagena bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "fuenlabrada",
@@ -7666,7 +7770,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Fuenlabrada bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "alcorcon",
@@ -7855,7 +7963,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Alcorcón bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "leganes",
@@ -8044,7 +8156,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Leganés bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "getafe",
@@ -8233,7 +8349,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Getafe bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "mostoles",
@@ -8422,7 +8542,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Móstoles bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "pamplona",
@@ -8611,7 +8735,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://policiamunicipal.pamplona.es/",
+    "sourceName": "Ayuntamiento de Pamplona - Zona de Acceso Controlado (ZAC) y ZBE",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Activa en Casco Antiguo con cámaras de acceso automatizado"
   },
   {
     "id": "castellon",
@@ -8800,7 +8928,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Castellón de la Plana bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "elche",
@@ -8989,7 +9121,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Elche bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "almeria",
@@ -9178,7 +9314,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Almería bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "pontevedra",
@@ -9367,7 +9507,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Pontevedra bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "santa-cruz-tenerife",
@@ -9556,7 +9700,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Santa Cruz de Tenerife bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "logrono",
@@ -9745,7 +9893,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Logroño bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "leon",
@@ -9934,7 +10086,11 @@
           }
         }
       ]
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de León bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "huesca",
@@ -10077,7 +10233,11 @@
         "status": "allowed",
         "reason": "Libre circulación."
       }
-    }
+    },
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Huesca bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "alcala-de-henares",
@@ -10160,7 +10320,11 @@
         40.4819,
         -3.355434
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Alcalá de Henares bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "torrejon-de-ardoz",
@@ -10243,7 +10407,11 @@
         40.4578,
         -3.472182
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Torrejón de Ardoz bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "parla",
@@ -10326,7 +10494,11 @@
         40.2372,
         -3.767217
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Parla bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "alcobendas",
@@ -10409,7 +10581,11 @@
         40.5475,
         -3.633908
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Alcobendas bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "las-rozas",
@@ -10492,7 +10668,11 @@
         40.4925,
         -3.86598
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Las Rozas de Madrid bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "san-sebastian-de-los-reyes",
@@ -10575,7 +10755,11 @@
         40.547,
         -3.619711
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de San Sebastián de los Reyes bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "pozuelo-de-alarcon",
@@ -10658,7 +10842,11 @@
         40.4354,
         -3.805699
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Pozuelo de Alarcón bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "rivas-vaciamadrid",
@@ -10741,7 +10929,11 @@
         40.3524,
         -3.525568
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Rivas-Vaciamadrid bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "valdemoro",
@@ -10824,7 +11016,11 @@
         40.1906,
         -3.670288
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Valdemoro bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "majadahonda",
@@ -10907,7 +11103,11 @@
         40.4727,
         -3.865518
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Majadahonda bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "collado-villalba",
@@ -10990,7 +11190,11 @@
         40.6306,
         -3.990176
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Collado Villalba bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "aranjuez",
@@ -11073,7 +11277,11 @@
         40.0333,
         -3.594403
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Aranjuez bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "arganda-del-rey",
@@ -11156,7 +11364,11 @@
         40.3008,
         -3.435939
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Arganda del Rey bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "boadilla-del-monte",
@@ -11239,7 +11451,11 @@
         40.4072,
         -3.867988
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Boadilla del Monte bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "pinto",
@@ -11322,7 +11538,11 @@
         40.2417,
         -3.693683
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Pinto bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "colmenar-viejo",
@@ -11405,7 +11625,11 @@
         40.6594,
         -3.761094
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Colmenar Viejo bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "tres-cantos",
@@ -11488,7 +11712,11 @@
         40.6075,
         -3.705505
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Tres Cantos bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "santa-coloma-de-gramenet",
@@ -11571,7 +11799,11 @@
         41.4517,
         2.222486
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Santa Coloma de Gramenet bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "mataro",
@@ -11654,7 +11886,11 @@
         41.5381,
         2.454998
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Mataró bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "reus",
@@ -11737,7 +11973,11 @@
         41.1561,
         1.115957
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Reus bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "tarragona",
@@ -11820,7 +12060,11 @@
         41.1189,
         1.256569
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Tarragona bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "girona",
@@ -11903,7 +12147,11 @@
         41.9794,
         2.831308
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Girona bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "lleida",
@@ -11986,7 +12234,11 @@
         41.6176,
         0.63075
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Lleida bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "cornella-de-llobregat",
@@ -12069,7 +12321,11 @@
         41.3567,
         2.086043
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Cornellà de Llobregat bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "sant-boi-de-llobregat",
@@ -12152,7 +12408,11 @@
         41.3461,
         2.052842
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Sant Boi de Llobregat bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "sant-cugat-del-valles",
@@ -12235,7 +12495,11 @@
         41.4725,
         2.10409
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Sant Cugat del Vallès bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "manresa",
@@ -12318,7 +12582,11 @@
         41.7289,
         1.835488
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Manresa bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "rubi",
@@ -12401,7 +12669,11 @@
         41.4925,
         2.040483
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Rubí bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "vilanova-i-la-geltru",
@@ -12484,7 +12756,11 @@
         41.2239,
         1.736269
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Vilanova i la Geltrú bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "viladecans",
@@ -12567,7 +12843,11 @@
         41.315,
         2.02897
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Viladecans bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "el-prat-de-llobregat",
@@ -12650,7 +12930,11 @@
         41.3267,
         2.106917
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de El Prat de Llobregat bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "castelldefels",
@@ -12733,7 +13017,11 @@
         41.28,
         1.987718
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Castelldefels bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "granollers",
@@ -12816,7 +13104,11 @@
         41.6078,
         2.296663
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Granollers bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "cerdanyola-del-valles",
@@ -12899,7 +13191,11 @@
         41.4914,
         2.150804
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Cerdanyola del Vallès bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "mollet-del-valles",
@@ -12982,7 +13278,11 @@
         41.5406,
         2.221417
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Mollet del Vallès bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "jerez-de-la-frontera",
@@ -13065,7 +13365,11 @@
         36.685,
         -6.116078
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Jerez de la Frontera bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "algeciras",
@@ -13148,7 +13452,11 @@
         36.1275,
         -5.445226
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Algeciras bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "marbella",
@@ -13231,7 +13539,11 @@
         36.5101,
         -4.87662
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Marbella bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "dos-hermanas",
@@ -13314,7 +13626,11 @@
         37.2831,
         -5.914641
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Dos Hermanas bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "san-fernando",
@@ -13397,7 +13713,11 @@
         36.4644,
         -6.191094
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de San Fernando bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "el-puerto-de-santa-maria",
@@ -13480,7 +13800,11 @@
         36.5997,
         -6.223046
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de El Puerto de Santa María bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "chiclana-de-la-frontera",
@@ -13563,7 +13887,11 @@
         36.4194,
         -6.140275
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Chiclana de la Frontera bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "roquetas-de-mar",
@@ -13646,7 +13974,11 @@
         36.7642,
         -2.606674
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Roquetas de Mar bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "jaen",
@@ -13729,7 +14061,11 @@
         37.7796,
         -3.776272
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Jaén bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "huelva",
@@ -13812,7 +14148,11 @@
         37.2614,
         -6.935668
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Huelva bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "cadiz",
@@ -13895,7 +14235,11 @@
         36.5271,
         -6.276767
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Cádiz bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "velez-malaga",
@@ -13978,7 +14322,11 @@
         36.7828,
         -4.092827
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Vélez-Málaga bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "mijas",
@@ -14061,7 +14409,11 @@
         36.5956,
         -4.628406
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Mijas bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "fuengirola",
@@ -14144,7 +14496,11 @@
         36.5397,
         -4.617215
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Fuengirola bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "torremolinos",
@@ -14227,7 +14583,11 @@
         36.6214,
         -4.492463
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Torremolinos bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "benalmadena",
@@ -14310,7 +14670,11 @@
         36.5978,
         -4.513946
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Benalmádena bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "estepona",
@@ -14393,7 +14757,11 @@
         36.4256,
         -5.136446
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Estepona bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "sanlucar-de-barrameda",
@@ -14476,7 +14844,11 @@
         36.7781,
         -6.345865
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Sanlúcar de Barrameda bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "la-linea-de-la-concepcion",
@@ -14559,7 +14931,11 @@
         36.1681,
         -5.340889
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de La Línea de la Concepción bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "motril",
@@ -14642,7 +15018,11 @@
         36.7458,
         -3.511147
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Motril bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "linares",
@@ -14725,7 +15105,11 @@
         38.0939,
         -3.628242
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Linares bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "alcala-de-guadaira",
@@ -14808,7 +15192,11 @@
         37.3372,
         -5.838797
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Alcalá de Guadaíra bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "el-ejido",
@@ -14891,7 +15279,11 @@
         36.7761,
         -2.806692
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de El Ejido bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "torrevieja",
@@ -14974,7 +15366,11 @@
         37.9789,
         -0.672421
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Torrevieja bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "orihuela",
@@ -15057,7 +15453,11 @@
         38.085,
         -0.93598
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Orihuela bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "torrent",
@@ -15140,7 +15540,11 @@
         39.4367,
         -0.456675
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Torrent bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "gandia",
@@ -15223,7 +15627,11 @@
         38.9672,
         -0.171829
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Gandía bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "paterna",
@@ -15306,7 +15714,11 @@
         39.5019,
         -0.434189
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Paterna bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "benidorm",
@@ -15389,7 +15801,11 @@
         38.5411,
         -0.111244
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Benidorm bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "sagunto",
@@ -15472,7 +15888,11 @@
         39.6797,
         -0.269439
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Sagunto bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "alcoy",
@@ -15555,7 +15975,11 @@
         38.6989,
         -0.466766
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Alcoy / Alcoi bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "san-vicente-del-raspeig",
@@ -15638,7 +16062,11 @@
         38.3961,
         -0.518496
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de San Vicente del Raspeig bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "elda",
@@ -15721,7 +16149,11 @@
         38.4778,
         -0.78489
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Elda bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "villarreal",
@@ -15804,7 +16236,11 @@
         39.9378,
         -0.093538
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Villarreal / Vila-real bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "vitoria-gasteiz",
@@ -15887,7 +16323,11 @@
         42.8469,
         -2.6601
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.vitoria-gasteiz.org/zbe",
+    "sourceName": "Ayuntamiento de Vitoria-Gasteiz - Ordenanza ZBE Casco Medieval y Ensanche",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En vigor con calendario escalonado"
   },
   {
     "id": "barakaldo",
@@ -15970,7 +16410,11 @@
         43.2975,
         -2.979494
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Barakaldo bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "getxo",
@@ -16053,7 +16497,11 @@
         43.3567,
         -2.998428
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Getxo bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "irun",
@@ -16136,7 +16584,11 @@
         43.3378,
         -1.779524
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Irun bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "portugalete",
@@ -16219,7 +16671,11 @@
         43.32,
         -3.011573
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Portugalete bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "santurtzi",
@@ -16302,7 +16758,11 @@
         43.3289,
         -3.025646
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Santurtzi bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "ourense",
@@ -16385,7 +16845,11 @@
         42.3364,
         -7.854722
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Ourense bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "lugo",
@@ -16468,7 +16932,11 @@
         43.0097,
         -7.547374
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Lugo bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "santiago-de-compostela",
@@ -16551,7 +17019,11 @@
         42.8782,
         -8.533833
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Santiago de Compostela bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "ferrol",
@@ -16634,7 +17106,11 @@
         43.4833,
         -8.225011
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Ferrol bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "palencia",
@@ -16717,7 +17193,11 @@
         42.0097,
         -4.520801
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Palencia bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "zamora",
@@ -16800,7 +17280,11 @@
         41.5039,
         -5.736088
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Zamora bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "segovia",
@@ -16883,7 +17367,11 @@
         40.9428,
         -4.099625
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Segovia bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "avila",
@@ -16966,7 +17454,11 @@
         40.6567,
         -4.673772
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Ávila bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "ponferrada",
@@ -17049,7 +17541,11 @@
         42.5467,
         -6.581873
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Ponferrada bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "albacete",
@@ -17132,7 +17628,11 @@
         38.9942,
         -1.8467
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Albacete bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "guadalajara",
@@ -17215,7 +17715,11 @@
         40.6339,
         -3.157714
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Guadalajara bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "toledo",
@@ -17298,7 +17802,11 @@
         39.8628,
         -4.016319
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Toledo bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "talavera-de-la-reina",
@@ -17381,7 +17889,11 @@
         39.9639,
         -4.822478
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Talavera de la Reina bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "ciudad-real",
@@ -17464,7 +17976,11 @@
         38.9861,
         -3.915503
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Ciudad Real bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "cuenca",
@@ -17547,7 +18063,11 @@
         40.0704,
         -2.129099
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Cuenca bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "murcia",
@@ -17630,7 +18150,11 @@
         37.9922,
         -1.118128
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Murcia bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "lorca",
@@ -17713,7 +18237,11 @@
         37.6714,
         -1.692427
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Lorca bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "molina-de-segura",
@@ -17796,7 +18324,11 @@
         38.0539,
         -1.20654
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Molina de Segura bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "san-cristobal-de-la-laguna",
@@ -17879,7 +18411,11 @@
         28.4872,
         -16.30662
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de San Cristóbal de La Laguna bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "telde",
@@ -17962,7 +18498,11 @@
         27.9989,
         -15.40905
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Telde bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "arona",
@@ -18045,7 +18585,11 @@
         28.0994,
         -16.672658
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Arona bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "santa-lucia-de-tirajana",
@@ -18128,7 +18672,11 @@
         27.9117,
         -15.533524
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Santa Lucía de Tirajana bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "arrecife",
@@ -18211,7 +18759,11 @@
         28.9631,
         -13.540006
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Arrecife bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "calvia",
@@ -18294,7 +18846,11 @@
         39.5653,
         2.516179
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Calvià bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "ibiza",
@@ -18377,7 +18933,11 @@
         38.9067,
         1.430928
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Ibiza / Eivissa bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "manacor",
@@ -18460,7 +19020,11 @@
         39.5694,
         3.217202
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Manacor bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "aviles",
@@ -18543,7 +19107,11 @@
         43.5567,
         -5.915555
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Avilés bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "siero",
@@ -18626,7 +19194,11 @@
         43.3917,
         -5.652033
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Siero (Pola de Siero y Lugones) bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "torrelavega",
@@ -18709,7 +19281,11 @@
         43.35,
         -4.038959
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Torrelavega bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "teruel",
@@ -18792,7 +19368,11 @@
         40.3456,
         -1.099894
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Teruel bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "badajoz",
@@ -18875,7 +19455,11 @@
         38.8794,
         -6.961138
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Badajoz bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "caceres",
@@ -18958,7 +19542,11 @@
         39.4753,
         -6.362214
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Cáceres bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "merida",
@@ -19041,7 +19629,11 @@
         38.9167,
         -6.334661
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Mérida bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "tudela",
@@ -19124,7 +19716,11 @@
         42.0642,
         -1.597794
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Tudela bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "calahorra",
@@ -19207,7 +19803,11 @@
         42.3028,
         -1.957828
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Calahorra bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "En periodo de tramitación técnica / periodo informativo de prueba"
   },
   {
     "id": "ceuta",
@@ -19290,7 +19890,11 @@
         35.8894,
         -5.312016
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Ceuta bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   },
   {
     "id": "melilla",
@@ -19373,6 +19977,10 @@
         35.2922,
         -2.930223
       ]
-    ]
+    ],
+    "sourceUrl": "https://www.sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/",
+    "sourceName": "Ordenanza Municipal ZBE - Ayuntamiento de Melilla bajo Ley 7/2021 de Cambio Climático",
+    "lastVerified": "2026-11-16",
+    "noticePeriod": "Ordenanza municipal en vigor con control automatizado"
   }
 ]

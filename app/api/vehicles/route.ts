@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import {
+  getBrands,
+  getModelsByBrand,
+  getVersionsByModel,
+  searchVehicles,
+  getAllReferenceVehicles,
+} from '@/lib/vehicles-repository';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,63 +15,28 @@ export async function GET(request: NextRequest) {
     const model = searchParams.get('model');
     const query = searchParams.get('search');
 
-    // 1. Búsqueda rápida de marcas
+    // 1. Marcas
     if (action === 'brands') {
-      const vehicles = await prisma.vehicle.findMany({
-        select: { brand: true },
-        distinct: ['brand'],
-        orderBy: { brand: 'asc' },
-      });
-      return NextResponse.json({ brands: vehicles.map((v) => v.brand) });
+      return NextResponse.json({ brands: getBrands() });
     }
 
     // 2. Modelos para una marca dada
     if (action === 'models' && brand) {
-      const vehicles = await prisma.vehicle.findMany({
-        where: { brand: { equals: brand } },
-        select: { model: true },
-        distinct: ['model'],
-        orderBy: { model: 'asc' },
-      });
-      return NextResponse.json({ models: vehicles.map((v) => v.model) });
+      return NextResponse.json({ models: getModelsByBrand(brand) });
     }
 
-    // 3. Versiones para marca y modelo dados
+    // 3. Versiones para marca y modelo
     if (action === 'versions' && brand && model) {
-      const vehicles = await prisma.vehicle.findMany({
-        where: {
-          brand: { equals: brand },
-          model: { equals: model },
-        },
-        orderBy: [{ year: 'desc' }, { powerCv: 'desc' }],
-      });
-      return NextResponse.json({ versions: vehicles });
+      return NextResponse.json({ versions: getVersionsByModel(brand, model) });
     }
 
-    // 4. Búsqueda libre por texto
+    // 4. Búsqueda libre
     if (query && query.trim().length > 1) {
-      const q = query.trim();
-      const results = await prisma.vehicle.findMany({
-        where: {
-          OR: [
-            { brand: { contains: q } },
-            { model: { contains: q } },
-            { version: { contains: q } },
-          ],
-        },
-        take: 15,
-        orderBy: { year: 'desc' },
-      });
-      return NextResponse.json({ results });
+      return NextResponse.json({ results: searchVehicles(query.trim()) });
     }
 
-    // Listado general de los más populares
-    const popularVehicles = await prisma.vehicle.findMany({
-      take: 20,
-      orderBy: { year: 'desc' },
-    });
-
-    return NextResponse.json({ vehicles: popularVehicles });
+    // Listado general
+    return NextResponse.json({ vehicles: getAllReferenceVehicles().slice(0, 20) });
   } catch (error) {
     console.error('Error fetching vehicles:', error);
     return NextResponse.json({ error: 'Error al consultar vehículos' }, { status: 500 });

@@ -54,30 +54,30 @@ export function RecommendationsSection({ vehicle, currentBadge }: Recommendation
             Alternativas de Renovación ZBE
           </span>
           <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
-            Coches equivalentes con Etiqueta ECO/CERO para circular sin restricciones
+            Modelos equivalentes con Etiqueta ECO/CERO para circular sin restricciones
           </h3>
           <p className="text-xs text-neutral-400 mt-1 max-w-xl">
-            Tu vehículo actual ({vehicle?.brand || 'tu coche'} {vehicle?.model || ''}) sufre restricciones en múltiples ciudades.
-            Hemos seleccionado 3 modelos equivalentes en habitabilidad (batalla ±100 mm) y potencia (±20% kW) con acceso ZBE libre.
+            {vehicle?.brand ? `${vehicle.brand} ${vehicle.model}` : 'Tu vehículo actual'} sufre restricciones en diversas ciudades con ZBE activa.
+            A continuación se muestran opciones en habitabilidad y potencia con distintivo ambiental ECO o CERO.
           </p>
         </div>
 
-        {/* Lead Gen Box */}
+        {/* External Tasación Box */}
         <div className="flex-shrink-0 bg-neutral-900 border border-neutral-800 rounded-lg p-3 text-center sm:text-left">
           <span className="text-[11px] font-bold text-orange-400 uppercase tracking-wider block">
             Tasación de tu coche actual
           </span>
           <p className="text-[11px] text-neutral-400 mt-0.5">
-            Comprueba el valor de mercado antes de que se devalúe por las ZBE.
+            Comprueba el valor de mercado en plataformas externas de tasación.
           </p>
           <a
-            href="https://www.compramostucoche.es/?utm_source=radar_zbe"
+            href="https://www.compramostucoche.es/"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="nofollow noopener noreferrer"
             className="mt-2 inline-flex items-center justify-center gap-1.5 w-full rounded bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold py-1.5 px-3 transition-colors"
           >
             <Coins className="h-3 w-3" />
-            Tasar online gratis
+            Tasación orientativa
           </a>
         </div>
       </div>
@@ -87,7 +87,7 @@ export function RecommendationsSection({ vehicle, currentBadge }: Recommendation
         <div className="py-8 flex justify-center items-center">
           <div className="flex items-center gap-2 text-neutral-400 text-xs">
             <span className="h-4 w-4 rounded-full border-2 border-orange-500 border-t-transparent animate-spin" />
-            Buscando vehículos equivalentes en el registro DGT...
+            Buscando vehículos equivalentes...
           </div>
         </div>
       ) : (
@@ -124,7 +124,7 @@ export function RecommendationsSection({ vehicle, currentBadge }: Recommendation
                   <div className="bg-neutral-950 p-2 rounded text-[11px] text-neutral-300 space-y-0.5 mb-3">
                     <div className="flex justify-between">
                       <span className="text-neutral-400">Acceso ZBE:</span>
-                      <strong className="text-green-400">100% Libre</strong>
+                      <strong className="text-green-400">Libre sin restricciones</strong>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-neutral-400">Emisiones CO₂:</span>
@@ -137,25 +137,25 @@ export function RecommendationsSection({ vehicle, currentBadge }: Recommendation
                   <a
                     href={car.affiliateDeals?.segundaMano?.url || '#'}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="nofollow noopener noreferrer"
                     className="flex items-center justify-between w-full px-2.5 py-1.5 rounded bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-medium transition-colors"
                   >
                     <span className="flex items-center gap-1.5">
                       <ShoppingBag className="h-3 w-3 text-orange-500" />
-                      <span>{car.affiliateDeals?.segundaMano?.priceEstimate}</span>
+                      <span>Ver ofertas de ocasión</span>
                     </span>
-                    <span className="text-[10px] text-neutral-400">Ocasión</span>
+                    <span className="text-[10px] text-neutral-400">Segunda mano</span>
                   </a>
 
                   <a
                     href={car.affiliateDeals?.renting?.url || '#'}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="nofollow noopener noreferrer"
                     className="flex items-center justify-between w-full px-2.5 py-1.5 rounded border border-orange-500/40 bg-orange-950/20 text-orange-400 text-xs font-medium transition-colors"
                   >
                     <span className="flex items-center gap-1.5">
                       <Zap className="h-3 w-3 text-orange-500" />
-                      <span>Renting: {car.affiliateDeals?.renting?.cuotaEstimate}</span>
+                      <span>Consultar cuotas de renting</span>
                     </span>
                     <ArrowRight className="h-3 w-3" />
                   </a>
