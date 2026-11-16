@@ -31,6 +31,22 @@ export function SpainZbeMap({
   const [mapTheme, setMapTheme] = useState<MapLayerType>('carto'); // CARTO Positron por defecto
   const [showPolygons, setShowPolygons] = useState(true);
 
+  // Sincronizar tema con modo oscuro/claro global
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const isDark = document.documentElement.classList.contains('dark');
+      setMapTheme(isDark ? 'dark' : 'carto');
+    }
+
+    const handler = (e: any) => {
+      const newTheme = e.detail?.theme;
+      setMapTheme(newTheme === 'dark' ? 'dark' : 'carto');
+    };
+
+    window.addEventListener('theme-change', handler);
+    return () => window.removeEventListener('theme-change', handler);
+  }, []);
+
   // Filtrar ciudades
   const filteredCities = cities.filter((c) => {
     if (statusFilter !== 'all' && c.status !== statusFilter) return false;
@@ -115,12 +131,12 @@ export function SpainZbeMap({
           onCitySelect(city);
           const geoLayer = geojsonLayersRef.current[city.cityId];
           if (geoLayer && typeof geoLayer.getBounds === 'function') {
-            map.fitBounds(geoLayer.getBounds(), { padding: [30, 30], maxZoom: 16 });
+            map.fitBounds(geoLayer.getBounds(), { padding: [60, 60], maxZoom: 13 });
             geoLayer.openPopup();
           } else if (city.polygon && city.polygon.length > 0) {
-            map.fitBounds(L.latLngBounds(city.polygon), { padding: [30, 30], maxZoom: 16 });
+            map.fitBounds(L.latLngBounds(city.polygon), { padding: [60, 60], maxZoom: 13 });
           } else {
-            map.flyTo([city.lat, city.lng], 14, { duration: 1 });
+            map.flyTo([city.lat, city.lng], 13, { duration: 0.8 });
           }
         });
 
@@ -337,19 +353,19 @@ export function SpainZbeMap({
     });
   }, [filteredCities, showPolygons, mapReady, renderMapElements]);
 
-  // Si cambia la ciudad seleccionada, enfocar a su capa GeoJSON
+  // Si cambia la ciudad seleccionada, enfocar a su capa GeoJSON con encuadre proporcionado
   useEffect(() => {
     if (selectedCity && mapInstanceRef.current) {
       import('leaflet').then((L) => {
         const geoLayer = geojsonLayersRef.current[selectedCity.cityId];
         if (geoLayer && typeof geoLayer.getBounds === 'function') {
-          mapInstanceRef.current.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
+          mapInstanceRef.current.fitBounds(geoLayer.getBounds(), { padding: [60, 60], maxZoom: 13 });
           geoLayer.openPopup();
         } else if (selectedCity.polygon && selectedCity.polygon.length > 0) {
           const bounds = L.latLngBounds(selectedCity.polygon);
-          mapInstanceRef.current.fitBounds(bounds, { padding: [30, 30] });
+          mapInstanceRef.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 13 });
         } else {
-          mapInstanceRef.current.flyTo([selectedCity.lat, selectedCity.lng], 15, { duration: 1 });
+          mapInstanceRef.current.flyTo([selectedCity.lat, selectedCity.lng], 13, { duration: 0.8 });
         }
       });
     }

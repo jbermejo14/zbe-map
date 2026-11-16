@@ -411,6 +411,8 @@ export function evaluateCitiesForBadge(
     perimeterName?: string | null;
     areaKm2?: number | null;
     polygon?: any;
+    streets?: any;
+    geoJSON?: any;
     rules?: Array<{ dgtBadge: string; accessStatus: string; reason: string }>;
   }>
 ): CityEvaluationResult[] {

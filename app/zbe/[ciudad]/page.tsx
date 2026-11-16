@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { SplitDashboard } from '@/components/SplitDashboard';
+import { CityMiniMap } from '@/components/CityMiniMap';
 import { evaluateCitiesForBadge, DgtBadgeType, getBadgeMetadata } from '@/lib/zbe-engine';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import {
@@ -174,6 +175,30 @@ export default async function CityZbeSeoPage({ params }: Props) {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Mapa Compacto de la ZBE de esta ciudad */}
+        <div className="mt-6 pt-6 border-b border-slate-800 pb-6">
+          <div className="flex items-center justify-between mb-2.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+              <MapPin className="h-4 w-4 text-emerald-400" />
+              Perímetro y Plano ZBE {city.name}
+            </span>
+            <span className="text-xs text-slate-400 font-medium">
+              {city.perimeterName || `Límites municipales ZBE ${city.name}`}
+            </span>
+          </div>
+          <CityMiniMap
+            city={{
+              lat: city.lat,
+              lng: city.lng,
+              name: city.name,
+              cityName: city.name,
+              polygon: city.polygon,
+              status: 'restricted',
+            }}
+            height="270px"
+          />
         </div>
 
         {/* Matriz Completa de Reglas por Etiqueta DGT en esta ciudad */}
