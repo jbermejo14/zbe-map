@@ -12,6 +12,7 @@ interface CityMiniMapProps {
     name?: string;
     cityName?: string;
     polygon?: [number, number][] | string | null;
+    geoJSON?: any;
     status?: string;
     /** Enlace municipal a mostrar cuando no hay perímetro; solo si la fuente es del ayuntamiento. */
     officialUrl?: string | null;
@@ -78,8 +79,24 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
       const color =
         status === 'allowed' ? '#16a34a' : status === 'restricted' ? '#ea580c' : '#e63946';
 
-      // Si tiene polígono, dibujarlo y ajustar vista
-      if (polygonCoords.length > 2) {
+      // Si tiene GeoJSON oficial o polígono, dibujarlo y ajustar vista
+      if (city.geoJSON) {
+        const geoLayer = L.geoJSON(city.geoJSON, {
+          style: (feature: any) => ({
+            color: feature?.properties?.fase === 'FASE 2' ? '#ea580c' : color,
+            weight: 2.5,
+            opacity: 0.9,
+            fillColor: feature?.properties?.fase === 'FASE 2' ? '#f97316' : color,
+            fillOpacity: feature?.properties?.fase === 'FASE 2' ? 0.16 : 0.25,
+            dashArray: feature?.properties?.fase === 'FASE 2' ? '5, 5' : undefined,
+          }),
+        }).addTo(map);
+
+        map.fitBounds(geoLayer.getBounds(), {
+          padding: [25, 25],
+          maxZoom: 15,
+        });
+      } else if (polygonCoords.length > 2) {
         const polyLayer = L.polygon(polygonCoords, {
           color: color,
           weight: 2.5,
@@ -90,7 +107,7 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
 
         map.fitBounds(polyLayer.getBounds(), {
           padding: [25, 25],
-          maxZoom: 14,
+          maxZoom: 15,
         });
       } else {
         // Sin perímetro real no se dibuja ninguna zona: solo el marcador central.
@@ -122,7 +139,7 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
     };
   }, [city]);
 
-  const hasPolygon = parsePolygonPoints(city.polygon).length > 2;
+  const hasPolygon = (city.geoJSON && city.geoJSON.features?.length > 0) || parsePolygonPoints(city.polygon).length > 2;
   const cityLabel = city.cityName || city.name || '';
 
   return (

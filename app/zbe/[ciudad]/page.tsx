@@ -250,6 +250,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
               name: city.name,
               cityName: city.name,
               polygon: city.polygon,
+              geoJSON: city.geoJSON,
               officialUrl: isCityVerified(city) ? city.sourceUrl : null,
               status: 'restricted',
             }}

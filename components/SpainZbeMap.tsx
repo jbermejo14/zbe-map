@@ -132,10 +132,10 @@ export function SpainZbeMap({
           onCitySelect(city);
           const geoLayer = geojsonLayersRef.current[city.cityId];
           if (geoLayer && typeof geoLayer.getBounds === 'function') {
-            map.fitBounds(geoLayer.getBounds(), { padding: [60, 60], maxZoom: 13 });
+            map.fitBounds(geoLayer.getBounds(), { padding: [60, 60], maxZoom: 15 });
             geoLayer.openPopup();
           } else if (city.polygon && city.polygon.length > 0) {
-            map.fitBounds(L.latLngBounds(city.polygon), { padding: [60, 60], maxZoom: 13 });
+            map.fitBounds(L.latLngBounds(city.polygon), { padding: [60, 60], maxZoom: 15 });
           } else {
             map.flyTo([city.lat, city.lng], 13, { duration: 0.8 });
           }
@@ -174,15 +174,19 @@ export function SpainZbeMap({
 
           if (geoData) {
             const capaZBE = L.geoJSON(geoData, {
-              style: {
-                color: strokeColor, // Color del borde (tipo CARTO)
-                weight: 2.5, // Grosor perimetral
-                opacity: 0.9,
-                fillColor: strokeColor, // Relleno translúcido
-                fillOpacity: 0.22, // Transparencia para leer las calles debajo
-                dashArray: isRestricted ? '5, 5' : undefined, // Línea discontinua opcional
+              style: function (feature: any) {
+                const isFase2 = feature?.properties?.fase === 'FASE 2';
+                return {
+                  color: isFase2 ? '#ea580c' : strokeColor,
+                  weight: isFase2 ? 2.5 : 3,
+                  opacity: 0.95,
+                  fillColor: isFase2 ? '#f97316' : strokeColor,
+                  fillOpacity: isFase2 ? 0.16 : 0.25,
+                  dashArray: isFase2 ? '6, 5' : (isRestricted ? '5, 5' : undefined),
+                };
               },
               onEachFeature: function (feature: any, layer: any) {
+                const faseBadge = feature?.properties?.fase ? `<span style="display:inline-block;padding:2px 6px;border-radius:4px;background:#ea580c;color:#ffffff;font-size:10px;font-weight:700;margin-bottom:4px;letter-spacing:0.5px;">${feature.properties.fase}</span><br/>` : '';
                 const nombre = feature.properties?.nombre || `ZBE ${city.cityName}`;
                 const desc = feature.properties?.descripcion || city.summary;
                 const streetsHtml =
@@ -194,7 +198,7 @@ export function SpainZbeMap({
 
                 layer.bindPopup(
                   `<div style="font-family: system-ui, sans-serif; font-size: 12px; line-height: 1.4; color: #18181b;">
-                    <strong style="font-size: 13px; color: #09090b;">${nombre}</strong><br/>
+                    ${faseBadge}<strong style="font-size: 13px; color: #09090b;">${nombre}</strong><br/>
                     <span style="color: ${strokeColor}; font-weight: bold; text-transform: uppercase; font-size: 10px;">
                       ${city.statusLabel} (${city.fineAmount} € sanción)
                     </span><br/>
@@ -353,11 +357,11 @@ export function SpainZbeMap({
       import('leaflet').then((L) => {
         const geoLayer = geojsonLayersRef.current[selectedCity.cityId];
         if (geoLayer && typeof geoLayer.getBounds === 'function') {
-          mapInstanceRef.current.fitBounds(geoLayer.getBounds(), { padding: [60, 60], maxZoom: 13 });
+          mapInstanceRef.current.fitBounds(geoLayer.getBounds(), { padding: [60, 60], maxZoom: 15 });
           geoLayer.openPopup();
         } else if (selectedCity.polygon && selectedCity.polygon.length > 0) {
           const bounds = L.latLngBounds(selectedCity.polygon);
-          mapInstanceRef.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 13 });
+          mapInstanceRef.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 15 });
         } else {
           mapInstanceRef.current.flyTo([selectedCity.lat, selectedCity.lng], 13, { duration: 0.8 });
         }
