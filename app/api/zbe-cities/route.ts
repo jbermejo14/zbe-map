@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { DgtBadgeType, evaluateCitiesForBadge } from '@/lib/zbe-engine';
+import { evaluateAllCities } from '@/lib/cities-repository';
+import { DgtBadgeType } from '@/lib/zbe-engine';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,17 +9,9 @@ export async function GET(request: NextRequest) {
     const validBadges: DgtBadgeType[] = ['CERO', 'ECO', 'C', 'B', 'SIN_ETIQUETA'];
     const badge = validBadges.includes(badgeParam) ? badgeParam : 'B';
 
-    // Cargar todas las ciudades con sus reglas
-    const cities = await prisma.zbeCity.findMany({
-      include: {
-        rules: true,
-      },
-      orderBy: { name: 'asc' },
-    });
+    // Evaluar todas las ciudades a partir del repositorio estático versionado
+    const evaluatedCities = evaluateAllCities(badge);
 
-    const evaluatedCities = evaluateCitiesForBadge(badge, cities);
-
-    // Calcular resumen
     const summary = {
       badge,
       totalCities: evaluatedCities.length,

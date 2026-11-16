@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { CityEvaluationResult, ZbeAccessStatus } from '@/lib/zbe-engine';
+import { getMapTileConfig, MAP_TILE_MAX_ZOOM, MAP_TILE_SUBDOMAINS } from '@/lib/map-config';
 import { Search, RotateCcw, Map, Moon, Satellite, Layers, Navigation, Compass } from 'lucide-react';
 
 interface SpainZbeMapProps {
@@ -30,6 +31,22 @@ export function SpainZbeMap({
   const [mapReady, setMapReady] = useState(false);
   const [mapTheme, setMapTheme] = useState<MapLayerType>('carto'); // CARTO Positron por defecto
   const [showPolygons, setShowPolygons] = useState(true);
+
+  // Sincronizar tema con modo oscuro/claro global
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const isDark = document.documentElement.classList.contains('dark');
+      setMapTheme(isDark ? 'dark' : 'carto');
+    }
+
+    const handler = (e: any) => {
+      const newTheme = e.detail?.theme;
+      setMapTheme(newTheme === 'dark' ? 'dark' : 'carto');
+    };
+
+    window.addEventListener('theme-change', handler);
+    return () => window.removeEventListener('theme-change', handler);
+  }, []);
 
   // Filtrar ciudades
   const filteredCities = cities.filter((c) => {
@@ -115,12 +132,12 @@ export function SpainZbeMap({
           onCitySelect(city);
           const geoLayer = geojsonLayersRef.current[city.cityId];
           if (geoLayer && typeof geoLayer.getBounds === 'function') {
-            map.fitBounds(geoLayer.getBounds(), { padding: [30, 30], maxZoom: 16 });
+            map.fitBounds(geoLayer.getBounds(), { padding: [60, 60], maxZoom: 13 });
             geoLayer.openPopup();
           } else if (city.polygon && city.polygon.length > 0) {
-            map.fitBounds(L.latLngBounds(city.polygon), { padding: [30, 30], maxZoom: 16 });
+            map.fitBounds(L.latLngBounds(city.polygon), { padding: [60, 60], maxZoom: 13 });
           } else {
-            map.flyTo([city.lat, city.lng], 14, { duration: 1 });
+            map.flyTo([city.lat, city.lng], 13, { duration: 0.8 });
           }
         });
 
@@ -221,34 +238,27 @@ export function SpainZbeMap({
 
     if (theme === 'carto') {
       // 1. CARTO Positron Minimalista (El estándar solicitado)
+      const tiles = getMapTileConfig();
       const cartoLayer = L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        tiles.lightUrl,
         {
-          attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-          subdomains: 'abcd',
-          maxZoom: 20,
+          attribution: tiles.attribution,
+          subdomains: MAP_TILE_SUBDOMAINS,
+          maxZoom: MAP_TILE_MAX_ZOOM,
         }
       );
       cartoLayer.addTo(map);
       currentTileLayersRef.current.push(cartoLayer);
     } else if (theme === 'dark') {
-      // 2. Esri / CARTO Dark Gray Canvas
-      const darkBase = L.tileLayer(
-        'https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-        {
-          attribution: '&copy; Esri, OpenStreetMap contributors',
-          maxZoom: 16,
-        }
-      );
-      const darkRef = L.tileLayer(
-        'https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
-        {
-          maxZoom: 16,
-        }
-      );
+      // 2. CARTO Dark Matter (URL y atribución configurables)
+      const tiles = getMapTileConfig();
+      const darkBase = L.tileLayer(tiles.darkUrl, {
+        attribution: tiles.attribution,
+        subdomains: MAP_TILE_SUBDOMAINS,
+        maxZoom: MAP_TILE_MAX_ZOOM,
+      });
       darkBase.addTo(map);
-      darkRef.addTo(map);
-      currentTileLayersRef.current.push(darkBase, darkRef);
+      currentTileLayersRef.current.push(darkBase);
     } else if (theme === 'osm') {
       // 3. OpenStreetMap
       const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -337,19 +347,19 @@ export function SpainZbeMap({
     });
   }, [filteredCities, showPolygons, mapReady, renderMapElements]);
 
-  // Si cambia la ciudad seleccionada, enfocar a su capa GeoJSON
+  // Si cambia la ciudad seleccionada, enfocar a su capa GeoJSON con encuadre proporcionado
   useEffect(() => {
     if (selectedCity && mapInstanceRef.current) {
       import('leaflet').then((L) => {
         const geoLayer = geojsonLayersRef.current[selectedCity.cityId];
         if (geoLayer && typeof geoLayer.getBounds === 'function') {
-          mapInstanceRef.current.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
+          mapInstanceRef.current.fitBounds(geoLayer.getBounds(), { padding: [60, 60], maxZoom: 13 });
           geoLayer.openPopup();
         } else if (selectedCity.polygon && selectedCity.polygon.length > 0) {
           const bounds = L.latLngBounds(selectedCity.polygon);
-          mapInstanceRef.current.fitBounds(bounds, { padding: [30, 30] });
+          mapInstanceRef.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 13 });
         } else {
-          mapInstanceRef.current.flyTo([selectedCity.lat, selectedCity.lng], 15, { duration: 1 });
+          mapInstanceRef.current.flyTo([selectedCity.lat, selectedCity.lng], 13, { duration: 0.8 });
         }
       });
     }

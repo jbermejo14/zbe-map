@@ -2,7 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { CityEvaluationResult, DgtBadgeType, getAccessStatusPresentation } from '@/lib/zbe-engine';
+import { PENDING_VERIFICATION_TEXT, isCityVerified } from '@/lib/city-verification';
 import {
   X,
   MapPin,
@@ -17,6 +19,18 @@ import {
   Layers,
   Milestone,
 } from 'lucide-react';
+
+const CityMiniMap = dynamic(
+  () => import('./CityMiniMap').then((mod) => mod.CityMiniMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-44 w-full rounded-xl bg-neutral-900 animate-pulse flex items-center justify-center text-xs text-neutral-500">
+        Cargando mapa de la ciudad...
+      </div>
+    ),
+  }
+);
 
 interface CityDetailDrawerProps {
   city: CityEvaluationResult | null;
@@ -121,6 +135,23 @@ export function CityDetailDrawer({
                 {city.schedule}
               </p>
             </div>
+          </div>
+
+          {!isCityVerified(city) && (
+            <p className="mt-2 text-[11px] text-amber-400">{PENDING_VERIFICATION_TEXT}</p>
+          )}
+
+          {/* Mapa Compacto de la Ciudad en la Vista Detalle */}
+          <div className="mt-3.5">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+                {city.polygon ? `Mapa ZBE ${city.cityName}` : `Ubicación ZBE ${city.cityName}`}
+              </span>
+              <span className="text-[10px] text-orange-400 font-semibold truncate max-w-[200px]">
+                {city.perimeterName || 'Área Regulada'}
+              </span>
+            </div>
+            <CityMiniMap city={city} height="195px" />
           </div>
 
           {/* Vías y Calles que delimitan el perímetro ZBE */}

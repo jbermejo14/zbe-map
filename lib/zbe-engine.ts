@@ -47,6 +47,10 @@ export interface CityEvaluationResult {
   polygon?: [number, number][] | null;
   streets?: string[] | null;
   geoJSON?: any;
+  sourceUrl?: string | null;
+  sourceName?: string | null;
+  verificationStatus?: 'verified' | 'pending' | null;
+  lastVerified?: string | null;
 }
 
 export interface VehicleRecord {
@@ -411,17 +415,29 @@ export function evaluateCitiesForBadge(
     perimeterName?: string | null;
     areaKm2?: number | null;
     polygon?: any;
-    rules?: Array<{ dgtBadge: string; accessStatus: string; reason: string }>;
+    streets?: any;
+    geoJSON?: any;
+    rules?: any;
+    sourceUrl?: string | null;
+    sourceName?: string | null;
+    verificationStatus?: 'verified' | 'pending' | null;
+    lastVerified?: string | null;
   }>
 ): CityEvaluationResult[] {
   return cities.map((city) => {
     let status: ZbeAccessStatus = 'allowed';
     let reason = 'Circulación permitida sin restricciones.';
 
-    if (city.rules && Array.isArray(city.rules)) {
-      const rule = city.rules.find((r) => r.dgtBadge === badge);
-      if (rule) {
-        status = rule.accessStatus as ZbeAccessStatus;
+    if (city.rules) {
+      if (Array.isArray(city.rules)) {
+        const rule = city.rules.find((r) => r.dgtBadge === badge);
+        if (rule) {
+          status = rule.accessStatus as ZbeAccessStatus;
+          reason = rule.reason;
+        }
+      } else if (typeof city.rules === 'object' && (city.rules as any)[badge]) {
+        const rule = (city.rules as any)[badge];
+        status = (rule.status || rule.accessStatus) as ZbeAccessStatus;
         reason = rule.reason;
       }
     }
@@ -499,6 +515,10 @@ export function evaluateCitiesForBadge(
       polygon: parsedPolygon,
       streets: parsedStreets,
       geoJSON: parsedGeoJSON,
+      sourceUrl: city.sourceUrl ?? null,
+      sourceName: city.sourceName ?? null,
+      verificationStatus: city.verificationStatus ?? null,
+      lastVerified: city.lastVerified ?? null,
     };
   });
 }

@@ -268,7 +268,7 @@ const streetLevelData: {
       'Rambla Méndez Núñez',
     ],
     polygon: [
-      [39.47? 38.3520 : 38.3520, -0.4850], // Jaime II / Santa Bárbara
+      [38.3520, -0.4850], // Jaime II / Santa Bárbara
       [38.3480, -0.4810], // Rambla / Puerta del Mar
       [38.3420, -0.4880], // Canalejas / Puerto
       [38.3395, -0.4930], // Óscar Esplá

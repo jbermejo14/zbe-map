@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { DgtBadgeType } from '@/lib/zbe-engine';
-import { Search, Filter, Car } from 'lucide-react';
+import { Search, Filter, Car, ShieldCheck, AlertCircle, Fuel, Zap } from 'lucide-react';
+
+type FuelOption = 'gasolina' | 'diesel' | 'hibrido' | 'electrico';
 
 interface VehicleSelectorProps {
   currentBadge: DgtBadgeType;
@@ -17,6 +19,13 @@ export function VehicleSelector({
   onVehicleSelect,
   selectedVehicle,
 }: VehicleSelectorProps) {
+  // Plate search state
+  const [plateInput, setPlateInput] = useState('');
+  const [selectedFuel, setSelectedFuel] = useState<FuelOption>('gasolina');
+  const [isPlateLoading, setIsPlateLoading] = useState(false);
+  const [plateError, setPlateError] = useState<string | null>(null);
+  const [plateSuccess, setPlateSuccess] = useState<any | null>(null);
+
   // Cascading states
   const [brands, setBrands] = useState<string[]>([]);
   const [models, setModels] = useState<string[]>([]);
@@ -93,10 +102,10 @@ export function VehicleSelector({
         if (data.versions) {
           setVersions(data.versions);
           if (data.versions.length > 0) {
-            const first = data.versions[0];
-            setSelectedVersionId(first.id);
-            onVehicleSelect(first);
-            onBadgeSelect(first.dgtBadge as DgtBadgeType);
+            const matched = data.versions.find((v: any) => v.dgtBadge === currentBadge) || data.versions[0];
+            setSelectedVersionId(matched.id);
+            onVehicleSelect(matched);
+            onBadgeSelect(matched.dgtBadge as DgtBadgeType);
           }
         }
       } catch (err) {
@@ -140,8 +149,211 @@ export function VehicleSelector({
     { badge: 'SIN_ETIQUETA', label: 'SIN ETIQUETA', desc: 'Categoría A' },
   ];
 
+  const handlePlateLookup = async (e?: React.FormEvent, fuelOverride?: FuelOption) => {
+    if (e) e.preventDefault();
+    if (!plateInput || plateInput.trim().length < 4) {
+      setPlateError('Introduce una matrícula válida (ej: 1234 LMN o M 1234 AB)');
+      return;
+    }
+
+    const fuelToUse = fuelOverride || selectedFuel;
+
+    setIsPlateLoading(true);
+    setPlateError(null);
+
+    try {
+      const res = await fetch(
+        `/api/plate?plate=${encodeURIComponent(plateInput.trim())}&fuel=${encodeURIComponent(fuelToUse)}`
+      );
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'No se pudo consultar la matrícula');
+      }
+
+      const exactBadge = data.badge as DgtBadgeType;
+      setPlateSuccess(data);
+
+      // 1. Marcar prioritariamente la etiqueta oficial calculada por la matrícula
+      onBadgeSelect(exactBadge);
+
+      // 2. Si hay vehículo representativo, asignarlo con la etiqueta oficial exacta
+      if (data.matchedVehicle) {
+        onVehicleSelect({
+          ...data.matchedVehicle,
+          dgtBadge: exactBadge,
+        });
+      }
+    } catch (err: any) {
+      setPlateError(err?.message || 'Error al conectar con el servicio DGT');
+    } finally {
+      setIsPlateLoading(false);
+    }
+  };
+
+  const onFuelChange = (fuel: FuelOption) => {
+    setSelectedFuel(fuel);
+    // Si ya hay matrícula escrita, recalcular al instante
+    if (plateInput.trim().length >= 4) {
+      handlePlateLookup(undefined, fuel);
+    }
+  };
+
+  const fuelOptions: { id: FuelOption; label: string; icon: string; desc: string }[] = [
+    { id: 'gasolina', label: 'Gasolina', icon: '⛽', desc: 'Euro 3 a 6' },
+    { id: 'diesel', label: 'Diésel', icon: '🛢️', desc: 'Euro 4 a 6' },
+    { id: 'hibrido', label: 'Híbrido / GLP', icon: '🔋', desc: 'HEV, MHEV, GNC' },
+    { id: 'electrico', label: '100% Eléctrico', icon: '⚡', desc: 'BEV / PHEV ≥40km' },
+  ];
+
   return (
     <div className="space-y-4">
+      {/* Buscador de Matrícula DGT */}
+      <div className="rounded-lg border border-neutral-800 bg-neutral-900/80 p-3 shadow-inner">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-[11px] font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Comprobador por Matrícula (Estimación)
+          </label>
+          <span className="text-[10px] text-neutral-400">Estimación por año de serie</span>
+        </div>
+
+        {/* Fila superior: Placa de Matrícula + Botón */}
+        <form onSubmit={(e) => handlePlateLookup(e)} className="flex flex-col sm:flex-row items-stretch gap-2">
+          {/* Placa de matrícula europea estilizada */}
+          <div className="flex-1 flex items-center bg-white rounded border-2 border-neutral-300 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-orange-500">
+            {/* Franja azul europea */}
+            <div className="bg-[#003399] text-white px-2.5 py-1.5 flex flex-col items-center justify-center select-none flex-shrink-0">
+              <span className="text-[10px] leading-tight text-amber-300 font-bold">★★★</span>
+              <span className="text-xs font-black tracking-tight mt-0.5">E</span>
+            </div>
+
+            {/* Input de matrícula */}
+            <input
+              type="text"
+              value={plateInput}
+              onChange={(e) => {
+                setPlateInput(e.target.value.toUpperCase());
+                if (plateError) setPlateError(null);
+              }}
+              placeholder="1234 LMN"
+              maxLength={10}
+              className="w-full bg-transparent px-3 py-1.5 text-base sm:text-lg font-black tracking-widest text-neutral-900 placeholder-neutral-400 uppercase text-center focus:outline-none"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isPlateLoading}
+            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs transition-colors disabled:opacity-50 whitespace-nowrap"
+          >
+            {isPlateLoading ? (
+              <>
+                <span className="h-3 w-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                Comprobando...
+              </>
+            ) : (
+              'Calcular Estimación'
+            )}
+          </button>
+        </form>
+
+        {/* Selector de Combustible al lado / debajo */}
+        <div className="mt-2.5 pt-2 border-t border-neutral-800/80">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-1">
+              <Fuel className="h-3 w-3 text-orange-400" />
+              Tipo de Motor / Combustible:
+            </span>
+            <span className="text-[9px] text-neutral-500 hidden sm:inline">
+              Cruza año DGT + combustible
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+            {fuelOptions.map((f) => {
+              const isSelected = selectedFuel === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => onFuelChange(f.id)}
+                  className={`flex flex-col items-center justify-center py-1.5 px-2 rounded border text-center transition-all ${
+                    isSelected
+                      ? 'border-orange-500 bg-orange-950/30 text-orange-400 font-bold shadow-sm'
+                      : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:text-white hover:border-neutral-700'
+                  }`}
+                >
+                  <span className="text-xs">{f.icon} {f.label}</span>
+                  <span className="text-[9px] text-neutral-500 mt-0.5">{f.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Error de matrícula */}
+        {plateError && (
+          <div className="mt-2 flex items-center gap-1.5 text-xs text-red-400 bg-red-950/30 border border-red-900/50 rounded px-2.5 py-1.5">
+            <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+            <span>{plateError}</span>
+          </div>
+        )}
+
+        {/* Éxito de matrícula */}
+        {plateSuccess && (
+          <div className="mt-2.5 rounded border border-neutral-700 bg-neutral-900 p-2.5 text-xs shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="font-black text-sm text-white tracking-wider">
+                  {plateSuccess.formattedPlate}
+                </span>
+                <span className="text-[10px] text-neutral-400 bg-neutral-800 px-1.5 py-0.5 rounded">
+                  {plateSuccess.estimatedYear ? `Año estimado: ~${plateSuccess.estimatedYear}` : ''} ({plateSuccess.fuelLabel})
+                </span>
+              </div>
+
+              {/* Distintivo Badge */}
+              <span
+                className={`text-[11px] font-black uppercase px-2 py-0.5 rounded border ${
+                  plateSuccess.badge === 'CERO'
+                    ? 'bg-blue-950/60 text-blue-400 border-blue-500/50'
+                    : plateSuccess.badge === 'ECO'
+                    ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/50'
+                    : plateSuccess.badge === 'C'
+                    ? 'bg-green-950/60 text-green-400 border-green-500/50'
+                    : plateSuccess.badge === 'B'
+                    ? 'bg-amber-950/60 text-amber-400 border-amber-500/50'
+                    : 'bg-neutral-800 text-neutral-300 border-neutral-600'
+                }`}
+              >
+                {plateSuccess.badge === 'CERO'
+                  ? '0 CERO'
+                  : plateSuccess.badge === 'SIN_ETIQUETA'
+                  ? 'SIN ETIQUETA (A)'
+                  : `ETIQUETA ${plateSuccess.badge}`}
+              </span>
+            </div>
+            <p className="text-[11px] text-neutral-300 mt-1.5 leading-relaxed">
+              {plateSuccess.explanation}
+            </p>
+            <div className="mt-2 pt-2 border-t border-neutral-800 flex items-center justify-between text-[10px]">
+              <span className="text-amber-400/90 font-medium">
+                ⚠️ Es una estimación basada en serie de matriculación.
+              </span>
+              <a
+                href={plateSuccess.officialDgtUrl || 'https://sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/'}
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+                className="text-orange-400 hover:text-orange-300 underline font-semibold inline-flex items-center gap-1"
+              >
+                Confirmar en Sede DGT &rarr;
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Botonera de prueba rápida */}
       <div>
         <div className="flex items-center justify-between mb-2">
