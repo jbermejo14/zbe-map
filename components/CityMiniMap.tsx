@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { CityEvaluationResult } from '@/lib/zbe-engine';
+import { getMapTileConfig, MAP_TILE_MAX_ZOOM, MAP_TILE_SUBDOMAINS } from '@/lib/map-config';
+import { PERIMETER_UNAVAILABLE_TEXT } from '@/lib/city-verification';
+import { parsePolygonPoints } from '@/lib/polygon-quality';
 
 interface CityMiniMapProps {
   city: {
@@ -11,14 +13,32 @@ interface CityMiniMapProps {
     cityName?: string;
     polygon?: [number, number][] | string | null;
     status?: string;
+    /** Enlace municipal a mostrar cuando no hay perímetro; solo si la fuente es del ayuntamiento. */
+    officialUrl?: string | null;
+    sourceUrl?: string | null;
+    verificationStatus?: 'verified' | 'pending' | null;
   };
   height?: string;
   className?: string;
 }
 
+/** Zoom del mapa cuando no hay perímetro que encuadrar. */
+const MINI_MAP_NO_PERIMETER_ZOOM = 13;
+
+/** Enlaces solo http(s): evita inyectar esquemas como javascript: en el popup. */
+function buildUnavailablePopupHtml(officialUrl: string | null): string {
+  const link =
+    officialUrl && /^https?:///i.test(officialUrl)
+      ? `<br/><a href="${encodeURI(officialUrl)}" target="_blank" rel="nofollow noopener noreferrer">Ver fuente municipal</a>`
+      : '';
+  return `${PERIMETER_UNAVAILABLE_TEXT}${link}`;
+}
+
 export function CityMiniMap({ city, height = '260px', className = '' }: CityMiniMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
+  const officialUrl =
+    city.officialUrl ?? (city.verificationStatus === 'verified' ? (city.sourceUrl ?? null) : null);
 
   useEffect(() => {
     let isMounted = true;
@@ -34,36 +54,25 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
       }
 
       const isDark = document.documentElement.classList.contains('dark');
-      const tileUrl = isDark
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+      const tiles = getMapTileConfig();
+      const tileUrl = isDark ? tiles.darkUrl : tiles.lightUrl;
 
       const map = L.map(mapContainerRef.current, {
         center: [city.lat, city.lng],
         zoom: 13,
         zoomControl: true,
         scrollWheelZoom: false, // Evitar scroll accidental dentro de la vista detalle
-        attributionControl: false,
+        attributionControl: true,
       });
 
       L.tileLayer(tileUrl, {
-        maxZoom: 18,
-        subdomains: 'abcd',
+        maxZoom: MAP_TILE_MAX_ZOOM,
+        subdomains: MAP_TILE_SUBDOMAINS,
+        attribution: tiles.attribution,
       }).addTo(map);
 
       // Parsear polígono
-      let polygonCoords: [number, number][] = [];
-      if (city.polygon) {
-        if (typeof city.polygon === 'string') {
-          try {
-            polygonCoords = JSON.parse(city.polygon);
-          } catch {
-            polygonCoords = [];
-          }
-        } else if (Array.isArray(city.polygon)) {
-          polygonCoords = city.polygon;
-        }
-      }
+      const polygonCoords = parsePolygonPoints(city.polygon);
 
       const status = city.status || 'allowed';
       const color =
@@ -84,19 +93,8 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
           maxZoom: 14,
         });
       } else {
-        // Círculo aproximado si no tiene polígono definido
-        const circle = L.circle([city.lat, city.lng], {
-          radius: 900,
-          color: color,
-          weight: 2,
-          fillColor: color,
-          fillOpacity: 0.2,
-        }).addTo(map);
-
-        map.fitBounds(circle.getBounds(), {
-          padding: [25, 25],
-          maxZoom: 14,
-        });
+        // Sin perímetro real no se dibuja ninguna zona: solo el marcador central.
+        map.setView([city.lat, city.lng], MINI_MAP_NO_PERIMETER_ZOOM);
       }
 
       // Marcador central
@@ -107,7 +105,10 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
         iconAnchor: [6, 6],
       });
 
-      L.marker([city.lat, city.lng], { icon: markerIcon }).addTo(map);
+      const marker = L.marker([city.lat, city.lng], { icon: markerIcon }).addTo(map);
+      if (polygonCoords.length <= 2) {
+        marker.bindPopup(buildUnavailablePopupHtml(officialUrl)).openPopup();
+      }
 
       mapInstanceRef.current = map;
     });
@@ -121,6 +122,9 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
     };
   }, [city]);
 
+  const hasPolygon = parsePolygonPoints(city.polygon).length > 2;
+  const cityLabel = city.cityName || city.name || '';
+
   return (
     <div
       className={`relative w-full rounded-xl overflow-hidden border border-slate-200 dark:border-neutral-800 shadow-sm ${className}`}
@@ -128,7 +132,7 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
     >
       <div ref={mapContainerRef} className="w-full h-full" />
       <div className="absolute bottom-2 left-2 z-[400] bg-white/90 dark:bg-neutral-900/90 backdrop-blur px-2 py-0.5 rounded text-[10px] font-semibold text-neutral-600 dark:text-neutral-400 border border-slate-200 dark:border-neutral-800 pointer-events-none">
-        Perímetro ZBE {city.cityName || city.name || ''}
+        {hasPolygon ? `Perímetro ZBE ${cityLabel}` : PERIMETER_UNAVAILABLE_TEXT}
       </div>
     </div>
   );

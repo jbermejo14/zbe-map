@@ -5,6 +5,8 @@ import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
 import { DgtBadgeType, getBadgeMetadata } from '@/lib/zbe-engine';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
+import { SEO_CURRENT_YEAR } from '@/lib/seo';
+import { getVerificationText, isCityVerified } from '@/lib/city-verification';
 import {
   ChevronRight,
   MapPin,
@@ -74,8 +76,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `¿Puede entrar un coche con ${badgeInfo.label} en la ZBE de ${city.name}? (2025)`;
-  const description = `Consulta si los vehículos con ${badgeInfo.label} pueden circular o aparcar en la Zona de Bajas Emisiones de ${city.name}. Horarios (${city.schedule}), multa de ${city.fineAmount} €, parkings y excepciones.`;
+  const title = `¿Puede entrar un coche con ${badgeInfo.label} en la ZBE de ${city.name}? (${SEO_CURRENT_YEAR})`;
+  const description = isCityVerified(city)
+    ? `Consulta si los vehículos con ${badgeInfo.label} pueden circular o aparcar en la Zona de Bajas Emisiones de ${city.name}. Horarios (${city.schedule}), multa de ${city.fineAmount} €, parkings y excepciones.`
+    : `Normas orientativas, pendientes de verificar con la ordenanza municipal, sobre si los vehículos con ${badgeInfo.label} pueden circular o aparcar en la Zona de Bajas Emisiones de ${city.name}. Consulta al ayuntamiento horario y sanciones.`;
 
   return {
     title,
@@ -143,16 +147,20 @@ export default async function CityBadgePage({ params }: Props) {
           ? `Sí, los vehículos con ${badgeInfo.label} tienen acceso libre a la ZBE de ${city.name}.`
           : accessStatus === 'restricted'
           ? `El acceso está condicionado en la ZBE de ${city.name}: ${reason}`
-          : `No, los vehículos con ${badgeInfo.label} tienen prohibido el acceso a la ZBE de ${city.name} según la ordenanza municipal: ${reason}`
+          : `No, los vehículos con ${badgeInfo.label} tienen prohibido el acceso a la ZBE de ${city.name} según las normas orientativas: ${reason}`
       }`,
     },
     {
       question: `¿Cuál es el horario de la Zona de Bajas Emisiones en ${city.name}?`,
-      answer: `El horario de restricción fijado por el Ayuntamiento de ${city.name} es: ${city.schedule}.`,
+      answer: isCityVerified(city)
+        ? `El horario de restricción fijado por el Ayuntamiento de ${city.name} es: ${city.schedule}.`
+        : `Horario orientativo, pendiente de verificar con la ordenanza municipal de ${city.name}: ${city.schedule}.`,
     },
     {
       question: `¿A cuánto asciende la multa por entrar sin permiso en la ZBE de ${city.name}?`,
-      answer: `La sanción general en ${city.name} es de ${city.fineAmount} €, con posibilidad de reducción del 50% por pronto pago.`,
+      answer: isCityVerified(city)
+        ? `La sanción general en ${city.name} es de ${city.fineAmount} €, con posibilidad de reducción del 50% por pronto pago.`
+        : `Sanción orientativa de ${city.fineAmount} €, pendiente de verificar con la ordenanza municipal de ${city.name}.`,
     },
   ];
 
@@ -286,7 +294,7 @@ export default async function CityBadgePage({ params }: Props) {
         <div className="mt-6 pt-4 border-t border-neutral-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-neutral-400">
           <div className="flex items-center gap-2">
             <CalendarCheck2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
-            <span>Última verificación: <strong className="text-neutral-300">{city.lastVerified}</strong></span>
+            <span>{getVerificationText(city)}</span>
             {city.noticePeriod && (
               <span className="inline-flex items-center gap-1 text-amber-400 bg-amber-950/30 px-2 py-0.5 rounded text-[11px]">
                 <BellRing className="h-3 w-3" />
@@ -300,7 +308,7 @@ export default async function CityBadgePage({ params }: Props) {
             rel="nofollow noopener noreferrer"
             className="text-orange-400 hover:text-orange-300 underline font-medium inline-flex items-center gap-1"
           >
-            Fuente: {city.sourceName}
+            {isCityVerified(city) ? 'Fuente' : 'Enlace consultado'}: {city.sourceName}
             <ExternalLink className="h-3 w-3" />
           </a>
         </div>
@@ -310,7 +318,7 @@ export default async function CityBadgePage({ params }: Props) {
       <div className="mb-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6">
         <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-300 mb-3 flex items-center gap-1.5">
           <MapPin className="h-4 w-4 text-orange-400" />
-          Plano y Perímetro ZBE de {city.name}
+          {city.polygon ? `Perímetro ZBE de ${city.name}` : `Ubicación de la ZBE de ${city.name}`}
         </h2>
         <CityMiniMap
           city={{
@@ -319,6 +327,7 @@ export default async function CityBadgePage({ params }: Props) {
             name: city.name,
             cityName: city.name,
             polygon: city.polygon,
+            officialUrl: isCityVerified(city) ? city.sourceUrl : null,
             status: accessStatus,
           }}
           height="280px"

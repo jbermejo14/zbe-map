@@ -67,6 +67,9 @@ Definidas y documentadas en `.env.example`:
 | Variable | Descripción | Valor por defecto |
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_SITE_URL` | URL canónica base para SEO, canonical, sitemap y OpenGraph | `https://radar-zbe.es` |
+| `NEXT_PUBLIC_MAP_TILE_URL_LIGHT` | URL de teselas del tema claro | CARTO `light_all` |
+| `NEXT_PUBLIC_MAP_TILE_URL_DARK` | URL de teselas del tema oscuro | CARTO `dark_all` |
+| `NEXT_PUBLIC_MAP_ATTRIBUTION` | Atribución del mapa (HTML) | OpenStreetMap contributors y CARTO |
 | `AFFILIATE_CLICARS_TAG` | (Opcional) Tag de afiliación para el portal Clicars | *vacío* |
 | `AFFILIATE_RENTING_TAG` | (Opcional) Tag de afiliación para Renting Finders | *vacío* |
 | `AFFILIATE_TASACION_TAG` | (Opcional) Tag de afiliación para Compramostucoche | *vacío* |
@@ -139,3 +142,20 @@ npm run build
 # Iniciar servidor de producción
 npm start
 ```
+
+---
+
+## 🗺️ Mapas: proveedor de teselas y límites de uso
+
+Las teselas y la atribución se configuran con `NEXT_PUBLIC_MAP_TILE_URL_LIGHT`, `NEXT_PUBLIC_MAP_TILE_URL_DARK` y `NEXT_PUBLIC_MAP_ATTRIBUTION` (valores por defecto en `.env.example`). Por defecto se usan los basemaps de **CARTO** (`light_all` / `dark_all`), que no necesitan clave.
+
+Límites de uso a tener en cuenta:
+
+- Los basemaps públicos de CARTO se ofrecen sujetos a sus términos de servicio: están pensados para proyectos pequeños o no comerciales. Un uso comercial o con mucho tráfico requiere un plan de CARTO o un proveedor propio (comprueba sus condiciones vigentes antes de publicar).
+- La atribución a OpenStreetMap y CARTO es obligatoria y se muestra en el mapa; no la elimines.
+- Si el proveedor configurado exige clave, las teselas se muestran con la marca de agua "API KEY REQUIRED". Cambia la URL por una que no la exija o añade la clave en la variable.
+
+## 🛡️ Calidad de los datos
+
+- `polygon` es `null` cuando no existe un perímetro oficial real; el mapa muestra solo un marcador en el centro. La prueba `tests/city-data.test.ts` falla si algún polígono es regular o copia la forma de otra ciudad (`lib/polygon-quality.ts`).
+- `verificationStatus` es `verified` solo si `sourceUrl` es del ayuntamiento o de su boletín oficial; entonces `lastVerified` lleva fecha. Si no, es `pending`, `lastVerified` es `null` y la web muestra las normas como orientativas.

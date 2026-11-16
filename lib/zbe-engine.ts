@@ -47,6 +47,10 @@ export interface CityEvaluationResult {
   polygon?: [number, number][] | null;
   streets?: string[] | null;
   geoJSON?: any;
+  sourceUrl?: string | null;
+  sourceName?: string | null;
+  verificationStatus?: 'verified' | 'pending' | null;
+  lastVerified?: string | null;
 }
 
 export interface VehicleRecord {
@@ -414,6 +418,10 @@ export function evaluateCitiesForBadge(
     streets?: any;
     geoJSON?: any;
     rules?: any;
+    sourceUrl?: string | null;
+    sourceName?: string | null;
+    verificationStatus?: 'verified' | 'pending' | null;
+    lastVerified?: string | null;
   }>
 ): CityEvaluationResult[] {
   return cities.map((city) => {
@@ -507,6 +515,10 @@ export function evaluateCitiesForBadge(
       polygon: parsedPolygon,
       streets: parsedStreets,
       geoJSON: parsedGeoJSON,
+      sourceUrl: city.sourceUrl ?? null,
+      sourceName: city.sourceName ?? null,
+      verificationStatus: city.verificationStatus ?? null,
+      lastVerified: city.lastVerified ?? null,
     };
   });
 }

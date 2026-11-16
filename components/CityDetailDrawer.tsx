@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { CityEvaluationResult, DgtBadgeType, getAccessStatusPresentation } from '@/lib/zbe-engine';
+import { PENDING_VERIFICATION_TEXT, isCityVerified } from '@/lib/city-verification';
 import {
   X,
   MapPin,
@@ -136,11 +137,15 @@ export function CityDetailDrawer({
             </div>
           </div>
 
+          {!isCityVerified(city) && (
+            <p className="mt-2 text-[11px] text-amber-400">{PENDING_VERIFICATION_TEXT}</p>
+          )}
+
           {/* Mapa Compacto de la Ciudad en la Vista Detalle */}
           <div className="mt-3.5">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
-                Mapa ZBE {city.cityName}
+                {city.polygon ? `Mapa ZBE ${city.cityName}` : `Ubicación ZBE ${city.cityName}`}
               </span>
               <span className="text-[10px] text-orange-400 font-semibold truncate max-w-[200px]">
                 {city.perimeterName || 'Área Regulada'}

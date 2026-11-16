@@ -5,6 +5,8 @@ import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
 import { DgtBadgeType } from '@/lib/zbe-engine';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
+import { SEO_CURRENT_YEAR } from '@/lib/seo';
+import { getVerificationText, isCityVerified } from '@/lib/city-verification';
 import {
   ChevronRight,
   MapPin,
@@ -44,8 +46,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `ZBE ${city.name} 2025: Mapa, Horarios, Multas y Normativa DGT`;
-  const description = `Normativa y restricciones de la Zona de Bajas Emisiones en ${city.name} (${city.province}). Horario (${city.schedule}), multa de ${city.fineAmount} €, exenciones y acceso por etiqueta DGT.`;
+  const verified = isCityVerified(city);
+  const title = verified
+    ? `ZBE ${city.name} ${SEO_CURRENT_YEAR}: Mapa, Horarios, Multas y Normativa DGT`
+    : `ZBE ${city.name} ${SEO_CURRENT_YEAR}: Mapa y Normas Orientativas por Etiqueta DGT`;
+  const description = verified
+    ? `Normativa y restricciones de la Zona de Bajas Emisiones en ${city.name} (${city.province}). Horario (${city.schedule}), multa de ${city.fineAmount} €, exenciones y acceso por etiqueta DGT.`
+    : `Normas orientativas de la Zona de Bajas Emisiones en ${city.name} (${city.province}), pendientes de verificar con la ordenanza municipal. Acceso por etiqueta DGT; consulta al ayuntamiento horario y sanciones.`;
 
   return {
     title,
@@ -203,9 +210,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
         <div className="py-3 px-4 mt-4 rounded-lg bg-neutral-950/80 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-neutral-400">
           <div className="flex items-center gap-2">
             <CalendarCheck2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
-            <span>
-              Verificado el <strong className="text-neutral-200">{city.lastVerified}</strong>
-            </span>
+            <span>{getVerificationText(city)}</span>
             {city.noticePeriod && (
               <span className="inline-flex items-center gap-1 text-amber-400 bg-amber-950/30 px-2 py-0.5 rounded border border-amber-900/40 text-[11px]">
                 <BellRing className="h-3 w-3" />
@@ -214,7 +219,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
             )}
           </div>
           <div className="flex items-center gap-1.5">
-            <span>Fuente:</span>
+            <span>{isCityVerified(city) ? 'Fuente:' : 'Enlace consultado:'}</span>
             <a
               href={city.sourceUrl}
               target="_blank"
@@ -232,7 +237,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
           <div className="flex items-center justify-between mb-2.5">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-300 flex items-center gap-1.5">
               <MapPin className="h-4 w-4 text-orange-400" />
-              Perímetro ZBE {city.name}
+              {city.polygon ? `Perímetro ZBE ${city.name}` : `ZBE ${city.name}`}
             </span>
             <span className="text-xs text-neutral-400 font-medium">
               {city.perimeterName || `Límites municipales ZBE ${city.name}`}
@@ -245,6 +250,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
               name: city.name,
               cityName: city.name,
               polygon: city.polygon,
+              officialUrl: isCityVerified(city) ? city.sourceUrl : null,
               status: 'restricted',
             }}
             height="270px"

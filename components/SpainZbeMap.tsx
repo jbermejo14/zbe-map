@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { CityEvaluationResult, ZbeAccessStatus } from '@/lib/zbe-engine';
+import { getMapTileConfig, MAP_TILE_MAX_ZOOM, MAP_TILE_SUBDOMAINS } from '@/lib/map-config';
 import { Search, RotateCcw, Map, Moon, Satellite, Layers, Navigation, Compass } from 'lucide-react';
 
 interface SpainZbeMapProps {
@@ -237,34 +238,27 @@ export function SpainZbeMap({
 
     if (theme === 'carto') {
       // 1. CARTO Positron Minimalista (El estándar solicitado)
+      const tiles = getMapTileConfig();
       const cartoLayer = L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        tiles.lightUrl,
         {
-          attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-          subdomains: 'abcd',
-          maxZoom: 20,
+          attribution: tiles.attribution,
+          subdomains: MAP_TILE_SUBDOMAINS,
+          maxZoom: MAP_TILE_MAX_ZOOM,
         }
       );
       cartoLayer.addTo(map);
       currentTileLayersRef.current.push(cartoLayer);
     } else if (theme === 'dark') {
-      // 2. Esri / CARTO Dark Gray Canvas
-      const darkBase = L.tileLayer(
-        'https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-        {
-          attribution: '&copy; Esri, OpenStreetMap contributors',
-          maxZoom: 16,
-        }
-      );
-      const darkRef = L.tileLayer(
-        'https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
-        {
-          maxZoom: 16,
-        }
-      );
+      // 2. CARTO Dark Matter (URL y atribución configurables)
+      const tiles = getMapTileConfig();
+      const darkBase = L.tileLayer(tiles.darkUrl, {
+        attribution: tiles.attribution,
+        subdomains: MAP_TILE_SUBDOMAINS,
+        maxZoom: MAP_TILE_MAX_ZOOM,
+      });
       darkBase.addTo(map);
-      darkRef.addTo(map);
-      currentTileLayersRef.current.push(darkBase, darkRef);
+      currentTileLayersRef.current.push(darkBase);
     } else if (theme === 'osm') {
       // 3. OpenStreetMap
       const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

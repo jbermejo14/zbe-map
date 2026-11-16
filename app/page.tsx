@@ -2,20 +2,21 @@ import type { Metadata } from 'next';
 import { SplitDashboard } from '@/components/SplitDashboard';
 import { getAllCities, evaluateAllCities } from '@/lib/cities-repository';
 import { DgtBadgeType } from '@/lib/zbe-engine';
+import { SEO_CURRENT_YEAR } from '@/lib/seo';
 
 export const revalidate = 3600;
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://radar-zbe.es';
 
 export const metadata: Metadata = {
-  title: 'Radar ZBE España 2025: Mapa y Restricciones de Bajas Emisiones',
+  title: `Radar ZBE España ${SEO_CURRENT_YEAR}: Mapa y Restricciones de Bajas Emisiones`,
   description:
-    'Comprueba si tu vehículo puede circular o aparcar en las 152 Zonas de Bajas Emisiones (ZBE) de España según su distintivo DGT. Perímetros, horarios y multas verificadas.',
+    'Comprueba si tu vehículo puede circular o aparcar en las 152 Zonas de Bajas Emisiones (ZBE) de España según su distintivo DGT. Perímetros oficiales cuando están disponibles; el resto de datos, orientativos hasta su verificación.',
   alternates: {
     canonical: siteUrl,
   },
   openGraph: {
-    title: 'Radar ZBE España 2025: Mapa y Restricciones de Bajas Emisiones',
+    title: `Radar ZBE España ${SEO_CURRENT_YEAR}: Mapa y Restricciones de Bajas Emisiones`,
     description:
       'Comprueba si tu vehículo puede circular o aparcar en las 152 Zonas de Bajas Emisiones (ZBE) de España según su distintivo DGT.',
     url: siteUrl,
@@ -49,7 +50,7 @@ export default function HomePage() {
       {/* Hero Headline */}
       <div className="text-center max-w-2xl mx-auto mb-6">
         <div className="inline-flex items-center gap-1.5 rounded bg-orange-950/30 border border-orange-500/40 px-2.5 py-0.5 text-xs font-semibold text-orange-400 mb-2.5">
-          <span>Perímetros ZBE actualizados a 2025</span>
+          <span>Perímetros ZBE actualizados a {SEO_CURRENT_YEAR}</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
           ¿Dónde puede circular tu coche?{' '}

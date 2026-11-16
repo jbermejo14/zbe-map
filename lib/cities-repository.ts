@@ -1,6 +1,7 @@
 import citiesJson from '../data/zbe-cities.json' with { type: 'json' };
 import type { DgtBadgeType, ZbeAccessStatus, CityEvaluationResult } from './zbe-engine.ts';
 import { evaluateCitiesForBadge } from './zbe-engine.ts';
+import type { VerificationStatus } from './city-verification.ts';
 
 export interface CityRule {
   status: ZbeAccessStatus;
@@ -29,7 +30,8 @@ export interface CityData {
   geoJSON?: any;
   sourceUrl: string;
   sourceName: string;
-  lastVerified: string;
+  verificationStatus: VerificationStatus;
+  lastVerified: string | null;
   noticePeriod?: string | null;
 }
 
