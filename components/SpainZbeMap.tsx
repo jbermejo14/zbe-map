@@ -377,6 +377,13 @@ export function SpainZbeMap({
     }
   };
 
+  const focusBarcelona = () => {
+    const bcn = cities.find((c) => c.cityId === 'barcelona');
+    if (bcn) {
+      onCitySelect(bcn);
+    }
+  };
+
   const focusHuesca = () => {
     const hsc = cities.find((c) => c.cityId === 'huesca');
     if (hsc) {
@@ -453,6 +460,16 @@ export function SpainZbeMap({
 
         {/* Accesos directos de prueba y controles */}
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Botón directo para probar Barcelona */}
+          <button
+            type="button"
+            onClick={focusBarcelona}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-neutral-900 text-neutral-300 hover:text-white border border-neutral-800 transition-colors"
+            title="Ver trazado oficial ZBE Rondas de Barcelona (77,5 km²)"
+          >
+            <span>Barcelona</span>
+          </button>
+
           {/* Botón directo para probar Zaragoza */}
           <button
             type="button"
