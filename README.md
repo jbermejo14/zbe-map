@@ -1,8 +1,10 @@
-# Radar ZBE España 🚗🗺️
+# Ododex · Zonas de Bajas Emisiones (ZBE) 🚗🗺️
 
-**Radar ZBE España** ([radar-zbe.es](https://radar-zbe.es)) es una plataforma web y motor de SEO programático diseñada para que cualquier conductor en España consulte con veracidad y transparencia las restricciones de acceso, circulación y estacionamiento en las **152 Zonas de Bajas Emisiones (ZBE)** obligatorias bajo la Ley 7/2021 de Cambio Climático.
+Sección de la red **Ododex**, publicada en **https://ododex.com/es/zbe**. Es una plataforma web y motor de SEO programático diseñada para que cualquier conductor en España consulte con veracidad y transparencia las restricciones de acceso, circulación y estacionamiento en las **152 Zonas de Bajas Emisiones (ZBE)** obligatorias bajo la Ley 7/2021 de Cambio Climático.
 
 Toda la lógica de clasificación de distintivos ambientales se rige estrictamente por la **Resolución de 13 de abril de 2016 de la Dirección General de Tráfico (BOE núm. 96)**, y las normativas municipales cuentan con fuente oficial enlazada y fecha de verificación.
+
+Es un sitio estático (`output: 'export'`) bajo la ruta base `/es/zbe`, sin servidor: todos los cálculos (evaluación por etiqueta, selector de vehículo, recomendaciones y estimación por matrícula) se ejecutan en el navegador. Lo ensambla y publica en Cloudflare el proyecto hermano `../ododex-sitio`. El diseño está en [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ---
 
@@ -26,13 +28,14 @@ Toda la lógica de clasificación de distintivos ambientales se rige estrictamen
 
 4. **SEO Programático Basado en Reglas Legales:**
    - `/etiqueta-dgt/[combustible]/[año]`: Clasificación ambiental oficial con desglose completo del acceso en las 152 ciudades de España (permitidas, restringidas y prohibidas).
-   - `/zbe/[ciudad]/[etiqueta]`: Respuesta precisa y estructurada a la consulta "¿Puede entrar un coche con etiqueta X en la ZBE de Y?", con horario, multa y parking.
-   - `/zbe/[ciudad]`: Guía integral de la ZBE del municipio con mapa interactivo y matriz de las 5 etiquetas.
-   - Redirecciones permanentes 301 para URLs antiguas o descatalogadas.
-   - Más de 1.000 páginas generadas estáticamente en el build (`SSG`).
+   - `/[ciudad]/[etiqueta]`: Respuesta precisa y estructurada a la consulta "¿Puede entrar un coche con etiqueta X en la ZBE de Y?", con horario, multa y parking.
+   - `/[ciudad]`: Guía integral de la ZBE del municipio con mapa interactivo y matriz de las 5 etiquetas.
+   - Todas las rutas cuelgan de `/es/zbe` (p. ej. `https://ododex.com/es/zbe/madrid/b`).
+   - Unas 1.090 páginas generadas estáticamente en el build.
 
-5. **Arquitectura Serverless Sin Base de Datos en Runtime:**
-   - Se ha eliminado la dependencia de SQLite y Prisma en runtime. Los datos se leen directamente de JSONs versionados en el repositorio (`data/zbe-cities.json` y `data/reference-vehicles.json`), garantizando compatibilidad 100% con Vercel, Cloudflare Pages o Docker.
+5. **Sin servidor ni base de datos:**
+   - Los datos se leen de JSON versionados (`data/zbe-cities.json` y `data/reference-vehicles.json`). Prisma solo lo usan los scripts antiguos de `scripts/` (dependencia de desarrollo).
+   - Los polígonos de las 152 ciudades solo se descargan en la página del mapa nacional (`import()` dinámico).
 
 6. **Monetización Honesta:**
    - Sin precios inventados ni parámetros de tracking ficticios.
@@ -51,8 +54,8 @@ Toda la lógica de clasificación de distintivos ambientales se rige estrictamen
 # 1. Clonar el repositorio y entrar en el directorio
 cd zbe-map
 
-# 2. Instalar dependencias
-npm install
+# 2. Instalar dependencias (--force: en Windows hace falta para @tailwindcss/oxide-wasm32-wasi)
+npm install --force
 
 # 3. Configurar variables de entorno
 cp .env.example .env.local
@@ -66,13 +69,13 @@ Definidas y documentadas en `.env.example`:
 
 | Variable | Descripción | Valor por defecto |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_SITE_URL` | URL canónica base para SEO, canonical, sitemap y OpenGraph | `https://radar-zbe.es` |
-| `NEXT_PUBLIC_MAP_TILE_URL_LIGHT` | URL de teselas del tema claro | CARTO `light_all` |
-| `NEXT_PUBLIC_MAP_TILE_URL_DARK` | URL de teselas del tema oscuro | CARTO `dark_all` |
-| `NEXT_PUBLIC_MAP_ATTRIBUTION` | Atribución del mapa (HTML) | OpenStreetMap contributors y CARTO |
-| `AFFILIATE_CLICARS_TAG` | (Opcional) Tag de afiliación para el portal Clicars | *vacío* |
-| `AFFILIATE_RENTING_TAG` | (Opcional) Tag de afiliación para Renting Finders | *vacío* |
-| `AFFILIATE_TASACION_TAG` | (Opcional) Tag de afiliación para Compramostucoche | *vacío* |
+| `NEXT_PUBLIC_SITE_URL` | Origen sin barra final para canonical, sitemap y OpenGraph. En producción, `https://ododex.com` | `http://localhost:3000` |
+| `NEXT_PUBLIC_ADSENSE_CLIENT` | Editor de AdSense (`ca-pub-` y 16 dígitos). Vacía: sin AdSense ni botón de cookies | *vacío* |
+| `NEXT_PUBLIC_AFFILIATE_CLICARS_TAG` | (Opcional) Tag de afiliación para el portal Clicars | *vacío* |
+| `NEXT_PUBLIC_AFFILIATE_RENTING_TAG` | (Opcional) Tag de afiliación para Renting Finders | *vacío* |
+| `NEXT_PUBLIC_AFFILIATE_TASACION_TAG` | (Opcional) Tag de afiliación para Compramostucoche | *vacío* |
+
+Las etiquetas de afiliación llevan el prefijo `NEXT_PUBLIC_` porque los enlaces se generan en el navegador: acaban en el JavaScript público, igual que antes acababan en los enlaces. `../ododex-sitio` pasa `NEXT_PUBLIC_SITE_URL` y `NEXT_PUBLIC_ADSENSE_CLIENT` al compilar para producción.
 
 ---
 
@@ -133,27 +136,26 @@ Para actualizar o añadir una ordenanza municipal:
 ## 🚀 Despliegue y Build
 
 ```bash
-# Modo desarrollo local (puerto 3000)
 npm run dev
-
-# Compilar para producción (SSG)
-npm run build
-
-# Iniciar servidor de producción
-npm start
 ```
+
+En desarrollo la web está en `http://localhost:3000/es/zbe`.
+
+```bash
+npm run build
+```
+
+Exporta el sitio en `out/` (`next build --webpack`; en Windows con Control de Aplicaciones los binarios nativos de SWC y Tailwind están bloqueados y se usan los WASM). Con exportación estática no hay `npm start`: para verlo como en producción, `npm run preview` en `../ododex-sitio`, que también lo despliega.
 
 ---
 
 ## 🗺️ Mapas: proveedor de teselas y límites de uso
 
-Las teselas y la atribución se configuran con `NEXT_PUBLIC_MAP_TILE_URL_LIGHT`, `NEXT_PUBLIC_MAP_TILE_URL_DARK` y `NEXT_PUBLIC_MAP_ATTRIBUTION` (valores por defecto en `.env.example`). Por defecto se usan los basemaps de **CARTO** (`light_all` / `dark_all`), que no necesitan clave.
+Las capas están en `lib/map-config.ts`: **OpenStreetMap** por defecto (en los dos temas) y **Satélite** de Esri como alternativa.
 
-Límites de uso a tener en cuenta:
-
-- Los basemaps públicos de CARTO se ofrecen sujetos a sus términos de servicio: están pensados para proyectos pequeños o no comerciales. Un uso comercial o con mucho tráfico requiere un plan de CARTO o un proveedor propio (comprueba sus condiciones vigentes antes de publicar).
-- La atribución a OpenStreetMap y CARTO es obligatoria y se muestra en el mapa; no la elimines.
-- Si el proveedor configurado exige clave, las teselas se muestran con la marca de agua "API KEY REQUIRED". Cambia la URL por una que no la exija o añade la clave en la variable.
+- Se retiraron los basemaps de CARTO: ahora exigen clave de API y sin ella muestran teselas con la marca "API KEY REQUIRED".
+- Las teselas de OpenStreetMap están sujetas a su política de uso (tráfico moderado, sin descargas masivas). Si el tráfico crece mucho, habrá que pasar a un proveedor con plan propio.
+- Las atribuciones (OpenStreetMap y Esri) se muestran en el mapa y son obligatorias; no las elimines.
 
 ## 🛡️ Calidad de los datos
 
