@@ -33,9 +33,12 @@ export default function PrivacidadPage() {
 
         <h2>Qué datos se tratan</h2>
         <p>
-          Esta web no tiene cuentas de usuario ni envía formularios a ningún servidor. La matrícula que escribes se procesa solo en tu navegador y no se envía a ningún servidor: la estimación de la etiqueta DGT se calcula en tu dispositivo. Lo mismo ocurre con el vehículo que eliges. El tema claro u oscuro se guarda en el almacenamiento local de tu navegador.
+          Esta web no tiene cuentas de usuario ni envía formularios a ningún servidor. El vehículo que eliges (marca, combustible y año) y la matrícula, si la escribes para estimar el año, se procesan solo en tu navegador: no se envían a ningún servidor ni se guardan. La etiqueta DGT se calcula en tu dispositivo. El tema claro u oscuro se guarda en el almacenamiento local de tu navegador.
         </p>
         <ul>
+          <li>
+            Ubicación: solo si pulsas «Mi ubicación», tu navegador te pide permiso para conocer tu posición. Se usa únicamente en tu navegador para centrar el mapa y calcular la ZBE más cercana; no se envía a ningún servidor ni se guarda.
+          </li>
           <li>
             Mapas: para dibujar el mapa, tu navegador pide imágenes (teselas) a tile.openstreetmap.org, servicio de la Fundación OpenStreetMap. Ese tercero recibe tu dirección IP y los datos técnicos de la petición. No instala cookies. La base jurídica es el interés legítimo de mostrar el mapa.
           </li>

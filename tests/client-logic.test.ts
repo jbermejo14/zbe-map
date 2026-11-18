@@ -6,8 +6,6 @@ import {
   DEFAULT_RECOMMENDATION_BODY_TYPE,
   DEFAULT_RECOMMENDATION_POWER_KW,
   DEFAULT_RECOMMENDATION_WHEELBASE_MM,
-  lookupPlateForForm,
-  PLATE_TOO_SHORT_MESSAGE,
 } from '../lib/client-logic.ts';
 import {
   getBrands,
@@ -133,34 +131,4 @@ test('recomendaciones: sin vehículo conocido usa los parámetros o el perfil po
     powerKw: DEFAULT_RECOMMENDATION_POWER_KW,
   });
   assert.equal(getVehicleById('id-que-no-existe'), undefined);
-});
-
-// /api/plate: matrícula corta o inválida daba error 400 con el mensaje; la válida, el resultado.
-test('matrícula válida moderna: devuelve etiqueta, año estimado y matrícula formateada', async () => {
-  const result = await lookupPlateForForm('1234 lmn', 'gasolina');
-  assert.equal(result.plate, '1234LMN');
-  assert.equal(result.formattedPlate, '1234 LMN');
-  assert.equal(result.confidence, 'estimation');
-  assert.ok(result.estimatedYear >= 2000);
-  assert.ok(ALL_BADGES.includes(result.badge));
-});
-
-test('matrícula provincial: sin etiqueta', async () => {
-  const result = await lookupPlateForForm('M-1234-AB', 'diesel');
-  assert.equal(result.badge, 'SIN_ETIQUETA');
-  assert.equal(result.confidence, 'provincial_vintage');
-});
-
-test('matrícula con combustible desconocido se trata como gasolina', async () => {
-  const unknownFuel = await lookupPlateForForm('1234 LMN', 'fusion');
-  const gasoline = await lookupPlateForForm('1234 LMN', 'gasolina');
-  assert.deepEqual(unknownFuel, gasoline);
-});
-
-test('matrícula corta: error con el mensaje de la API', async () => {
-  await assert.rejects(() => lookupPlateForForm(' 12 ', 'gasolina'), { message: PLATE_TOO_SHORT_MESSAGE });
-});
-
-test('matrícula con formato inválido: error explícito, no se silencia', async () => {
-  await assert.rejects(() => lookupPlateForForm('1234 AEI', 'gasolina'), /Formato de matrícula española no válido/);
 });

@@ -67,9 +67,11 @@ test('aviso legal: sitio no oficial de la DGT ni de los ayuntamientos, sin resto
   }
 });
 
-test('privacidad: matrícula solo en el navegador; teselas de OpenStreetMap y Esri; AdSense con consentimiento', () => {
+test('privacidad: vehículo y ubicación solo en el navegador, matrícula solo en el navegador; teselas de OpenStreetMap y Esri; AdSense con consentimiento', () => {
   const html = renderToStaticMarkup(<PrivacidadPage />);
-  assert.match(html, /matrícula que escribes se procesa solo en tu navegador y no se envía a ningún servidor/);
+  assert.match(html, /vehículo que eliges[^<]*se procesan solo en tu navegador/);
+  assert.match(html, /«Mi ubicación»[^<]*no se envía a ningún servidor ni se guarda/);
+  assert.match(html, /matrícula, si la escribes[^<]*no se envían a ningún servidor ni se guardan/);
   assert.match(html, /tile\.openstreetmap\.org/);
   assert.match(html, /services\.arcgisonline\.com/);
   assert.match(html, /AdSense[^<]*solo si das tu consentimiento/);

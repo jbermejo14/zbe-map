@@ -5,17 +5,6 @@
 import { findEquivalentEcoCars } from './zbe-engine.ts';
 import type { VehicleRecord } from './zbe-engine.ts';
 import { getEcoCandidates, getVehicleById } from './vehicles-repository.ts';
-import { lookupPlate } from './plate-lookup.ts';
-import type { FuelType, PlateLookupResult } from './plate-lookup.ts';
-
-/** Longitud mínima de una matrícula para intentar la consulta. */
-export const PLATE_MIN_LENGTH = 4;
-
-export const PLATE_TOO_SHORT_MESSAGE =
-  'Debes proporcionar una matrícula válida (ej. 1234 LMN o M 1234 AB)';
-
-const DEFAULT_FUEL: FuelType = 'gasolina';
-const VALID_FUELS: FuelType[] = ['gasolina', 'diesel', 'hibrido', 'electrico', 'auto'];
 
 /** Perfil de partida de las recomendaciones cuando no se conoce el vehículo. */
 export const DEFAULT_RECOMMENDATION_BODY_TYPE = 'Compacto';
@@ -53,18 +42,6 @@ export interface EnrichedRecommendation extends VehicleRecord {
 export interface RecommendationsResult {
   target: RecommendationTarget;
   recommendations: EnrichedRecommendation[];
-}
-
-/**
- * Consulta de matrícula. Lanza Error con el motivo (matrícula corta o con formato
- * no válido) para que la interfaz lo muestre. Un combustible desconocido se trata como gasolina.
- */
-export async function lookupPlateForForm(plate: string, fuel: string): Promise<PlateLookupResult> {
-  if (plate.trim().length < PLATE_MIN_LENGTH) {
-    throw new Error(PLATE_TOO_SHORT_MESSAGE);
-  }
-  const selectedFuel = VALID_FUELS.includes(fuel as FuelType) ? (fuel as FuelType) : DEFAULT_FUEL;
-  return lookupPlate(plate, selectedFuel);
 }
 
 function resolveRecommendationTarget(input: RecommendationInput): RecommendationTarget {

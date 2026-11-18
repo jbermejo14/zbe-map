@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { SplitDashboard } from '@/components/SplitDashboard';
 import { absoluteUrl, SECTION_NAME, SITE_NAME } from '@/lib/site';
-import { DgtBadgeType } from '@/lib/zbe-engine';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
 
 const homeUrl = absoluteUrl('/');
@@ -24,8 +23,6 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const fallbackBadge: DgtBadgeType = 'B';
-
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
@@ -56,16 +53,13 @@ export default function HomePage() {
           </span>
         </h1>
         <p className="mt-2 text-xs sm:text-sm text-secondary leading-relaxed max-w-xl mx-auto">
-          Selecciona tu coche o etiqueta DGT y visualiza en el mapa el perímetro
+          Elige la marca, el combustible y el año de tu coche y visualiza en el mapa el perímetro
           de cada Zona de Bajas Emisiones (ZBE), con horarios, condiciones de parking y multas.
         </p>
       </div>
 
       {/* Split Dashboard */}
-      <SplitDashboard
-        initialVehicle={null}
-        initialBadge={fallbackBadge}
-      />
+      <SplitDashboard />
     </div>
   );
 }

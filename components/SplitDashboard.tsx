@@ -1,19 +1,24 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import {
-  DgtBadgeType,
-  CityEvaluationResult,
-  ZbeAccessStatus,
-} from '@/lib/zbe-engine';
-import { searchVehicles } from '@/lib/vehicles-repository';
+import { evaluateCitiesForBadge } from '@/lib/zbe-engine';
+import type { CityEvaluationResult, DgtBadgeType, ZbeAccessStatus } from '@/lib/zbe-engine';
+import type { CityData } from '@/lib/cities-repository';
 import { zbeUiBadgeChipClass, zbeUiBadgeSentenceLabel } from '@/lib/zbe-ui';
+import {
+  EMPTY_VEHICLE_SELECTION,
+  FUEL_QUESTION,
+  evaluateVehicleSelection,
+  selectionNeedsFuel,
+} from '@/lib/vehicle-selection';
+import type { VehicleSelection } from '@/lib/vehicle-selection';
 import { VehicleSelector } from './VehicleSelector';
-import { VehicleBadgeCard } from './VehicleBadgeCard';
+import { VehicleResultCard, VehicleResultPlaceholder } from './VehicleResultCard';
 import { CityDetailDrawer } from './CityDetailDrawer';
+import { MultiCitySelector } from './MultiCitySelector';
 import { RecommendationsSection } from './RecommendationsSection';
-import { Check, AlertTriangle, X, Shield, MapPin } from 'lucide-react';
+import { Check, AlertTriangle, X } from 'lucide-react';
 
 const SpainZbeMap = dynamic(
   () => import('./SpainZbeMap').then((mod) => mod.SpainZbeMap),
@@ -30,120 +35,99 @@ const SpainZbeMap = dynamic(
   }
 );
 
-/** Vehículo que se selecciona al abrir la página. */
-const DEFAULT_VEHICLE_QUERY = 'A4';
+/** Sin etiqueta no hay acceso que calcular; este valor solo sirve para obtener la geometría de las ciudades. */
+const GEOMETRY_ONLY_BADGE: DgtBadgeType = 'B';
 
-/** Primer vehículo de la búsqueda de ejemplo; la búsqueda mira marca, modelo y versión por separado. */
-function splitDashboardDefaultVehicle() {
-  return searchVehicles(DEFAULT_VEHICLE_QUERY)[0] ?? null;
-}
+const EMPTY_STATE_TEXT = 'Elige tu vehículo (marca, combustible y año) para ver dónde puedes circular';
+const COUNT_PLACEHOLDER = '—';
+const CITIES_LOAD_ERROR =
+  'No se pudieron cargar los datos de las ciudades ZBE. Recarga la página; si persiste, vuelve a intentarlo más tarde.';
 
-interface SplitDashboardProps {
-  initialVehicle?: any;
-  initialBadge?: DgtBadgeType;
-}
-
-export function SplitDashboard({
-  initialVehicle = null,
-  initialBadge = 'B',
-}: SplitDashboardProps) {
-  // El vehículo inicial se fija en el primer render para que el HTML exportado ya traiga su resultado.
-  const [startVehicle] = useState<any>(() => initialVehicle ?? splitDashboardDefaultVehicle());
-  const [currentBadge, setCurrentBadge] = useState<DgtBadgeType>(
-    () => (startVehicle?.dgtBadge as DgtBadgeType | undefined) ?? initialBadge
+function DashboardCount({ label, value, icon, colorClass }: {
+  label: string;
+  value: string | number;
+  icon: React.ReactNode;
+  colorClass: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center px-4 py-2 rounded bg-elevated border border-line text-center">
+      <span className={`flex items-center gap-1 text-[11px] font-semibold ${colorClass}`}>
+        {icon}
+        {label}
+      </span>
+      <span className="text-xl font-black text-fg">{value}</span>
+    </div>
   );
-  const [selectedVehicle, setSelectedVehicle] = useState<any>(startVehicle);
-  const [cities, setCities] = useState<CityEvaluationResult[]>([]);
-  const [loadingCities, setLoadingCities] = useState(true);
+}
+
+export function SplitDashboard() {
+  const [selection, setSelection] = useState<VehicleSelection>(EMPTY_VEHICLE_SELECTION);
+  const [allCities, setAllCities] = useState<CityData[] | null>(null);
   const [citiesError, setCitiesError] = useState<string | null>(null);
-  const [selectedCity, setSelectedCity] = useState<CityEvaluationResult | null>(null);
+  const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | ZbeAccessStatus>('all');
 
-  // Evaluar las ciudades cuando cambia el distintivo. Los datos (con polígonos, ~400 KB)
-  // se importan de forma dinámica para que no entren en el JS inicial de la página.
+  const result = useMemo(() => evaluateVehicleSelection(selection), [selection]);
+  const currentBadge = result?.badge ?? null;
+
+  // Los datos de las ciudades (con polígonos, ~400 KB) se importan de forma dinámica
+  // para que no entren en el JS inicial de la página.
   useEffect(() => {
     let isCurrent = true;
-    setLoadingCities(true);
-    setCitiesError(null);
-
     import('@/lib/cities-repository')
-      .then(({ evaluateAllCities }) => {
-        if (isCurrent) setCities(evaluateAllCities(currentBadge));
+      .then(({ getAllCities }) => {
+        if (isCurrent) setAllCities(getAllCities());
       })
       .catch((err: unknown) => {
         console.error('Error cargando las ciudades ZBE:', err);
-        if (isCurrent) {
-          setCitiesError(
-            'No se pudieron cargar los datos de las ciudades ZBE. Recarga la página; si persiste, vuelve a intentarlo más tarde.'
-          );
-        }
-      })
-      .finally(() => {
-        if (isCurrent) setLoadingCities(false);
+        if (isCurrent) setCitiesError(CITIES_LOAD_ERROR);
       });
-
     return () => {
       isCurrent = false;
     };
-  }, [currentBadge]);
+  }, []);
 
-  // Contadores
-  const allowedCount = cities.filter((c) => c.status === 'allowed').length;
-  const restrictedCount = cities.filter((c) => c.status === 'restricted').length;
-  const bannedCount = cities.filter((c) => c.status === 'banned').length;
+  const cities: CityEvaluationResult[] = useMemo(
+    () => (allCities ? evaluateCitiesForBadge(currentBadge ?? GEOMETRY_ONLY_BADGE, allCities) : []),
+    [allCities, currentBadge]
+  );
+  const selectedCity = cities.find((city) => city.cityId === selectedCityId) ?? null;
 
-  const vehicleDisplayName = selectedVehicle
-    ? `${selectedVehicle.brand} ${selectedVehicle.model}`
-    : `Vehículo Etiqueta ${currentBadge}`;
+  const countOf = (status: ZbeAccessStatus) => {
+    if (!currentBadge || !allCities) return COUNT_PLACEHOLDER;
+    return cities.filter((c) => c.status === status).length;
+  };
 
   return (
     <div className="w-full">
       {/* Barra de resumen superior */}
       <div className="mb-6 rounded-xl border border-line bg-surface p-4 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="h-2 w-2 rounded-full bg-accent" />
               <span className="text-[11px] font-bold text-muted uppercase tracking-wider">
                 Veredicto Nacional ZBE
               </span>
             </div>
-            <h2 className="text-base sm:text-lg font-bold text-fg">
-              {vehicleDisplayName} &middot;{' '}
-              <span className={`${zbeUiBadgeChipClass(currentBadge)} font-black px-2 py-0.5 rounded`}>
-                {zbeUiBadgeSentenceLabel(currentBadge)}
-              </span>
+            <h2 className="text-base sm:text-lg font-bold text-fg break-words">
+              {result && currentBadge ? (
+                <>
+                  {result.title} &middot;{' '}
+                  <span className={`${zbeUiBadgeChipClass(currentBadge)} font-black px-2 py-0.5 rounded`}>
+                    {zbeUiBadgeSentenceLabel(currentBadge)}
+                  </span>
+                </>
+              ) : (
+                EMPTY_STATE_TEXT
+              )}
             </h2>
           </div>
 
-          {/* Estadísticas de ciudades */}
           <div className="grid grid-cols-3 gap-2 flex-shrink-0">
-            {/* Permitidas */}
-            <div className="flex flex-col items-center justify-center px-4 py-2 rounded bg-elevated border border-line text-center">
-              <span className="flex items-center gap-1 text-[11px] font-semibold text-positive">
-                <Check className="h-3 w-3" />
-                Libre
-              </span>
-              <span className="text-xl font-black text-fg">{loadingCities ? '…' : allowedCount}</span>
-            </div>
-
-            {/* Restringidas */}
-            <div className="flex flex-col items-center justify-center px-4 py-2 rounded bg-elevated border border-line text-center">
-              <span className="flex items-center gap-1 text-[11px] font-semibold text-warning">
-                <AlertTriangle className="h-3 w-3" />
-                Parking
-              </span>
-              <span className="text-xl font-black text-fg">{loadingCities ? '…' : restrictedCount}</span>
-            </div>
-
-            {/* Prohibidas */}
-            <div className="flex flex-col items-center justify-center px-4 py-2 rounded bg-elevated border border-line text-center">
-              <span className="flex items-center gap-1 text-[11px] font-semibold text-negative">
-                <X className="h-3 w-3" />
-                Vetado
-              </span>
-              <span className="text-xl font-black text-fg">{loadingCities ? '…' : bannedCount}</span>
-            </div>
+            <DashboardCount label="Libre" value={countOf('allowed')} colorClass="text-positive" icon={<Check className="h-3 w-3" aria-hidden="true" />} />
+            <DashboardCount label="Parking" value={countOf('restricted')} colorClass="text-warning" icon={<AlertTriangle className="h-3 w-3" aria-hidden="true" />} />
+            <DashboardCount label="Vetado" value={countOf('banned')} colorClass="text-negative" icon={<X className="h-3 w-3" aria-hidden="true" />} />
           </div>
         </div>
       </div>
@@ -154,75 +138,68 @@ export function SplitDashboard({
         </div>
       )}
 
-      {/* Split View Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* PANEL IZQUIERDO: Selector de Vehículo & Ficha DGT */}
+        {/* PANEL IZQUIERDO: selector de vehículo y resultado */}
         <div className="lg:col-span-5 min-w-0 space-y-6">
           <div id="buscador" className="anchor-target card card-compact">
             <h3 className="text-sm font-bold text-fg uppercase tracking-wider mb-3">
-              Selector de Vehículo DGT
+              Tu vehículo
             </h3>
-
             <VehicleSelector
-              currentBadge={currentBadge}
-              onBadgeSelect={(badge) => {
-                setCurrentBadge(badge);
+              selection={selection}
+              onSelectionChange={setSelection}
+              onReset={() => {
+                setSelection(EMPTY_VEHICLE_SELECTION);
+                setSelectedCityId(null);
+                setStatusFilter('all');
               }}
-              onVehicleSelect={(veh) => {
-                setSelectedVehicle(veh);
-              }}
-              selectedVehicle={selectedVehicle}
             />
           </div>
 
-          {/* Ficha Técnica */}
-          {selectedVehicle ? (
-            <VehicleBadgeCard vehicle={selectedVehicle} />
+          {result ? (
+            <VehicleResultCard
+              badge={result.badge}
+              title={result.title}
+              chips={[String(result.year), ...(result.fuelLabel ? [result.fuelLabel] : [])]}
+              description={result.evaluation.description}
+              euroStandard={result.evaluation.euroStandard}
+              etiquetaHref={result.etiquetaHref}
+              assumptions={result.assumptions}
+            />
           ) : (
-            <VehicleBadgeCard
-              vehicle={{
-                brand: 'Simulación',
-                model: `Etiqueta ${currentBadge}`,
-                version: 'Perfil de homologación DGT',
-                year: 2024,
-                propulsionCode: currentBadge === 'CERO' ? 'BEV' : currentBadge === 'ECO' ? 'HEV' : 'GASOLINA',
-                euroNorm: currentBadge === 'CERO' ? 'Cero Emisiones' : currentBadge === 'B' ? 'Euro 4' : 'Euro 6',
-                dgtBadge: currentBadge,
-                powerKw: 100,
-                powerCv: 136,
-                bodyType: 'Turismo',
-                wheelbaseMm: 2650,
-              }}
+            <VehicleResultPlaceholder
+              message={selectionNeedsFuel(selection) ? FUEL_QUESTION : undefined}
             />
           )}
         </div>
 
-        {/* PANEL DERECHO: Mapa de España con Líneas ZBE */}
-        <div id="ciudades" className="anchor-target lg:col-span-7 flex flex-col h-full min-h-[580px] min-w-0">
+        {/* PANEL DERECHO: mapa de España con los perímetros ZBE */}
+        <div id="mapa" className="anchor-target lg:col-span-7 flex flex-col h-full min-h-[580px] min-w-0">
           <SpainZbeMap
             cities={cities}
+            badge={currentBadge}
             selectedCity={selectedCity}
-            onCitySelect={(city) => setSelectedCity(city)}
+            onCitySelect={(city) => setSelectedCityId(city.cityId)}
             statusFilter={statusFilter}
-            onFilterChange={(f) => setStatusFilter(f)}
+            onFilterChange={setStatusFilter}
           />
 
           <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[11px] text-muted px-1">
-            <span>Haz clic en cualquier ciudad o polígono para ver las calles y límites de la ZBE.</span>
+            <span>Haz clic en cualquier ciudad o perímetro para ver las calles y límites de la ZBE.</span>
             <span>Multa general: 200 €</span>
           </div>
         </div>
       </div>
 
-      {/* Sección Inferior de Recomendación */}
-      <RecommendationsSection vehicle={selectedVehicle} currentBadge={currentBadge} />
+      <MultiCitySelector cities={allCities} badge={currentBadge} />
 
-      {/* Drawer lateral para detalle de ciudad */}
+      <RecommendationsSection currentBadge={currentBadge} vehicleTitle={result?.title ?? null} />
+
       <CityDetailDrawer
         city={selectedCity}
-        onClose={() => setSelectedCity(null)}
+        onClose={() => setSelectedCityId(null)}
         currentBadge={currentBadge}
-        vehicleName={vehicleDisplayName}
+        vehicleName={result?.title}
       />
     </div>
   );

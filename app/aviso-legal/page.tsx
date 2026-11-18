@@ -39,12 +39,12 @@ export default function AvisoLegalPage() {
 
         <h2>Objeto del sitio</h2>
         <p>
-          {SITE_NAME} ofrece información orientativa sobre las zonas de bajas emisiones (ZBE) de España y sobre las etiquetas ambientales de la DGT, con un mapa de perímetros y una estimación de la etiqueta de un vehículo por su matrícula o por su modelo. Los perímetros y las condiciones de acceso son una referencia: la ordenanza municipal vigente es la que manda.
+          {SITE_NAME} ofrece información orientativa sobre las zonas de bajas emisiones (ZBE) de España y sobre las etiquetas ambientales de la DGT, con un mapa de perímetros y el cálculo de la etiqueta de un vehículo a partir de su combustible y su año de matriculación (o de la serie de su matrícula). Los perímetros y las condiciones de acceso son una referencia: la ordenanza municipal vigente es la que manda.
         </p>
 
         <h2>Carácter no oficial y orientativo</h2>
         <p>
-          Este sitio es independiente. No es una web oficial de la Dirección General de Tráfico (DGT), de ningún ayuntamiento ni de ninguna otra administración pública. La etiqueta calculada para una matrícula es una estimación y no sustituye al distintivo que figura en el Registro de Vehículos de la DGT.
+          Este sitio es independiente. No es una web oficial de la Dirección General de Tráfico (DGT), de ningún ayuntamiento ni de ninguna otra administración pública. La etiqueta calculada para un vehículo es una estimación y no sustituye al distintivo que figura en el Registro de Vehículos de la DGT.
         </p>
 
         <h2>Limitación de responsabilidad</h2>

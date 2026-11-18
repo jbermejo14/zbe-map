@@ -10,7 +10,7 @@ import { SECTION_NAME, SITE_NAME } from '../lib/site.ts';
 
 const SOURCE_DIRECTORIES = ['app', 'components', 'lib'];
 const OLD_BRAND_PATTERN = /radar-zbe|Radar ZBE/i;
-const SECTION_LINKS = ['/', '/etiqueta-dgt/gasolina/2018', '/#ciudades'];
+const SECTION_LINKS = ['/', '/etiqueta-dgt/gasolina/2018', '/ciudades'];
 
 function brandListFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -59,9 +59,10 @@ test('tema: el script de layout y el conmutador usan ododex-theme y data-theme, 
   assert.ok(!readFileSync(path.join('app', 'globals.css'), 'utf-8').includes('.dark'));
 });
 
-test('anclas: la home tiene los destinos #ciudades y #buscador del menú y del JSON-LD', () => {
+test('anclas: la home tiene los destinos #buscador, #mapa y #varias-ciudades', () => {
   const dashboard = readFileSync(path.join('components', 'SplitDashboard.tsx'), 'utf-8');
-  assert.ok(dashboard.includes('id="ciudades"'));
+  assert.ok(dashboard.includes('id="mapa"'));
   assert.ok(dashboard.includes('id="buscador"'));
+  assert.ok(readFileSync(path.join('components', 'MultiCitySelector.tsx'), 'utf-8').includes('id="varias-ciudades"'));
   assert.match(readFileSync(path.join('app', 'globals.css'), 'utf-8'), /\.anchor-target\s*\{[^}]*scroll-margin-top/);
 });

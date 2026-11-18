@@ -19,6 +19,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  routes.push({
+    url: absoluteUrl('/ciudades'),
+    lastModified,
+    changeFrequency: 'weekly',
+    priority: 0.9,
+  });
+
   const cities = getAllCities();
   const badges = ['cero', 'eco', 'c', 'b', 'sin-etiqueta'];
 

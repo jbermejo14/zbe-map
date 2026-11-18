@@ -70,10 +70,14 @@ export function zbeUiAccessDotClass(status: ZbeAccessStatus): string {
   return ZBE_UI_ACCESS_DOT_CLASS[status];
 }
 
-const ZBE_UI_MAP_COLOR_TOKEN: Record<ZbeAccessStatus, string> = {
+/** Clave del color de un perímetro: un estado de acceso, o "neutral" si aún no hay etiqueta. */
+export type ZbeMapColorKey = ZbeAccessStatus | 'neutral';
+
+const ZBE_UI_MAP_COLOR_TOKEN: Record<ZbeMapColorKey, string> = {
   allowed: '--map-allowed',
   restricted: '--map-restricted',
   banned: '--map-banned',
+  neutral: '--map-neutral',
 };
 
 /**
@@ -81,7 +85,7 @@ const ZBE_UI_MAP_COLOR_TOKEN: Record<ZbeAccessStatus, string> = {
  * Leaflet pinta con atributos SVG, que no admiten var(), por eso se resuelve aquí.
  * Solo se llama en el navegador.
  */
-export function zbeUiReadMapColor(status: ZbeAccessStatus): string {
+export function zbeUiReadMapColor(status: ZbeMapColorKey): string {
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue(ZBE_UI_MAP_COLOR_TOKEN[status])
     .trim();

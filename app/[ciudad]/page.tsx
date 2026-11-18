@@ -101,7 +101,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
         '@type': 'ListItem',
         position: 2,
         name: 'ZBE España',
-        item: `${absoluteUrl('/')}#ciudades`,
+        item: absoluteUrl('/ciudades'),
       },
       {
         '@type': 'ListItem',

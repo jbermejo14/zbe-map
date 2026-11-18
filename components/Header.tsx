@@ -7,7 +7,7 @@ import { SECTION_NAME } from '@/lib/site';
 const SECTION_LINKS = [
   { label: 'Mapa', href: '/' },
   { label: 'Etiqueta DGT', href: '/etiqueta-dgt/gasolina/2018' },
-  { label: 'Ciudades', href: '/#ciudades' }
+  { label: 'Ciudades', href: '/ciudades' }
 ] as const;
 
 /** Cabecera: logo, nombre de la sección, conmutador de tema y fila de navegación. */

@@ -95,6 +95,7 @@
   --map-allowed: #15803d;
   --map-restricted: #b45309;
   --map-banned: #b91c1c;
+  --map-neutral: var(--dgt-sin);
 
   /* Matrícula europea del comprobador: blanca y con franja azul en los dos temas. */
   --plate-bg: #ffffff;
@@ -323,7 +324,7 @@ main {
   flex: 1;
 }
 
-/* Destino de un ancla (/#ciudades, /#buscador): deja sitio a la cabecera fija. */
+/* Destino de un ancla (/#mapa, /#buscador, /#varias-ciudades): deja sitio a la cabecera fija. */
 .anchor-target {
   scroll-margin-top: var(--header-offset);
 }
@@ -687,6 +688,10 @@ main {
     color: var(--negative);
   }
 
+  .zbe-status-neutral {
+    color: var(--text-secondary);
+  }
+
   .zbe-tip-detail {
     margin-top: 2px;
     font-size: 0.625rem;
@@ -715,7 +720,9 @@ main {
   /* Marcadores de ciudad: un punto con el color del estado de acceso. */
   .zbe-marker-allowed,
   .zbe-marker-restricted,
-  .zbe-marker-banned {
+  .zbe-marker-banned,
+  .zbe-marker-neutral,
+  .zbe-marker-user {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -739,6 +746,14 @@ main {
 
   .zbe-marker-banned .marker-core {
     background: var(--map-banned);
+  }
+
+  .zbe-marker-neutral .marker-core {
+    background: var(--map-neutral);
+  }
+
+  .zbe-marker-user .marker-core {
+    background: var(--plate-band);
   }
 }
 

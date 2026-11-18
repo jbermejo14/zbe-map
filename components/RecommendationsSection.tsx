@@ -8,26 +8,32 @@ import { zbeUiBadgeChipClass, zbeUiBadgeSentenceLabel } from '@/lib/zbe-ui';
 import { ArrowRight, ShoppingBag, Zap, Coins } from 'lucide-react';
 
 interface RecommendationsSectionProps {
-  vehicle: any | null;
-  currentBadge: DgtBadgeType;
+  /** Etiqueta del vehículo; null mientras no se haya elegido. */
+  currentBadge: DgtBadgeType | null;
+  vehicleTitle: string | null;
 }
 
-export function RecommendationsSection({ vehicle, currentBadge }: RecommendationsSectionProps) {
+export function RecommendationsSection({ currentBadge, vehicleTitle }: RecommendationsSectionProps) {
   const shouldShow = currentBadge === 'B' || currentBadge === 'SIN_ETIQUETA';
 
   const recommendations = useMemo(
     () =>
       shouldShow
-        ? buildRecommendations({
-            vehicleId: vehicle?.id,
-            bodyType: vehicle?.bodyType,
-            wheelbaseMm: vehicle?.wheelbaseMm,
-            powerKw: vehicle?.powerKw,
-          }).recommendations
+        ? buildRecommendations({}).recommendations
         : [],
-    [vehicle, shouldShow]
+    [shouldShow]
   );
 
+  if (currentBadge === null) {
+    return (
+      <section className="mt-8 rounded-xl border border-dashed border-line bg-surface p-5 text-center">
+        <h3 className="text-sm font-bold text-fg">Alternativas de renovación</h3>
+        <p className="text-xs text-muted mt-1">
+          Elige tu vehículo para ver, si hace falta, modelos con etiqueta ECO o CERO que circulan sin restricciones.
+        </p>
+      </section>
+    );
+  }
   if (!shouldShow) return null;
 
   return (
@@ -42,7 +48,7 @@ export function RecommendationsSection({ vehicle, currentBadge }: Recommendation
             Modelos equivalentes con Etiqueta ECO/CERO para circular sin restricciones
           </h3>
           <p className="text-xs text-muted mt-1 max-w-xl">
-            {vehicle?.brand ? `${vehicle.brand} ${vehicle.model}` : 'Tu vehículo actual'} sufre restricciones en diversas ciudades con ZBE activa.
+            {vehicleTitle ?? 'Tu vehículo actual'} sufre restricciones en diversas ciudades con ZBE activa.
             A continuación se muestran opciones en habitabilidad y potencia con distintivo ambiental ECO o CERO.
           </p>
         </div>

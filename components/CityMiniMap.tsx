@@ -6,7 +6,7 @@ import { MAP_TILE_SOURCES, getTileLayerOptions } from '@/lib/map-config';
 import { PERIMETER_UNAVAILABLE_TEXT } from '@/lib/city-verification';
 import { parsePolygonPoints } from '@/lib/polygon-quality';
 import { zbeUiReadMapColor } from '@/lib/zbe-ui';
-import type { ZbeAccessStatus } from '@/lib/zbe-engine';
+import type { ZbeMapColorKey } from '@/lib/zbe-ui';
 
 interface CityMiniMapProps {
   city: {
@@ -15,7 +15,8 @@ interface CityMiniMapProps {
     name?: string;
     cityName?: string;
     polygon?: [number, number][] | string | null;
-    status?: string;
+    /** Estado de acceso, o 'neutral' si aún no hay etiqueta elegida. */
+    status?: ZbeMapColorKey;
     /** Enlace municipal a mostrar cuando no hay perímetro; solo si la fuente es del ayuntamiento. */
     officialUrl?: string | null;
     sourceUrl?: string | null;
@@ -71,7 +72,7 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
       // Parsear polígono
       const polygonCoords = parsePolygonPoints(city.polygon);
 
-      const status = (city.status || 'allowed') as ZbeAccessStatus;
+      const status: ZbeMapColorKey = city.status ?? 'allowed';
       const color = zbeUiReadMapColor(status);
 
       // Si tiene polígono, dibujarlo y ajustar vista

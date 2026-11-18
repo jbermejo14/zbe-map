@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import {
@@ -48,7 +48,8 @@ const ACCESS_PANEL_CLASS: Record<ZbeAccessStatus, string> = {
 interface CityDetailDrawerProps {
   city: CityEvaluationResult | null;
   onClose: () => void;
-  currentBadge: DgtBadgeType;
+  /** Etiqueta elegida; null si aún no hay, y entonces no se muestra veredicto. */
+  currentBadge: DgtBadgeType | null;
   vehicleName?: string;
 }
 
@@ -58,7 +59,12 @@ export function CityDetailDrawer({
   currentBadge,
   vehicleName,
 }: CityDetailDrawerProps) {
-  if (!city) return null;
+  const miniMapCity = useMemo(
+    () => (city ? { ...city, status: currentBadge ? city.status : ('neutral' as const) } : null),
+    [city, currentBadge]
+  );
+
+  if (!city || !miniMapCity) return null;
 
   const pres = getAccessStatusPresentation(city.status);
 
@@ -86,13 +92,14 @@ export function CityDetailDrawer({
               type="button"
               aria-label="Cerrar detalle de la ciudad"
               onClick={onClose}
-              className="rounded p-1.5 text-muted hover:text-fg hover:bg-elevated transition-colors"
+              className="inline-flex items-center justify-center min-h-11 min-w-11 rounded text-muted hover:text-fg hover:bg-elevated transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          {/* Veredicto actual */}
+          {/* Veredicto actual: solo con etiqueta elegida */}
+          {currentBadge && (
           <div className={`mt-4 rounded-lg p-3.5 border ${ACCESS_PANEL_CLASS[city.status]}`}>
             <div className="flex items-center gap-2 mb-1.5">
               {city.status === 'allowed' && <CheckCircle2 className="h-4 w-4 text-positive" />}
@@ -113,6 +120,7 @@ export function CityDetailDrawer({
               </p>
             )}
           </div>
+          )}
 
           {/* Sanción y Horarios */}
           <div className="grid grid-cols-2 gap-2 mt-3">
@@ -150,7 +158,7 @@ export function CityDetailDrawer({
                 {city.perimeterName || 'Área Regulada'}
               </span>
             </div>
-            <CityMiniMap city={city} height="195px" />
+            <CityMiniMap city={miniMapCity} height="195px" />
           </div>
 
           {/* Vías y Calles que delimitan el perímetro ZBE */}
