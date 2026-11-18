@@ -233,3 +233,42 @@ Sección nueva en la home, "Consulta varias ciudades" (`components/MultiCitySele
   - el mapa no tiene los botones eliminados;
   - "Mi ubicación" muestra su aviso si se deniega el permiso;
   - todo sin desbordamiento a 375 px.
+
+---
+
+## Z6 — Anuncios, afiliación y página de etiquetas (18/11/2026)
+
+### Z6.1 Anuncios manuales
+
+Se aplica la sección 8 de `../ododex-sitio/ARCHITECTURE.md` (componente `AdSlot`, reglas y pruebas). Posiciones:
+
+- Home: después de la sección del selector y el mapa, antes de "Consulta varias ciudades"; y antes del pie.
+- `/[ciudad]` y `/[ciudad]/[etiqueta]`: después de la tarjeta de veredicto o normativa, y al final del contenido.
+- `/etiqueta-dgt` y `/etiqueta-dgt/[combustible]/[anio]`: después del resultado, y al final.
+- `/ciudades`: después del buscador o de los primeros grupos, y al final.
+
+### Z6.2 Sin afiliados hasta que existan
+
+- La tarjeta "Tasación de tu coche actual" y los botones de las recomendaciones (segunda mano y renting) se muestran solo si existe su variable `NEXT_PUBLIC_AFFILIATE_*_TAG`. Sin ella no se renderizan, y nunca hay enlaces a `#`.
+- Si una recomendación se queda sin ningún botón de afiliado, se muestra igual, solo con su información: es útil como alternativa de etiqueta ECO o CERO.
+- Prueba: sin variables de afiliado, el HTML de la home exportada no contiene "Tasación" ni `href="#"`.
+
+### Z6.3 Página "Etiqueta DGT" (`/etiqueta-dgt`)
+
+Hoy el botón "Etiqueta DGT" de la cabecera lleva a `/etiqueta-dgt/gasolina/2018`, una ficha concreta que no explica nada general. Página índice nueva `app/etiqueta-dgt/page.tsx`:
+
+- H1 "Etiqueta ambiental de la DGT: qué etiqueta tiene tu coche".
+- Las cinco etiquetas (CERO, ECO, C, B, sin etiqueta), cada una con su pegatina (`DgtSticker`) y sus criterios en lenguaje claro: combustible, años y norma Euro. Los textos salen de `lib/dgt-rules.ts` o de sus constantes; si hay que escribirlos, se ciñen a la Resolución de 13 de abril de 2016 (BOE núm. 96), citada con enlace (`DGT_LEGAL_SOURCE`).
+- Calculadora rápida en el cliente: combustible y año (más mes o autonomía cuando se exijan, igual que en el selector de la home), con la etiqueta resultante y un enlace a su ficha `/etiqueta-dgt/<combustible>/<año>` si la ruta existe. Reutiliza `lib/vehicle-selection.ts`, sin duplicar lógica.
+- Tabla o rejilla de enlaces a las fichas por combustible y año (las generadas en `lib/etiqueta-routes.ts`), agrupadas por combustible.
+- Metadatos y canonical con `absoluteUrl`; incluida en el sitemap; JSON-LD de migas.
+- El enlace "Etiqueta DGT" de la cabecera pasa a `/etiqueta-dgt`. Las migas de `/etiqueta-dgt/[combustible]/[anio]` enlazan a `/etiqueta-dgt`.
+
+### Z6.4 Criterios de aceptación
+
+- `npm test` pasa, con pruebas de:
+  - Z6.2, sin afiliados;
+  - `/etiqueta-dgt`: renderiza las cinco etiquetas, y la cabecera enlaza a `/etiqueta-dgt`;
+  - la calculadora rápida da la misma etiqueta que `getOfficialDgtBadge` en dos casos;
+  - las de `AdSlot` de la sección 8.5.
+- Build: `out/etiqueta-dgt.html` existe y está en el sitemap; `out/index.html` no contiene "Tasación".
