@@ -41,10 +41,6 @@ export function getAllCities(): CityData[] {
   return cities;
 }
 
-export function getActiveCities(): CityData[] {
-  return cities.filter((c) => c.status === 'activa');
-}
-
 export function getCityBySlug(slug: string): CityData | undefined {
   if (!slug) return undefined;
   const normalized = slug.toLowerCase().trim();
