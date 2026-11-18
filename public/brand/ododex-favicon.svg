@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Ododex"><title>Ododex</title>
+  <rect width="48" height="48" rx="10" fill="#C2410C"/>
+  <path d="M12.69 35.31 A16 16 0 1 1 35.31 35.31" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+  <line x1="24" y1="24" x2="31.8" y2="16.2" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="24" cy="24" r="3" fill="#FFFFFF"/>
+</svg>

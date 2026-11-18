@@ -40,3 +40,7 @@ prisma/dev.db-journal
 prisma/dev.db-wal
 prisma/dev.db-shm
 dev.db
+
+# Datos personales del titular (ver config/titular.example.json)
+/config/titular.json
+out/
