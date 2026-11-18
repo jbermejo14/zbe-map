@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { getMapTileConfig, MAP_TILE_MAX_ZOOM, MAP_TILE_SUBDOMAINS } from '@/lib/map-config';
+import 'leaflet/dist/leaflet.css';
+import { MAP_TILE_SOURCES, getTileLayerOptions } from '@/lib/map-config';
 import { PERIMETER_UNAVAILABLE_TEXT } from '@/lib/city-verification';
 import { parsePolygonPoints } from '@/lib/polygon-quality';
 
@@ -25,10 +26,12 @@ interface CityMiniMapProps {
 /** Zoom del mapa cuando no hay perímetro que encuadrar. */
 const MINI_MAP_NO_PERIMETER_ZOOM = 13;
 
+const HTTP_URL_PATTERN = new RegExp('^https?://', 'i');
+
 /** Enlaces solo http(s): evita inyectar esquemas como javascript: en el popup. */
 function buildUnavailablePopupHtml(officialUrl: string | null): string {
   const link =
-    officialUrl && /^https?:///i.test(officialUrl)
+    officialUrl && HTTP_URL_PATTERN.test(officialUrl)
       ? `<br/><a href="${encodeURI(officialUrl)}" target="_blank" rel="nofollow noopener noreferrer">Ver fuente municipal</a>`
       : '';
   return `${PERIMETER_UNAVAILABLE_TEXT}${link}`;
@@ -53,10 +56,6 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
         mapInstanceRef.current = null;
       }
 
-      const isDark = document.documentElement.classList.contains('dark');
-      const tiles = getMapTileConfig();
-      const tileUrl = isDark ? tiles.darkUrl : tiles.lightUrl;
-
       const map = L.map(mapContainerRef.current, {
         center: [city.lat, city.lng],
         zoom: 13,
@@ -65,11 +64,7 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
         attributionControl: true,
       });
 
-      L.tileLayer(tileUrl, {
-        maxZoom: MAP_TILE_MAX_ZOOM,
-        subdomains: MAP_TILE_SUBDOMAINS,
-        attribution: tiles.attribution,
-      }).addTo(map);
+      L.tileLayer(MAP_TILE_SOURCES.osm.url, getTileLayerOptions('osm')).addTo(map);
 
       // Parsear polígono
       const polygonCoords = parsePolygonPoints(city.polygon);
@@ -127,7 +122,7 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
 
   return (
     <div
-      className={`relative w-full rounded-xl overflow-hidden border border-slate-200 dark:border-neutral-800 shadow-sm ${className}`}
+      className={`relative isolate w-full rounded-xl overflow-hidden border border-slate-200 dark:border-neutral-800 shadow-sm ${className}`}
       style={{ height }}
     >
       <div ref={mapContainerRef} className="w-full h-full" />

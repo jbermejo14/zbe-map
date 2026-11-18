@@ -2,8 +2,14 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { CityEvaluationResult, ZbeAccessStatus } from '@/lib/zbe-engine';
-import { getMapTileConfig, MAP_TILE_MAX_ZOOM, MAP_TILE_SUBDOMAINS } from '@/lib/map-config';
-import { Search, RotateCcw, Map, Moon, Satellite, Layers, Navigation, Compass } from 'lucide-react';
+import 'leaflet/dist/leaflet.css';
+import {
+  MAP_DEFAULT_LAYER,
+  MAP_TILE_SOURCES,
+  getTileLayerOptions,
+  type MapLayerType,
+} from '@/lib/map-config';
+import { Search, RotateCcw, Layers, Navigation } from 'lucide-react';
 
 interface SpainZbeMapProps {
   cities: CityEvaluationResult[];
@@ -12,8 +18,6 @@ interface SpainZbeMapProps {
   statusFilter: 'all' | ZbeAccessStatus;
   onFilterChange: (filter: 'all' | ZbeAccessStatus) => void;
 }
-
-type MapLayerType = 'carto' | 'dark' | 'osm' | 'sat';
 
 export function SpainZbeMap({
   cities,
@@ -29,24 +33,8 @@ export function SpainZbeMap({
   const geojsonLayersRef = useRef<{ [cityId: string]: any }>({});
   const [searchCityQuery, setSearchCityQuery] = useState('');
   const [mapReady, setMapReady] = useState(false);
-  const [mapTheme, setMapTheme] = useState<MapLayerType>('carto'); // CARTO Positron por defecto
+  const [mapLayer, setMapLayer] = useState<MapLayerType>(MAP_DEFAULT_LAYER);
   const [showPolygons, setShowPolygons] = useState(true);
-
-  // Sincronizar tema con modo oscuro/claro global
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      const isDark = document.documentElement.classList.contains('dark');
-      setMapTheme(isDark ? 'dark' : 'carto');
-    }
-
-    const handler = (e: any) => {
-      const newTheme = e.detail?.theme;
-      setMapTheme(newTheme === 'dark' ? 'dark' : 'carto');
-    };
-
-    window.addEventListener('theme-change', handler);
-    return () => window.removeEventListener('theme-change', handler);
-  }, []);
 
   // Filtrar ciudades
   const filteredCities = cities.filter((c) => {
@@ -62,7 +50,7 @@ export function SpainZbeMap({
     return true;
   });
 
-  // Renderizar marcadores y polígonos GeoJSON (Estilo CARTO exacto)
+  // Renderizar marcadores y polígonos GeoJSON
   const renderMapElements = useCallback(
     (map: any, L: any, list: CityEvaluationResult[], displayPolygons: boolean) => {
       // 1. Limpiar marcadores antiguos
@@ -144,7 +132,7 @@ export function SpainZbeMap({
         marker.addTo(map);
         markersRef.current[city.cityId] = marker;
 
-        // B. Trazado GeoJSON de la ZBE con estética tipo CARTO
+        // B. Trazado GeoJSON de la ZBE
         if (displayPolygons && (city.geoJSON || (city.polygon && city.polygon.length > 2))) {
           let geoData = city.geoJSON;
 
@@ -175,10 +163,10 @@ export function SpainZbeMap({
           if (geoData) {
             const capaZBE = L.geoJSON(geoData, {
               style: {
-                color: strokeColor, // Color del borde (tipo CARTO)
+                color: strokeColor, // Color del borde
                 weight: 2.5, // Grosor perimetral
                 opacity: 0.9,
-                fillColor: strokeColor, // Relleno translúcido
+                fillColor: strokeColor, 
                 fillOpacity: 0.22, // Transparencia para leer las calles debajo
                 dashArray: isRestricted ? '5, 5' : undefined, // Línea discontinua opcional
               },
@@ -225,61 +213,12 @@ export function SpainZbeMap({
     [onCitySelect]
   );
 
-  // Aplicar capa base seleccionada (CARTO Positron por defecto)
-  const applyTileLayer = useCallback((map: any, L: any, theme: MapLayerType) => {
-    currentTileLayersRef.current.forEach((layer) => {
-      try {
-        layer.remove();
-      } catch {
-        // ignore
-      }
-    });
-    currentTileLayersRef.current = [];
-
-    if (theme === 'carto') {
-      // 1. CARTO Positron Minimalista (El estándar solicitado)
-      const tiles = getMapTileConfig();
-      const cartoLayer = L.tileLayer(
-        tiles.lightUrl,
-        {
-          attribution: tiles.attribution,
-          subdomains: MAP_TILE_SUBDOMAINS,
-          maxZoom: MAP_TILE_MAX_ZOOM,
-        }
-      );
-      cartoLayer.addTo(map);
-      currentTileLayersRef.current.push(cartoLayer);
-    } else if (theme === 'dark') {
-      // 2. CARTO Dark Matter (URL y atribución configurables)
-      const tiles = getMapTileConfig();
-      const darkBase = L.tileLayer(tiles.darkUrl, {
-        attribution: tiles.attribution,
-        subdomains: MAP_TILE_SUBDOMAINS,
-        maxZoom: MAP_TILE_MAX_ZOOM,
-      });
-      darkBase.addTo(map);
-      currentTileLayersRef.current.push(darkBase);
-    } else if (theme === 'osm') {
-      // 3. OpenStreetMap
-      const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        subdomains: ['a', 'b', 'c'],
-        maxZoom: 19,
-      });
-      osmLayer.addTo(map);
-      currentTileLayersRef.current.push(osmLayer);
-    } else if (theme === 'sat') {
-      // 4. Satélite
-      const satLayer = L.tileLayer(
-        'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        {
-          attribution: '&copy; Esri, Maxar',
-          maxZoom: 18,
-        }
-      );
-      satLayer.addTo(map);
-      currentTileLayersRef.current.push(satLayer);
-    }
+  // Aplicar la capa base seleccionada (OpenStreetMap por defecto, en claro y oscuro)
+  const applyTileLayer = useCallback((map: any, L: any, layer: MapLayerType) => {
+    currentTileLayersRef.current.forEach((tileLayer) => tileLayer.remove());
+    const nextLayer = L.tileLayer(MAP_TILE_SOURCES[layer].url, getTileLayerOptions(layer));
+    nextLayer.addTo(map);
+    currentTileLayersRef.current = [nextLayer];
   }, []);
 
   // Inicializar Leaflet map
@@ -308,8 +247,7 @@ export function SpainZbeMap({
 
       L.control.zoom({ position: 'topright' }).addTo(map);
 
-      // Cargar CARTO Positron por defecto
-      applyTileLayer(map, L, mapTheme);
+      applyTileLayer(map, L, mapLayer);
 
       mapInstanceRef.current = map;
       setMapReady(true);
@@ -325,16 +263,16 @@ export function SpainZbeMap({
     };
   }, []);
 
-  // Actualizar tema
+  // Actualizar capa base
   useEffect(() => {
     if (!mapReady || !mapInstanceRef.current) return;
 
     import('leaflet').then((L) => {
       if (mapInstanceRef.current) {
-        applyTileLayer(mapInstanceRef.current, L, mapTheme);
+        applyTileLayer(mapInstanceRef.current, L, mapLayer);
       }
     });
-  }, [mapTheme, mapReady, applyTileLayer]);
+  }, [mapLayer, mapReady, applyTileLayer]);
 
   // Actualizar elementos
   useEffect(() => {
@@ -393,7 +331,7 @@ export function SpainZbeMap({
   };
 
   return (
-    <div className="relative flex flex-col h-full w-full rounded-xl overflow-hidden border border-neutral-800 bg-black shadow-lg">
+    <div className="relative isolate flex flex-col h-full w-full rounded-xl overflow-hidden border border-neutral-800 bg-black shadow-lg">
       {/* Barra de control superior - Negro y Naranja */}
       <div className="z-10 flex flex-wrap items-center justify-between gap-2.5 p-3 bg-neutral-950 border-b border-neutral-800">
         {/* Filtros de estado */}
@@ -487,46 +425,19 @@ export function SpainZbeMap({
 
           {/* Selector de capa de mapa */}
           <div className="flex items-center bg-neutral-900 rounded border border-neutral-800 p-0.5 text-xs">
-            <button
-              type="button"
-              onClick={() => setMapTheme('carto')}
-              className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-                mapTheme === 'carto' ? 'bg-orange-600 text-white' : 'text-neutral-400 hover:text-neutral-200'
-              }`}
-              title="Estilo CARTO Positron minimalista"
-            >
-              CARTO
-            </button>
-            <button
-              type="button"
-              onClick={() => setMapTheme('dark')}
-              className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-                mapTheme === 'dark' ? 'bg-orange-600 text-white' : 'text-neutral-400 hover:text-neutral-200'
-              }`}
-              title="Modo Oscuro"
-            >
-              Oscuro
-            </button>
-            <button
-              type="button"
-              onClick={() => setMapTheme('osm')}
-              className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-                mapTheme === 'osm' ? 'bg-orange-600 text-white' : 'text-neutral-400 hover:text-neutral-200'
-              }`}
-              title="OpenStreetMap"
-            >
-              OSM
-            </button>
-            <button
-              type="button"
-              onClick={() => setMapTheme('sat')}
-              className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-                mapTheme === 'sat' ? 'bg-orange-600 text-white' : 'text-neutral-400 hover:text-neutral-200'
-              }`}
-              title="Satélite"
-            >
-              Satélite
-            </button>
+            {(Object.keys(MAP_TILE_SOURCES) as MapLayerType[]).map((layer) => (
+              <button
+                key={layer}
+                type="button"
+                onClick={() => setMapLayer(layer)}
+                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
+                  mapLayer === layer ? 'bg-orange-600 text-white' : 'text-neutral-400 hover:text-neutral-200'
+                }`}
+                title={MAP_TILE_SOURCES[layer].title}
+              >
+                {MAP_TILE_SOURCES[layer].label}
+              </button>
+            ))}
           </div>
 
           {/* Buscador */}
@@ -555,10 +466,10 @@ export function SpainZbeMap({
       <div className="relative flex-1 w-full min-h-[580px] h-[580px]">
         <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
 
-        {/* Indicador de trazado GeoJSON CARTO */}
+        {/* Indicador de trazado GeoJSON */}
         <div className="absolute top-3 left-3 z-20 pointer-events-none bg-black/85 border border-neutral-800 rounded px-2.5 py-1 text-[11px] text-neutral-300 flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-orange-500" />
-          <span>Trazado GeoJSON estilo CARTO Positron &bull; Clic para ver delimitación exacta</span>
+          <span>Trazado GeoJSON de cada ZBE &bull; Clic para ver delimitación exacta</span>
         </div>
 
         {/* Leyenda simple */}

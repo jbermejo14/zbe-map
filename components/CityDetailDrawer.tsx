@@ -235,7 +235,7 @@ export function CityDetailDrawer({
         {/* Footer */}
         <div className="pt-4 mt-4 border-t border-neutral-800">
           <Link
-            href={`/zbe/${city.slug}`}
+            href={`/${city.slug}`}
             className="w-full flex items-center justify-center gap-2 rounded bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs py-2.5 px-4 transition-colors"
           >
             <span>Ver Ficha Completa ZBE {city.cityName}</span>

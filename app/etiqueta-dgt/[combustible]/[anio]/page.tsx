@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { absoluteUrl } from '@/lib/site';
 import { getOfficialDgtBadge, normalizeFuel, FuelCategory, DGT_LEGAL_SOURCE } from '@/lib/dgt-rules';
 import { evaluateAllCities } from '@/lib/cities-repository';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
@@ -28,8 +29,6 @@ interface Props {
   }>;
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://radar-zbe.es';
-
 const VALID_FUELS: Record<string, { category: FuelCategory; label: string; desc: string }> = {
   gasolina: { category: 'gasolina', label: 'Gasolina', desc: 'Turismos de gasolina' },
   diesel: { category: 'diesel', label: 'Diésel', desc: 'Turismos diésel' },
@@ -50,6 +49,8 @@ const BADGE_TO_SLUG: Record<DgtBadgeType, string> = {
   B: 'b',
   SIN_ETIQUETA: 'sin-etiqueta',
 };
+
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const fuels = Object.keys(VALID_FUELS);
@@ -90,12 +91,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: {
-      canonical: `${siteUrl}/etiqueta-dgt/${combustible}/${yearNumber}`,
+      canonical: absoluteUrl(`/etiqueta-dgt/${combustible}/${yearNumber}`),
     },
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/etiqueta-dgt/${combustible}/${yearNumber}`,
+      url: absoluteUrl(`/etiqueta-dgt/${combustible}/${yearNumber}`),
       type: 'article',
     },
   };
@@ -144,19 +145,19 @@ export default async function FuelYearDgtPage({ params }: Props) {
         '@type': 'ListItem',
         position: 1,
         name: 'Inicio',
-        item: siteUrl,
+        item: absoluteUrl('/'),
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Distintivo DGT',
-        item: `${siteUrl}/#buscador`,
+        item: `${absoluteUrl('/')}#buscador`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: `${fuelInfo.label} ${yearNumber}`,
-        item: `${siteUrl}/etiqueta-dgt/${fuelKey}/${yearNumber}`,
+        item: absoluteUrl(`/etiqueta-dgt/${fuelKey}/${yearNumber}`),
       },
     ],
   };
@@ -313,7 +314,7 @@ export default async function FuelYearDgtPage({ params }: Props) {
                 {bannedCities.slice(0, 16).map((c) => (
                   <Link
                     key={c.slug}
-                    href={`/zbe/${c.slug}/${badgeSlug}`}
+                    href={`/${c.slug}/${badgeSlug}`}
                     className="p-2.5 rounded-lg border border-red-950 bg-red-950/10 hover:border-red-500/40 text-xs text-neutral-300 flex items-center justify-between"
                   >
                     <span className="truncate">{c.cityName}</span>
@@ -334,7 +335,7 @@ export default async function FuelYearDgtPage({ params }: Props) {
                 {restrictedCities.slice(0, 16).map((c) => (
                   <Link
                     key={c.slug}
-                    href={`/zbe/${c.slug}/${badgeSlug}`}
+                    href={`/${c.slug}/${badgeSlug}`}
                     className="p-2.5 rounded-lg border border-amber-950 bg-amber-950/10 hover:border-amber-500/40 text-xs text-neutral-300 flex items-center justify-between"
                   >
                     <span className="truncate">{c.cityName}</span>
@@ -355,7 +356,7 @@ export default async function FuelYearDgtPage({ params }: Props) {
                 {allowedCities.slice(0, 16).map((c) => (
                   <Link
                     key={c.slug}
-                    href={`/zbe/${c.slug}/${badgeSlug}`}
+                    href={`/${c.slug}/${badgeSlug}`}
                     className="p-2.5 rounded-lg border border-emerald-950 bg-emerald-950/10 hover:border-emerald-500/40 text-xs text-neutral-300 flex items-center justify-between"
                   >
                     <span className="truncate">{c.cityName}</span>

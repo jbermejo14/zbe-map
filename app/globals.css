@@ -1,8 +1,19 @@
-@import "leaflet/dist/leaflet.css";
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* El tema se aplica con la clase .dark en <html> (ver layout y ThemeToggle). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Colores oficiales de las etiquetas y estados de acceso DGT. */
+@theme {
+  --color-dgt-zero: #008ece;
+  --color-dgt-eco: #00a651;
+  --color-dgt-c: #10b981;
+  --color-dgt-b: #eab308;
+  --color-dgt-none: #6b7280;
+  --color-dgt-banned: #ef4444;
+  --color-dgt-restricted: #f59e0b;
+  --color-dgt-allowed: #10b981;
+}
 
 :root {
   --background: #f8fafc;
@@ -81,17 +92,19 @@ html:not(.dark) .hover\:bg-neutral-900:hover {
   background-color: #f1f5f9 !important;
 }
 
-/* Custom Leaflet Map styling */
-.leaflet-container {
-  width: 100%;
-  height: 100%;
-  background-color: #f1f5f9 !important;
-  font-family: inherit;
-  transition: background-color 0.2s ease;
-}
+/* Estilo de los mapas Leaflet. Dentro de @layer base para que las utilidades de Tailwind
+   (h-full, h-[580px]...) ganen. No fija width ni height: sin capa, estas reglas se
+   imponían a las utilidades y el mapa medía 2 px. */
+@layer base {
+  .leaflet-container {
+    background-color: #f1f5f9 !important;
+    font-family: inherit;
+    transition: background-color 0.2s ease;
+  }
 
-.dark .leaflet-container {
-  background-color: #121212 !important;
+  .dark .leaflet-container {
+    background-color: #121212 !important;
+  }
 }
 
 /* Marcadores simplificados limpios */

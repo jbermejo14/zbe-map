@@ -1,25 +1,23 @@
 import type { Metadata } from 'next';
 import { SplitDashboard } from '@/components/SplitDashboard';
-import { getAllCities, evaluateAllCities } from '@/lib/cities-repository';
+import { absoluteUrl } from '@/lib/site';
 import { DgtBadgeType } from '@/lib/zbe-engine';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
 
-export const revalidate = 3600;
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://radar-zbe.es';
+const homeUrl = absoluteUrl('/');
 
 export const metadata: Metadata = {
   title: `Radar ZBE España ${SEO_CURRENT_YEAR}: Mapa y Restricciones de Bajas Emisiones`,
   description:
     'Comprueba si tu vehículo puede circular o aparcar en las 152 Zonas de Bajas Emisiones (ZBE) de España según su distintivo DGT. Perímetros oficiales cuando están disponibles; el resto de datos, orientativos hasta su verificación.',
   alternates: {
-    canonical: siteUrl,
+    canonical: homeUrl,
   },
   openGraph: {
     title: `Radar ZBE España ${SEO_CURRENT_YEAR}: Mapa y Restricciones de Bajas Emisiones`,
     description:
       'Comprueba si tu vehículo puede circular o aparcar en las 152 Zonas de Bajas Emisiones (ZBE) de España según su distintivo DGT.',
-    url: siteUrl,
+    url: homeUrl,
     siteName: 'Radar ZBE España',
     type: 'website',
   },
@@ -27,13 +25,12 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   const fallbackBadge: DgtBadgeType = 'B';
-  const initialEvaluatedCities = evaluateAllCities(fallbackBadge);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: 'Radar ZBE España',
-    url: siteUrl,
+    url: homeUrl,
     applicationCategory: 'TravelApplication',
     operatingSystem: 'All',
     description:
@@ -68,7 +65,6 @@ export default function HomePage() {
       <SplitDashboard
         initialVehicle={null}
         initialBadge={fallbackBadge}
-        initialCities={initialEvaluatedCities}
       />
     </div>
   );

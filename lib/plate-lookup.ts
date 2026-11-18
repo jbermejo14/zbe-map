@@ -1,5 +1,5 @@
-import { DgtBadgeType } from '@/lib/zbe-engine.ts';
-import { calculateDgtBadge, normalizeFuel } from '@/lib/dgt-rules.ts';
+import type { DgtBadgeType } from './zbe-engine.ts';
+import { calculateDgtBadge, normalizeFuel } from './dgt-rules.ts';
 
 export type FuelType = 'gasolina' | 'diesel' | 'hibrido' | 'electrico' | 'auto';
 

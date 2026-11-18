@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { absoluteUrl } from '@/lib/site';
 import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
 import { DgtBadgeType, getBadgeMetadata } from '@/lib/zbe-engine';
@@ -31,8 +32,6 @@ interface Props {
   }>;
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://radar-zbe.es';
-
 const SLUG_TO_BADGE: Record<string, { badge: DgtBadgeType; label: string }> = {
   cero: { badge: 'CERO', label: '0 CERO' },
   eco: { badge: 'ECO', label: 'ECO' },
@@ -48,6 +47,8 @@ const BADGE_TO_SLUG: Record<DgtBadgeType, string> = {
   B: 'b',
   SIN_ETIQUETA: 'sin-etiqueta',
 };
+
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const cities = getAllCities();
@@ -85,12 +86,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: {
-      canonical: `${siteUrl}/zbe/${city.slug}/${etiqueta}`,
+      canonical: absoluteUrl(`/${city.slug}/${etiqueta}`),
     },
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/zbe/${city.slug}/${etiqueta}`,
+      url: absoluteUrl(`/${city.slug}/${etiqueta}`),
       type: 'article',
     },
   };
@@ -172,19 +173,19 @@ export default async function CityBadgePage({ params }: Props) {
         '@type': 'ListItem',
         position: 1,
         name: 'Inicio',
-        item: siteUrl,
+        item: absoluteUrl('/'),
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: `ZBE ${city.name}`,
-        item: `${siteUrl}/zbe/${city.slug}`,
+        item: absoluteUrl(`/${city.slug}`),
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: badgeInfo.label,
-        item: `${siteUrl}/zbe/${city.slug}/${etiqueta}`,
+        item: absoluteUrl(`/${city.slug}/${etiqueta}`),
       },
     ],
   };
@@ -219,7 +220,7 @@ export default async function CityBadgePage({ params }: Props) {
           Inicio
         </Link>
         <ChevronRight className="h-3 w-3" />
-        <Link href={`/zbe/${city.slug}`} className="hover:text-orange-400 transition-colors">
+        <Link href={`/${city.slug}`} className="hover:text-orange-400 transition-colors">
           ZBE {city.name}
         </Link>
         <ChevronRight className="h-3 w-3" />
@@ -382,7 +383,7 @@ export default async function CityBadgePage({ params }: Props) {
             .map(([s, info]) => (
               <Link
                 key={s}
-                href={`/zbe/${city.slug}/${s}`}
+                href={`/${city.slug}/${s}`}
                 className="flex items-center justify-between p-3 rounded-lg border border-neutral-800 bg-neutral-950/60 hover:border-orange-500/50 hover:bg-neutral-900 text-xs text-neutral-300 transition-colors"
               >
                 <span>{info.label}</span>
@@ -392,7 +393,7 @@ export default async function CityBadgePage({ params }: Props) {
         </div>
 
         <div className="mt-6 pt-4 border-t border-neutral-800/80 flex items-center justify-between text-xs">
-          <Link href={`/zbe/${city.slug}`} className="text-neutral-400 hover:text-white underline">
+          <Link href={`/${city.slug}`} className="text-neutral-400 hover:text-white underline">
             &larr; Ver guía completa de la ZBE de {city.name}
           </Link>
           <Link href="/" className="text-orange-400 hover:text-orange-300 font-semibold">

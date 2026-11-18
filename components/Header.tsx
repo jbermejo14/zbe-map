@@ -26,21 +26,21 @@ export function Header() {
         <div className="flex items-center gap-2 sm:gap-3">
           <nav className="flex items-center gap-1 sm:gap-2">
             <Link
-              href="/zbe/madrid"
+              href="/madrid"
               className="flex items-center gap-1 rounded px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-neutral-900 transition-colors"
             >
               <MapPin className="h-3 w-3 text-orange-500" />
               <span>Madrid</span>
             </Link>
             <Link
-              href="/zbe/barcelona"
+              href="/barcelona"
               className="flex items-center gap-1 rounded px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-neutral-900 transition-colors"
             >
               <MapPin className="h-3 w-3 text-orange-500" />
               <span>Barcelona</span>
             </Link>
             <Link
-              href="/etiqueta-dgt/toyota/corolla"
+              href="/etiqueta-dgt/gasolina/2018"
               className="flex items-center gap-1 rounded px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-neutral-900 transition-colors"
             >
               <Car className="h-3 w-3 text-slate-400 dark:text-neutral-400" />

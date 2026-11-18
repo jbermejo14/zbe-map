@@ -1,28 +1,50 @@
 /**
- * Configuración de las teselas del mapa. Se lee de variables de entorno públicas
- * (documentadas en .env.example); los valores por defecto son los basemaps de CARTO,
- * que no requieren clave.
+ * Configuración de las teselas del mapa. Sin CARTO: sus basemaps exigen ahora clave de API
+ * y devuelven teselas de aviso. OpenStreetMap se usa en los dos temas.
  */
 
-export const MAP_DEFAULT_TILE_URL_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-export const MAP_DEFAULT_TILE_URL_DARK = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-export const MAP_DEFAULT_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
-export const MAP_TILE_SUBDOMAINS = 'abcd';
-export const MAP_TILE_MAX_ZOOM = 19;
+export type MapLayerType = 'osm' | 'sat';
 
-export interface MapTileConfig {
-  lightUrl: string;
-  darkUrl: string;
+export interface MapTileSource {
+  label: string;
+  title: string;
+  url: string;
   attribution: string;
+  maxZoom: number;
+  /** Solo las teselas con {s} en la URL necesitan subdominios. */
+  subdomains?: string;
 }
 
-/** Devuelve la configuración de teselas, usando los valores por defecto si la variable está vacía. */
-export function getMapTileConfig(): MapTileConfig {
-  // Next solo sustituye NEXT_PUBLIC_* si se referencian con nombre literal.
+const MAP_OSM_ATTRIBUTION =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+export const MAP_TILE_SOURCES: Record<MapLayerType, MapTileSource> = {
+  osm: {
+    label: 'OSM',
+    title: 'Capa OpenStreetMap',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: MAP_OSM_ATTRIBUTION,
+    maxZoom: 19,
+    subdomains: 'abc',
+  },
+  sat: {
+    label: 'Satélite',
+    title: 'Fotografía satélite',
+    url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Fuente: Esri, Maxar, Earthstar Geographics and the GIS User Community',
+    maxZoom: 18,
+  },
+};
+
+/** Capa inicial del mapa, igual en claro y oscuro. */
+export const MAP_DEFAULT_LAYER: MapLayerType = 'osm';
+
+/** Opciones de `L.tileLayer` para una capa; no pasa `subdomains` si la capa no lo usa. */
+export function getTileLayerOptions(layer: MapLayerType) {
+  const source = MAP_TILE_SOURCES[layer];
   return {
-    lightUrl: process.env.NEXT_PUBLIC_MAP_TILE_URL_LIGHT || MAP_DEFAULT_TILE_URL_LIGHT,
-    darkUrl: process.env.NEXT_PUBLIC_MAP_TILE_URL_DARK || MAP_DEFAULT_TILE_URL_DARK,
-    attribution: process.env.NEXT_PUBLIC_MAP_ATTRIBUTION || MAP_DEFAULT_ATTRIBUTION,
+    attribution: source.attribution,
+    maxZoom: source.maxZoom,
+    ...(source.subdomains ? { subdomains: source.subdomains } : {}),
   };
 }

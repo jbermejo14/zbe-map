@@ -7,6 +7,7 @@ import {
   CityEvaluationResult,
   ZbeAccessStatus,
 } from '@/lib/zbe-engine';
+import { searchVehicles } from '@/lib/vehicles-repository';
 import { VehicleSelector } from './VehicleSelector';
 import { VehicleBadgeCard } from './VehicleBadgeCard';
 import { CityDetailDrawer } from './CityDetailDrawer';
@@ -28,61 +29,61 @@ const SpainZbeMap = dynamic(
   }
 );
 
+/** Vehículo que se selecciona al abrir la página. */
+const DEFAULT_VEHICLE_QUERY = 'Audi A4';
+
 interface SplitDashboardProps {
   initialVehicle?: any;
   initialBadge?: DgtBadgeType;
-  initialCities?: CityEvaluationResult[];
 }
 
 export function SplitDashboard({
   initialVehicle = null,
   initialBadge = 'B',
-  initialCities = [],
 }: SplitDashboardProps) {
   const [currentBadge, setCurrentBadge] = useState<DgtBadgeType>(initialBadge);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(initialVehicle);
-  const [cities, setCities] = useState<CityEvaluationResult[]>(initialCities);
-  const [loadingCities, setLoadingCities] = useState(false);
+  const [cities, setCities] = useState<CityEvaluationResult[]>([]);
+  const [loadingCities, setLoadingCities] = useState(true);
+  const [citiesError, setCitiesError] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<CityEvaluationResult | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | ZbeAccessStatus>('all');
 
-  // Cargar ciudades cuando cambia el distintivo
+  // Evaluar las ciudades cuando cambia el distintivo. Los datos (con polígonos, ~400 KB)
+  // se importan de forma dinámica para que no entren en el JS inicial de la página.
   useEffect(() => {
-    async function fetchCities() {
-      setLoadingCities(true);
-      try {
-        const res = await fetch(`/api/zbe-cities?badge=${currentBadge}`);
-        const data = await res.json();
-        if (data.cities) {
-          setCities(data.cities);
-        }
-      } catch (err) {
-        console.error('Error fetching cities for badge:', err);
-      } finally {
-        setLoadingCities(false);
-      }
-    }
+    let isCurrent = true;
+    setLoadingCities(true);
+    setCitiesError(null);
 
-    fetchCities();
+    import('@/lib/cities-repository')
+      .then(({ evaluateAllCities }) => {
+        if (isCurrent) setCities(evaluateAllCities(currentBadge));
+      })
+      .catch((err: unknown) => {
+        console.error('Error cargando las ciudades ZBE:', err);
+        if (isCurrent) {
+          setCitiesError(
+            'No se pudieron cargar los datos de las ciudades ZBE. Recarga la página; si persiste, vuelve a intentarlo más tarde.'
+          );
+        }
+      })
+      .finally(() => {
+        if (isCurrent) setLoadingCities(false);
+      });
+
+    return () => {
+      isCurrent = false;
+    };
   }, [currentBadge]);
 
   // Vehículo inicial por defecto
   useEffect(() => {
-    if (!selectedVehicle) {
-      async function loadDefaultCar() {
-        try {
-          const res = await fetch('/api/vehicles?search=Audi A4');
-          const data = await res.json();
-          if (data.results && data.results.length > 0) {
-            const car = data.results[0];
-            setSelectedVehicle(car);
-            setCurrentBadge(car.dgtBadge as DgtBadgeType);
-          }
-        } catch (err) {
-          console.error('Error loading default vehicle:', err);
-        }
-      }
-      loadDefaultCar();
+    if (selectedVehicle) return;
+    const [defaultCar] = searchVehicles(DEFAULT_VEHICLE_QUERY);
+    if (defaultCar) {
+      setSelectedVehicle(defaultCar);
+      setCurrentBadge(defaultCar.dgtBadge as DgtBadgeType);
     }
   }, [selectedVehicle]);
 
@@ -127,7 +128,7 @@ export function SplitDashboard({
                 <Check className="h-3 w-3" />
                 Libre
               </span>
-              <span className="text-xl font-black text-white">{allowedCount}</span>
+              <span className="text-xl font-black text-white">{loadingCities ? '…' : allowedCount}</span>
             </div>
 
             {/* Restringidas */}
@@ -136,7 +137,7 @@ export function SplitDashboard({
                 <AlertTriangle className="h-3 w-3" />
                 Parking
               </span>
-              <span className="text-xl font-black text-white">{restrictedCount}</span>
+              <span className="text-xl font-black text-white">{loadingCities ? '…' : restrictedCount}</span>
             </div>
 
             {/* Prohibidas */}
@@ -145,11 +146,17 @@ export function SplitDashboard({
                 <X className="h-3 w-3" />
                 Vetado
               </span>
-              <span className="text-xl font-black text-white">{bannedCount}</span>
+              <span className="text-xl font-black text-white">{loadingCities ? '…' : bannedCount}</span>
             </div>
           </div>
         </div>
       </div>
+
+      {citiesError && (
+        <div role="alert" className="mb-6 rounded-xl border border-red-500/40 bg-red-950/20 p-4 text-xs text-red-400">
+          {citiesError}
+        </div>
+      )}
 
       {/* Split View Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">

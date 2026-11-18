@@ -64,7 +64,7 @@ test('Validación de Slugs y Manejo Estricto de 404 (Requisito 3 y 9)', async (t
     }
   });
 
-  await t.test('Etiquetas válidas para rutas /zbe/[ciudad]/[etiqueta]', () => {
+  await t.test('Etiquetas válidas para rutas /[ciudad]/[etiqueta]', () => {
     const validBadgeSlugs = ['cero', 'eco', 'c', 'b', 'sin-etiqueta'];
     const invalidBadgeSlugs = ['a', 'd', 'euro6', 'electrico', 'verde', 'fake'];
 

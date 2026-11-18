@@ -22,11 +22,11 @@ export function Footer() {
               Ciudades Principales
             </h4>
             <ul className="space-y-1.5 text-neutral-400">
-              <li><Link href="/zbe/madrid" className="hover:text-orange-400">ZBE Madrid (Distrito Centro y M-30)</Link></li>
-              <li><Link href="/zbe/barcelona" className="hover:text-orange-400">ZBE Rondas de Barcelona</Link></li>
-              <li><Link href="/zbe/valencia" className="hover:text-orange-400">ZBE Valencia</Link></li>
-              <li><Link href="/zbe/sevilla" className="hover:text-orange-400">ZBE Sevilla (Isla de la Cartuja)</Link></li>
-              <li><Link href="/zbe/bilbao" className="hover:text-orange-400">ZBE Bilbao (Abando)</Link></li>
+              <li><Link href="/madrid" className="hover:text-orange-400">ZBE Madrid (Distrito Centro y M-30)</Link></li>
+              <li><Link href="/barcelona" className="hover:text-orange-400">ZBE Rondas de Barcelona</Link></li>
+              <li><Link href="/valencia" className="hover:text-orange-400">ZBE Valencia</Link></li>
+              <li><Link href="/sevilla" className="hover:text-orange-400">ZBE Sevilla (Isla de la Cartuja)</Link></li>
+              <li><Link href="/bilbao" className="hover:text-orange-400">ZBE Bilbao (Abando)</Link></li>
             </ul>
           </div>
 
@@ -35,10 +35,10 @@ export function Footer() {
               Búsquedas Frecuentes
             </h4>
             <ul className="space-y-1.5 text-neutral-400">
-              <li><Link href="/etiqueta-dgt/toyota/corolla" className="hover:text-orange-400">Toyota Corolla Etiqueta DGT</Link></li>
-              <li><Link href="/etiqueta-dgt/audi/a4" className="hover:text-orange-400">Audi A4 Etiqueta DGT</Link></li>
-              <li><Link href="/puede-entrar/audi-a4-2-0-tdi-en-madrid" className="hover:text-orange-400">¿Puede entrar Audi A4 en Madrid?</Link></li>
-              <li><Link href="/puede-entrar/seat-ibiza-en-barcelona" className="hover:text-orange-400">¿Puede entrar Seat Ibiza en Barcelona?</Link></li>
+              <li><Link href="/etiqueta-dgt/gasolina/2018" className="hover:text-orange-400">Etiqueta DGT de un gasolina de 2018</Link></li>
+              <li><Link href="/etiqueta-dgt/diesel/2015" className="hover:text-orange-400">Etiqueta DGT de un diésel de 2015</Link></li>
+              <li><Link href="/madrid/b" className="hover:text-orange-400">¿Puede entrar un coche con etiqueta B en Madrid?</Link></li>
+              <li><Link href="/barcelona/c" className="hover:text-orange-400">¿Puede entrar un coche con etiqueta C en Barcelona?</Link></li>
             </ul>
           </div>
 

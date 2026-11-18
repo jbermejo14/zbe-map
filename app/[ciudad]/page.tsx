@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { absoluteUrl } from '@/lib/site';
 import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
 import { DgtBadgeType } from '@/lib/zbe-engine';
@@ -27,7 +28,7 @@ interface Props {
   }>;
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://radar-zbe.es';
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const cities = getAllCities();
@@ -58,12 +59,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: {
-      canonical: `${siteUrl}/zbe/${city.slug}`,
+      canonical: absoluteUrl(`/${city.slug}`),
     },
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/zbe/${city.slug}`,
+      url: absoluteUrl(`/${city.slug}`),
       type: 'article',
     },
   };
@@ -93,19 +94,19 @@ export default async function CityZbeSeoPage({ params }: Props) {
         '@type': 'ListItem',
         position: 1,
         name: 'Inicio',
-        item: siteUrl,
+        item: absoluteUrl('/'),
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'ZBE España',
-        item: `${siteUrl}/#ciudades`,
+        item: `${absoluteUrl('/')}#ciudades`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: city.name,
-        item: `${siteUrl}/zbe/${city.slug}`,
+        item: absoluteUrl(`/${city.slug}`),
       },
     ],
   };
@@ -273,7 +274,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
               return (
                 <Link
                   key={key}
-                  href={`/zbe/${city.slug}/${slug}`}
+                  href={`/${city.slug}/${slug}`}
                   className={`group rounded-xl p-4 border flex flex-col justify-between transition-all hover:scale-[1.01] ${
                     status === 'allowed'
                       ? 'bg-emerald-950/20 border-emerald-500/30 hover:border-emerald-400'

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { getSiteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Radar ZBE España | Mapa Interactivo de Zonas de Bajas Emisiones y Consulta Etiqueta DGT',
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     'Multas ZBE 200 euros',
   ],
   authors: [{ name: 'Radar ZBE España' }],
-  metadataBase: new URL('https://radar-zbe.es'),
+  metadataBase: new URL(getSiteUrl()),
   openGraph: {
     title: 'Radar ZBE España | Buscador Visual y Mapa Interactivo ZBE',
     description:

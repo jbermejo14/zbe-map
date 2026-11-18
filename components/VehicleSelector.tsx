@@ -1,10 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { DgtBadgeType } from '@/lib/zbe-engine';
+import React, { useMemo, useState } from 'react';
+import type { DgtBadgeType } from '@/lib/zbe-engine';
+import { getBrands, getModelsByBrand, getVersionsByModel, searchVehicles } from '@/lib/vehicles-repository';
+import { lookupPlateForForm } from '@/lib/client-logic';
 import { Search, Filter, Car, ShieldCheck, AlertCircle, Fuel, Zap } from 'lucide-react';
 
 type FuelOption = 'gasolina' | 'diesel' | 'hibrido' | 'electrico';
+
+/** Caracteres mínimos para lanzar la búsqueda libre de vehículos. */
+const SEARCH_MIN_LENGTH = 2;
 
 interface VehicleSelectorProps {
   currentBadge: DgtBadgeType;
@@ -26,120 +31,39 @@ export function VehicleSelector({
   const [plateError, setPlateError] = useState<string | null>(null);
   const [plateSuccess, setPlateSuccess] = useState<any | null>(null);
 
-  // Cascading states
-  const [brands, setBrands] = useState<string[]>([]);
-  const [models, setModels] = useState<string[]>([]);
-  const [versions, setVersions] = useState<any[]>([]);
-
+  // Selección en cascada: marcas, modelos, versiones y búsqueda se derivan de forma síncrona
   const [selectedBrand, setSelectedBrand] = useState<string>('');
   const [selectedModel, setSelectedModel] = useState<string>('');
   const [selectedVersionId, setSelectedVersionId] = useState<string>('');
-
-  // Live search states
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
 
-  // Load brands on mount
-  useEffect(() => {
-    async function loadBrands() {
-      try {
-        const res = await fetch('/api/vehicles?action=brands');
-        const data = await res.json();
-        if (data.brands) {
-          setBrands(data.brands);
-        }
-      } catch (err) {
-        console.error('Error fetching brands:', err);
-      }
-    }
-    loadBrands();
-  }, []);
+  const brands = useMemo(() => getBrands(), []);
+  const models = useMemo(() => (selectedBrand ? getModelsByBrand(selectedBrand) : []), [selectedBrand]);
+  const versions = useMemo(
+    () => (selectedBrand && selectedModel ? getVersionsByModel(selectedBrand, selectedModel) : []),
+    [selectedBrand, selectedModel]
+  );
+  const searchResults = useMemo(
+    () => (searchQuery.trim().length >= SEARCH_MIN_LENGTH ? searchVehicles(searchQuery.trim()) : []),
+    [searchQuery]
+  );
 
-  // When brand changes, load models
-  useEffect(() => {
-    if (!selectedBrand) {
-      setModels([]);
-      setSelectedModel('');
-      setVersions([]);
-      setSelectedVersionId('');
-      return;
-    }
+  const handleBrandChange = (brand: string) => {
+    setSelectedBrand(brand);
+    setSelectedModel('');
+    setSelectedVersionId('');
+  };
 
-    async function loadModels() {
-      try {
-        const res = await fetch(`/api/vehicles?action=models&brand=${encodeURIComponent(selectedBrand)}`);
-        const data = await res.json();
-        if (data.models) {
-          setModels(data.models);
-          setSelectedModel('');
-          setVersions([]);
-          setSelectedVersionId('');
-        }
-      } catch (err) {
-        console.error('Error loading models:', err);
-      }
-    }
-    loadModels();
-  }, [selectedBrand]);
-
-  // When model changes, load versions
-  useEffect(() => {
-    if (!selectedBrand || !selectedModel) {
-      setVersions([]);
-      setSelectedVersionId('');
-      return;
-    }
-
-    async function loadVersions() {
-      try {
-        const res = await fetch(
-          `/api/vehicles?action=versions&brand=${encodeURIComponent(selectedBrand)}&model=${encodeURIComponent(
-            selectedModel
-          )}`
-        );
-        const data = await res.json();
-        if (data.versions) {
-          setVersions(data.versions);
-          if (data.versions.length > 0) {
-            const matched = data.versions.find((v: any) => v.dgtBadge === currentBadge) || data.versions[0];
-            setSelectedVersionId(matched.id);
-            onVehicleSelect(matched);
-            onBadgeSelect(matched.dgtBadge as DgtBadgeType);
-          }
-        }
-      } catch (err) {
-        console.error('Error loading versions:', err);
-      }
-    }
-    loadVersions();
-  }, [selectedBrand, selectedModel]);
-
-  // Live search
-  useEffect(() => {
-    if (!searchQuery || searchQuery.trim().length < 2) {
-      setSearchResults([]);
-      setIsSearching(false);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      setIsSearching(true);
-      try {
-        const res = await fetch(`/api/vehicles?search=${encodeURIComponent(searchQuery.trim())}`);
-        const data = await res.json();
-        if (data.results) {
-          setSearchResults(data.results);
-        }
-      } catch (err) {
-        console.error('Error searching vehicles:', err);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  const handleModelChange = (model: string) => {
+    setSelectedModel(model);
+    setSelectedVersionId('');
+    const modelVersions = model ? getVersionsByModel(selectedBrand, model) : [];
+    if (modelVersions.length === 0) return;
+    const matched = modelVersions.find((v) => v.dgtBadge === currentBadge) || modelVersions[0];
+    setSelectedVersionId(matched.id);
+    onVehicleSelect(matched);
+    onBadgeSelect(matched.dgtBadge as DgtBadgeType);
+  };
 
   const quickBadges: { badge: DgtBadgeType; label: string; desc: string }[] = [
     { badge: 'CERO', label: '0 CERO', desc: '100% Eléctrico / PHEV' },
@@ -151,26 +75,13 @@ export function VehicleSelector({
 
   const handlePlateLookup = async (e?: React.FormEvent, fuelOverride?: FuelOption) => {
     if (e) e.preventDefault();
-    if (!plateInput || plateInput.trim().length < 4) {
-      setPlateError('Introduce una matrícula válida (ej: 1234 LMN o M 1234 AB)');
-      return;
-    }
-
     const fuelToUse = fuelOverride || selectedFuel;
 
     setIsPlateLoading(true);
     setPlateError(null);
 
     try {
-      const res = await fetch(
-        `/api/plate?plate=${encodeURIComponent(plateInput.trim())}&fuel=${encodeURIComponent(fuelToUse)}`
-      );
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        throw new Error(data.error || 'No se pudo consultar la matrícula');
-      }
-
+      const data = await lookupPlateForForm(plateInput.trim(), fuelToUse);
       const exactBadge = data.badge as DgtBadgeType;
       setPlateSuccess(data);
 
@@ -184,8 +95,8 @@ export function VehicleSelector({
           dgtBadge: exactBadge,
         });
       }
-    } catch (err: any) {
-      setPlateError(err?.message || 'Error al conectar con el servicio DGT');
+    } catch (err) {
+      setPlateError(err instanceof Error ? err.message : 'No se pudo consultar la matrícula');
     } finally {
       setIsPlateLoading(false);
     }
@@ -395,11 +306,6 @@ export function VehicleSelector({
             placeholder="Buscar modelo (ej. Corolla, Golf, Audi A4, Tucson...)"
             className="w-full rounded border border-neutral-800 bg-neutral-900 py-2 pl-9 pr-3 text-xs text-white placeholder-neutral-400 focus:border-orange-500 focus:outline-none"
           />
-          {isSearching && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <span className="h-3.5 w-3.5 rounded-full border-2 border-orange-500 border-t-transparent animate-spin block" />
-            </div>
-          )}
         </div>
 
         {/* Resultados de búsqueda */}
@@ -416,7 +322,6 @@ export function VehicleSelector({
                   setSelectedModel(item.model);
                   setSelectedVersionId(item.id);
                   setSearchQuery('');
-                  setSearchResults([]);
                 }}
                 className="w-full px-3 py-2 text-left text-xs border-b border-neutral-800/60 last:border-b-0 hover:bg-neutral-800 flex items-center justify-between"
               >
@@ -449,7 +354,7 @@ export function VehicleSelector({
             <label className="block text-[10px] text-neutral-400 mb-0.5">1. Marca</label>
             <select
               value={selectedBrand}
-              onChange={(e) => setSelectedBrand(e.target.value)}
+              onChange={(e) => handleBrandChange(e.target.value)}
               className="w-full rounded border border-neutral-800 bg-neutral-900 px-2 py-1.5 text-xs text-white focus:border-orange-500 focus:outline-none"
             >
               <option value="">Selecciona Marca</option>
@@ -466,7 +371,7 @@ export function VehicleSelector({
             <label className="block text-[10px] text-neutral-400 mb-0.5">2. Modelo</label>
             <select
               value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
+              onChange={(e) => handleModelChange(e.target.value)}
               disabled={!selectedBrand}
               className="w-full rounded border border-neutral-800 bg-neutral-900 px-2 py-1.5 text-xs text-white focus:border-orange-500 focus:outline-none disabled:opacity-40"
             >

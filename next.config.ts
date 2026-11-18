@@ -1,70 +1,18 @@
 import type { NextConfig } from 'next';
 
+// Debe coincidir con BASE_PATH de lib/site.ts (lo comprueba tests/site.test.ts).
+// No se importa de allí porque Next compila este fichero a ESM y no resuelve
+// importaciones TypeScript sin extensión.
+const BASE_PATH = '/es/zbe';
+
+// Exportación estática: el sitio se publica como ficheros en Cloudflare (ver ../ododex-sitio).
+// Sin servidor no hay redirects(): la web nunca se publicó con las URLs antiguas.
 const nextConfig: NextConfig = {
+  basePath: BASE_PATH,
+  output: 'export',
   reactStrictMode: true,
   images: {
     unoptimized: true,
-  },
-  async redirects() {
-    return [
-      // Redirecciones 301 específicas de slugs legacy de /puede-entrar a su página verificada equivalente
-      {
-        source: '/puede-entrar/audi-a4-2-0-tdi-en-madrid',
-        destination: '/zbe/madrid/b',
-        permanent: true,
-      },
-      {
-        source: '/puede-entrar/audi-a4-2-0-tdi-en-barcelona',
-        destination: '/zbe/barcelona/b',
-        permanent: true,
-      },
-      {
-        source: '/puede-entrar/seat-ibiza-en-madrid',
-        destination: '/zbe/madrid/c',
-        permanent: true,
-      },
-      {
-        source: '/puede-entrar/seat-ibiza-en-barcelona',
-        destination: '/zbe/barcelona/c',
-        permanent: true,
-      },
-      {
-        source: '/puede-entrar/volkswagen-golf-en-madrid',
-        destination: '/zbe/madrid/c',
-        permanent: true,
-      },
-      {
-        source: '/puede-entrar/volkswagen-golf-en-valencia',
-        destination: '/zbe/valencia/c',
-        permanent: true,
-      },
-      {
-        source: '/puede-entrar/toyota-corolla-en-madrid',
-        destination: '/zbe/madrid/eco',
-        permanent: true,
-      },
-      {
-        source: '/puede-entrar/toyota-corolla-en-sevilla',
-        destination: '/zbe/sevilla/eco',
-        permanent: true,
-      },
-      {
-        source: '/puede-entrar/renault-clio-en-bilbao',
-        destination: '/zbe/bilbao/c',
-        permanent: true,
-      },
-      {
-        source: '/puede-entrar/:slug*',
-        destination: '/',
-        permanent: true,
-      },
-      // Redirección 301 legacy de modelos inventados a la ruta programática oficial
-      {
-        source: '/etiqueta-dgt/:marca((?!gasolina|diesel|hibrido|hibrido-enchufable|electrico|glp-gnc)[^/]+)/:modelo((?!\\d{4}$).*)',
-        destination: '/etiqueta-dgt/gasolina/2018',
-        permanent: true,
-      },
-    ];
   },
 };
 

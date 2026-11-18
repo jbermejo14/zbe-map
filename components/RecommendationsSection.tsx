@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { DgtBadgeType } from '@/lib/zbe-engine';
+import React, { useMemo } from 'react';
+import type { DgtBadgeType } from '@/lib/zbe-engine';
+import { buildRecommendations } from '@/lib/client-logic';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { ArrowRight, ShoppingBag, Zap, Coins } from 'lucide-react';
 
@@ -11,37 +12,20 @@ interface RecommendationsSectionProps {
 }
 
 export function RecommendationsSection({ vehicle, currentBadge }: RecommendationsSectionProps) {
-  const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-
   const shouldShow = currentBadge === 'B' || currentBadge === 'SIN_ETIQUETA';
 
-  useEffect(() => {
-    if (!shouldShow) return;
-
-    async function fetchRecommendations() {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        if (vehicle?.id) params.set('vehicleId', vehicle.id);
-        if (vehicle?.bodyType) params.set('bodyType', vehicle.bodyType);
-        if (vehicle?.wheelbaseMm) params.set('wheelbaseMm', String(vehicle.wheelbaseMm));
-        if (vehicle?.powerKw) params.set('powerKw', String(vehicle.powerKw));
-
-        const res = await fetch(`/api/recommendations?${params.toString()}`);
-        const data = await res.json();
-        if (data.recommendations) {
-          setRecommendations(data.recommendations);
-        }
-      } catch (err) {
-        console.error('Error fetching recommendations:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchRecommendations();
-  }, [vehicle, currentBadge, shouldShow]);
+  const recommendations = useMemo(
+    () =>
+      shouldShow
+        ? buildRecommendations({
+            vehicleId: vehicle?.id,
+            bodyType: vehicle?.bodyType,
+            wheelbaseMm: vehicle?.wheelbaseMm,
+            powerKw: vehicle?.powerKw,
+          }).recommendations
+        : [],
+    [vehicle, shouldShow]
+  );
 
   if (!shouldShow) return null;
 
@@ -83,88 +67,79 @@ export function RecommendationsSection({ vehicle, currentBadge }: Recommendation
       </div>
 
       {/* Grid de Coches */}
-      {loading ? (
-        <div className="py-8 flex justify-center items-center">
-          <div className="flex items-center gap-2 text-neutral-400 text-xs">
-            <span className="h-4 w-4 rounded-full border-2 border-orange-500 border-t-transparent animate-spin" />
-            Buscando vehículos equivalentes...
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
-          {recommendations.map((car) => {
-            return (
-              <div
-                key={car.id}
-                className="flex flex-col justify-between rounded-lg border border-neutral-800 bg-neutral-900/60 p-4 hover:border-neutral-700 transition-colors"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded border border-neutral-700 bg-neutral-800 text-neutral-200">
-                      {car.dgtBadge === 'CERO' ? '0 CERO' : 'Etiqueta ECO'}
-                    </span>
-                    <span className="text-[11px] text-neutral-400">
-                      {car.bodyType} &middot; {car.year}
-                    </span>
-                  </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+        {recommendations.map((car) => {
+          return (
+            <div
+              key={car.id}
+              className="flex flex-col justify-between rounded-lg border border-neutral-800 bg-neutral-900/60 p-4 hover:border-neutral-700 transition-colors"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded border border-neutral-700 bg-neutral-800 text-neutral-200">
+                    {car.dgtBadge === 'CERO' ? '0 CERO' : 'Etiqueta ECO'}
+                  </span>
+                  <span className="text-[11px] text-neutral-400">
+                    {car.bodyType} &middot; {car.year}
+                  </span>
+                </div>
 
-                  <div className="flex items-center gap-3 mb-3">
-                    <DgtSticker badge={car.dgtBadge} size={54} className="flex-shrink-0" />
-                    <div>
-                      <h4 className="text-sm font-bold text-white">
-                        {car.brand} {car.model}
-                      </h4>
-                      <p className="text-xs text-neutral-300 truncate">{car.version}</p>
-                      <p className="text-[11px] text-neutral-400 mt-0.5">
-                        {car.powerCv} CV ({car.powerKw} kW) &middot; {car.wheelbaseMm} mm
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="bg-neutral-950 p-2 rounded text-[11px] text-neutral-300 space-y-0.5 mb-3">
-                    <div className="flex justify-between">
-                      <span className="text-neutral-400">Acceso ZBE:</span>
-                      <strong className="text-green-400">Libre sin restricciones</strong>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-neutral-400">Emisiones CO₂:</span>
-                      <span>{car.co2Emissions ? `${car.co2Emissions} g/km` : '0 g/km'}</span>
-                    </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <DgtSticker badge={car.dgtBadge as DgtBadgeType} size={54} className="flex-shrink-0" />
+                  <div>
+                    <h4 className="text-sm font-bold text-white">
+                      {car.brand} {car.model}
+                    </h4>
+                    <p className="text-xs text-neutral-300 truncate">{car.version}</p>
+                    <p className="text-[11px] text-neutral-400 mt-0.5">
+                      {car.powerCv} CV ({car.powerKw} kW) &middot; {car.wheelbaseMm} mm
+                    </p>
                   </div>
                 </div>
 
-                <div className="space-y-1.5 pt-2 border-t border-neutral-800">
-                  <a
-                    href={car.affiliateDeals?.segundaMano?.url || '#'}
-                    target="_blank"
-                    rel="nofollow noopener noreferrer"
-                    className="flex items-center justify-between w-full px-2.5 py-1.5 rounded bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-medium transition-colors"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <ShoppingBag className="h-3 w-3 text-orange-500" />
-                      <span>Ver ofertas de ocasión</span>
-                    </span>
-                    <span className="text-[10px] text-neutral-400">Segunda mano</span>
-                  </a>
-
-                  <a
-                    href={car.affiliateDeals?.renting?.url || '#'}
-                    target="_blank"
-                    rel="nofollow noopener noreferrer"
-                    className="flex items-center justify-between w-full px-2.5 py-1.5 rounded border border-orange-500/40 bg-orange-950/20 text-orange-400 text-xs font-medium transition-colors"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <Zap className="h-3 w-3 text-orange-500" />
-                      <span>Consultar cuotas de renting</span>
-                    </span>
-                    <ArrowRight className="h-3 w-3" />
-                  </a>
+                <div className="bg-neutral-950 p-2 rounded text-[11px] text-neutral-300 space-y-0.5 mb-3">
+                  <div className="flex justify-between">
+                    <span className="text-neutral-400">Acceso ZBE:</span>
+                    <strong className="text-green-400">Libre sin restricciones</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-400">Emisiones CO₂:</span>
+                    <span>{car.co2Emissions ? `${car.co2Emissions} g/km` : '0 g/km'}</span>
+                  </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+
+              <div className="space-y-1.5 pt-2 border-t border-neutral-800">
+                <a
+                  href={car.affiliateDeals?.segundaMano?.url || '#'}
+                  target="_blank"
+                  rel="nofollow noopener noreferrer"
+                  className="flex items-center justify-between w-full px-2.5 py-1.5 rounded bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-medium transition-colors"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <ShoppingBag className="h-3 w-3 text-orange-500" />
+                    <span>Ver ofertas de ocasión</span>
+                  </span>
+                  <span className="text-[10px] text-neutral-400">Segunda mano</span>
+                </a>
+
+                <a
+                  href={car.affiliateDeals?.renting?.url || '#'}
+                  target="_blank"
+                  rel="nofollow noopener noreferrer"
+                  className="flex items-center justify-between w-full px-2.5 py-1.5 rounded border border-orange-500/40 bg-orange-950/20 text-orange-400 text-xs font-medium transition-colors"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Zap className="h-3 w-3 text-orange-500" />
+                    <span>Consultar cuotas de renting</span>
+                  </span>
+                  <ArrowRight className="h-3 w-3" />
+                </a>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </section>
   );
 }

@@ -1,14 +1,17 @@
 import type { MetadataRoute } from 'next';
 import { getAllCities } from '../lib/cities-repository.ts';
+import { absoluteUrl } from '../lib/site.ts';
+
+// Exportación estática: el sitemap se genera en el build.
+export const dynamic = 'force-static';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://radar-zbe.es';
   const lastModified = new Date();
 
   // 1. Home
   const routes: MetadataRoute.Sitemap = [
     {
-      url: `${siteUrl}`,
+      url: absoluteUrl('/'),
       lastModified,
       changeFrequency: 'daily',
       priority: 1.0,
@@ -18,19 +21,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const cities = getAllCities();
   const badges = ['cero', 'eco', 'c', 'b', 'sin-etiqueta'];
 
-  // 2. Páginas de ciudad (/zbe/[ciudad])
+  // 2. Páginas de ciudad (/[ciudad])
   for (const city of cities) {
     routes.push({
-      url: `${siteUrl}/zbe/${city.slug}`,
+      url: absoluteUrl(`/${city.slug}`),
       lastModified: new Date(city.lastVerified || lastModified),
       changeFrequency: 'weekly',
       priority: 0.8,
     });
 
-    // 3. Páginas ciudad x etiqueta (/zbe/[ciudad]/[etiqueta])
+    // 3. Páginas ciudad x etiqueta (/[ciudad]/[etiqueta])
     for (const badge of badges) {
       routes.push({
-        url: `${siteUrl}/zbe/${city.slug}/${badge}`,
+        url: absoluteUrl(`/${city.slug}/${badge}`),
         lastModified: new Date(city.lastVerified || lastModified),
         changeFrequency: 'weekly',
         priority: 0.7,
@@ -48,7 +51,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const fuel of fuels) {
     for (const year of years) {
       routes.push({
-        url: `${siteUrl}/etiqueta-dgt/${fuel}/${year}`,
+        url: absoluteUrl(`/etiqueta-dgt/${fuel}/${year}`),
         lastModified,
         changeFrequency: 'monthly',
         priority: 0.6,
