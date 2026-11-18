@@ -171,6 +171,16 @@ Las recomendaciones de alternativas ECO o CERO siguen usando `data/reference-veh
 - Junto al resultado, el enlace "Confirmar en la DGT" a la consulta oficial del distintivo (`DGT_LEGAL_SOURCE.dgtPortalUrl`, en una pestaña nueva con `rel="noopener noreferrer"`).
 - La consulta por matrícula se mantiene, rotulada claramente como **estimación por la serie de la matrícula**. El campo de matrícula lleva `<label>` asociado (hoy no lo tiene). Su resultado rellena el combustible y el año del selector, de modo que el usuario puede corregirlos.
 
+
+**Decisiones finales del titular (18/11/2026), que prevalecen sobre lo anterior de Z5.1:**
+
+- El selector tiene solo **marca, combustible y año**, más el mes si es diésel de 2015 y la autonomía si es híbrido enchufable, porque las reglas los exigen. No hay campo de modelo ni selector rápido de etiqueta.
+- **No se conecta ninguna API de matrículas.** No hay ninguna gratuita: la DGT no tiene API pública y las comerciales cobran unos 0,20 € por consulta. La matrícula se mantiene como **atajo para el año**: `resolveBadgeFromPlate` (`lib/plate-badge.ts`) estima el año por la serie con `lib/plate-lookup.ts` y calcula la etiqueta para gasolina y para diésel:
+  - si coinciden, la muestra sin preguntar el combustible, con la nota de que en híbridos, eléctricos o de gas cambia;
+  - si difieren, pide el combustible antes de mostrarla.
+- Sin enlace a la DGT junto al resultado de la matrícula. "Confirmar en la DGT" se queda junto al resultado del selector.
+- La matrícula y la ubicación se procesan solo en el navegador; lo dice la página de privacidad.
+
 ### Z5.2 Página de ciudades y botón "Ciudades"
 
 - Página nueva `app/ciudades/page.tsx` (`/es/zbe/ciudades`):
