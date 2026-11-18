@@ -230,12 +230,12 @@ export default async function CityBadgePage({ params }: Props) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-line">
           <div className="flex items-center gap-4">
             <DgtSticker badge={badgeKey} size={70} className="flex-shrink-0" />
-            <div>
-              <span className={`inline-flex items-center gap-1.5 tag-lg ${zbeUiAccessTagClass(accessStatus)}`}>
+            <div className="min-w-0">
+              <span className={`inline-flex items-center gap-1.5 tag-lg whitespace-normal ${zbeUiAccessTagClass(accessStatus)}`}>
                 <StatusIcon className="h-3.5 w-3.5" />
                 {statusConfig.label}
               </span>
-              <h1 className="text-2xl sm:text-3xl font-black text-fg tracking-tight mt-2">
+              <h1 className="text-2xl sm:text-3xl font-black text-fg tracking-tight mt-2 break-words">
                 ¿Puede entrar un coche con {badgeInfo.label} en la ZBE de {city.name}?
               </h1>
               <p className="text-xs sm:text-sm text-muted mt-1">
