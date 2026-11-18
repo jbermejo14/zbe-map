@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import type { DgtBadgeType } from '@/lib/zbe-engine';
 import { getBrands, getModelsByBrand, getVersionsByModel, searchVehicles } from '@/lib/vehicles-repository';
 import { lookupPlateForForm } from '@/lib/client-logic';
+import { zbeUiBadgeChipClass, zbeUiBadgeShortLabel } from '@/lib/zbe-ui';
 import { Search, Filter, Car, ShieldCheck, AlertCircle, Fuel, Zap } from 'lucide-react';
 
 type FuelOption = 'gasolina' | 'diesel' | 'hibrido' | 'electrico';
@@ -120,22 +121,22 @@ export function VehicleSelector({
   return (
     <div className="space-y-4">
       {/* Buscador de Matrícula DGT */}
-      <div className="rounded-lg border border-neutral-800 bg-neutral-900/80 p-3 shadow-inner">
+      <div className="rounded-lg border border-line bg-elevated/80 p-3 shadow-inner">
         <div className="flex items-center justify-between mb-2">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
+          <label className="text-[11px] font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5" />
             Comprobador por Matrícula (Estimación)
           </label>
-          <span className="text-[10px] text-neutral-400">Estimación por año de serie</span>
+          <span className="text-[10px] text-muted">Estimación por año de serie</span>
         </div>
 
         {/* Fila superior: Placa de Matrícula + Botón */}
         <form onSubmit={(e) => handlePlateLookup(e)} className="flex flex-col sm:flex-row items-stretch gap-2">
           {/* Placa de matrícula europea estilizada */}
-          <div className="flex-1 flex items-center bg-white rounded border-2 border-neutral-300 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-orange-500">
+          <div className="flex-1 flex items-center bg-plate rounded border-2 border-line shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-accent">
             {/* Franja azul europea */}
-            <div className="bg-[#003399] text-white px-2.5 py-1.5 flex flex-col items-center justify-center select-none flex-shrink-0">
-              <span className="text-[10px] leading-tight text-amber-300 font-bold">★★★</span>
+            <div className="bg-plate-band text-on-plate-band px-2.5 py-1.5 flex flex-col items-center justify-center select-none flex-shrink-0">
+              <span className="text-[10px] leading-tight text-plate-star font-bold">★★★</span>
               <span className="text-xs font-black tracking-tight mt-0.5">E</span>
             </div>
 
@@ -149,18 +150,18 @@ export function VehicleSelector({
               }}
               placeholder="1234 LMN"
               maxLength={10}
-              className="w-full bg-transparent px-3 py-1.5 text-base sm:text-lg font-black tracking-widest text-neutral-900 placeholder-neutral-400 uppercase text-center focus:outline-none"
+              className="w-full bg-transparent px-3 py-1.5 text-base sm:text-lg font-black tracking-widest text-on-plate placeholder:text-on-plate-muted uppercase text-center focus:outline-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={isPlateLoading}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs transition-colors disabled:opacity-50 whitespace-nowrap"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded bg-btn hover:bg-btn-hover text-on-btn font-bold text-xs transition-colors disabled:opacity-50 whitespace-nowrap"
           >
             {isPlateLoading ? (
               <>
-                <span className="h-3 w-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                <span className="h-3 w-3 rounded-full border-2 border-on-btn border-t-transparent animate-spin" />
                 Comprobando...
               </>
             ) : (
@@ -170,13 +171,13 @@ export function VehicleSelector({
         </form>
 
         {/* Selector de Combustible al lado / debajo */}
-        <div className="mt-2.5 pt-2 border-t border-neutral-800/80">
+        <div className="mt-2.5 pt-2 border-t border-line">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-1">
-              <Fuel className="h-3 w-3 text-orange-400" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted flex items-center gap-1">
+              <Fuel className="h-3 w-3 text-accent" />
               Tipo de Motor / Combustible:
             </span>
-            <span className="text-[9px] text-neutral-500 hidden sm:inline">
+            <span className="text-[9px] text-muted hidden sm:inline">
               Cruza año DGT + combustible
             </span>
           </div>
@@ -191,12 +192,12 @@ export function VehicleSelector({
                   onClick={() => onFuelChange(f.id)}
                   className={`flex flex-col items-center justify-center py-1.5 px-2 rounded border text-center transition-all ${
                     isSelected
-                      ? 'border-orange-500 bg-orange-950/30 text-orange-400 font-bold shadow-sm'
-                      : 'border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:text-white hover:border-neutral-700'
+                      ? 'border-accent bg-accent-soft text-accent font-bold shadow-sm'
+                      : 'border-line bg-elevated/60 text-muted hover:text-fg hover:border-line-hover'
                   }`}
                 >
                   <span className="text-xs">{f.icon} {f.label}</span>
-                  <span className="text-[9px] text-neutral-500 mt-0.5">{f.desc}</span>
+                  <span className="text-[9px] text-muted mt-0.5">{f.desc}</span>
                 </button>
               );
             })}
@@ -205,7 +206,7 @@ export function VehicleSelector({
 
         {/* Error de matrícula */}
         {plateError && (
-          <div className="mt-2 flex items-center gap-1.5 text-xs text-red-400 bg-red-950/30 border border-red-900/50 rounded px-2.5 py-1.5">
+          <div className="mt-2 flex items-center gap-1.5 text-xs text-negative bg-negative-soft border border-negative-line rounded px-2.5 py-1.5">
             <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
             <span>{plateError}</span>
           </div>
@@ -213,50 +214,34 @@ export function VehicleSelector({
 
         {/* Éxito de matrícula */}
         {plateSuccess && (
-          <div className="mt-2.5 rounded border border-neutral-700 bg-neutral-900 p-2.5 text-xs shadow-sm">
+          <div className="mt-2.5 rounded border border-line bg-elevated p-2.5 text-xs shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="font-black text-sm text-white tracking-wider">
+                <span className="font-black text-sm text-fg tracking-wider">
                   {plateSuccess.formattedPlate}
                 </span>
-                <span className="text-[10px] text-neutral-400 bg-neutral-800 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] text-muted bg-elevated px-1.5 py-0.5 rounded">
                   {plateSuccess.estimatedYear ? `Año estimado: ~${plateSuccess.estimatedYear}` : ''} ({plateSuccess.fuelLabel})
                 </span>
               </div>
 
               {/* Distintivo Badge */}
-              <span
-                className={`text-[11px] font-black uppercase px-2 py-0.5 rounded border ${
-                  plateSuccess.badge === 'CERO'
-                    ? 'bg-blue-950/60 text-blue-400 border-blue-500/50'
-                    : plateSuccess.badge === 'ECO'
-                    ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/50'
-                    : plateSuccess.badge === 'C'
-                    ? 'bg-green-950/60 text-green-400 border-green-500/50'
-                    : plateSuccess.badge === 'B'
-                    ? 'bg-amber-950/60 text-amber-400 border-amber-500/50'
-                    : 'bg-neutral-800 text-neutral-300 border-neutral-600'
-                }`}
-              >
-                {plateSuccess.badge === 'CERO'
-                  ? '0 CERO'
-                  : plateSuccess.badge === 'SIN_ETIQUETA'
-                  ? 'SIN ETIQUETA (A)'
-                  : `ETIQUETA ${plateSuccess.badge}`}
+              <span className={`${zbeUiBadgeChipClass(plateSuccess.badge)} text-[11px] font-black uppercase px-2 py-0.5 rounded`}>
+                {zbeUiBadgeShortLabel(plateSuccess.badge)}
               </span>
             </div>
-            <p className="text-[11px] text-neutral-300 mt-1.5 leading-relaxed">
+            <p className="text-[11px] text-secondary mt-1.5 leading-relaxed">
               {plateSuccess.explanation}
             </p>
-            <div className="mt-2 pt-2 border-t border-neutral-800 flex items-center justify-between text-[10px]">
-              <span className="text-amber-400/90 font-medium">
+            <div className="mt-2 pt-2 border-t border-line flex items-center justify-between text-[10px]">
+              <span className="text-warning font-medium">
                 ⚠️ Es una estimación basada en serie de matriculación.
               </span>
               <a
                 href={plateSuccess.officialDgtUrl || 'https://sede.dgt.gob.es/es/vehiculos/distintivo-ambiental/'}
                 target="_blank"
                 rel="nofollow noopener noreferrer"
-                className="text-orange-400 hover:text-orange-300 underline font-semibold inline-flex items-center gap-1"
+                className="text-accent hover:text-accent-hover underline font-semibold inline-flex items-center gap-1"
               >
                 Confirmar en Sede DGT &rarr;
               </a>
@@ -268,7 +253,7 @@ export function VehicleSelector({
       {/* Botonera de prueba rápida */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+          <label className="text-[11px] font-bold uppercase tracking-wider text-muted">
             Prueba rápida por Etiqueta
           </label>
         </div>
@@ -283,12 +268,12 @@ export function VehicleSelector({
                 onClick={() => onBadgeSelect(b.badge)}
                 className={`flex flex-col p-2 rounded border text-left transition-colors ${
                   isActive
-                    ? 'border-orange-500 bg-orange-950/20 text-orange-400'
-                    : 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white hover:border-neutral-700'
+                    ? 'border-accent bg-accent-soft text-accent'
+                    : 'border-line bg-elevated text-muted hover:text-fg hover:border-line-hover'
                 }`}
               >
                 <span className="text-xs font-bold">{b.label}</span>
-                <span className="text-[10px] text-neutral-400 truncate mt-0.5">{b.desc}</span>
+                <span className="text-[10px] text-muted truncate mt-0.5">{b.desc}</span>
               </button>
             );
           })}
@@ -298,19 +283,19 @@ export function VehicleSelector({
       {/* Buscador de vehículo */}
       <div className="relative">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar modelo (ej. Corolla, Golf, Audi A4, Tucson...)"
-            className="w-full rounded border border-neutral-800 bg-neutral-900 py-2 pl-9 pr-3 text-xs text-white placeholder-neutral-400 focus:border-orange-500 focus:outline-none"
+            placeholder="Buscar modelo (ej. Corolla, Golf, A4, Tucson...)"
+            className="w-full rounded border border-line bg-elevated py-2 pl-9 pr-3 text-xs text-fg placeholder:text-muted focus:border-accent focus:outline-none"
           />
         </div>
 
         {/* Resultados de búsqueda */}
         {searchResults.length > 0 && (
-          <div className="absolute z-30 mt-1 w-full rounded border border-neutral-800 bg-neutral-900 shadow-xl max-h-56 overflow-y-auto">
+          <div className="absolute z-30 mt-1 w-full rounded border border-line bg-elevated shadow-xl max-h-56 overflow-y-auto">
             {searchResults.map((item) => (
               <button
                 key={item.id}
@@ -323,16 +308,16 @@ export function VehicleSelector({
                   setSelectedVersionId(item.id);
                   setSearchQuery('');
                 }}
-                className="w-full px-3 py-2 text-left text-xs border-b border-neutral-800/60 last:border-b-0 hover:bg-neutral-800 flex items-center justify-between"
+                className="w-full px-3 py-2 text-left text-xs border-b border-line last:border-b-0 hover:bg-elevated flex items-center justify-between"
               >
                 <div>
-                  <span className="font-semibold text-white">
+                  <span className="font-semibold text-fg">
                     {item.brand} {item.model}
                   </span>
-                  <span className="text-neutral-400 ml-2">({item.year})</span>
-                  <p className="text-[11px] text-neutral-400 truncate">{item.version}</p>
+                  <span className="text-muted ml-2">({item.year})</span>
+                  <p className="text-[11px] text-muted truncate">{item.version}</p>
                 </div>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-orange-500/40 text-orange-400">
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-accent-line text-accent">
                   {item.dgtBadge}
                 </span>
               </button>
@@ -342,20 +327,20 @@ export function VehicleSelector({
       </div>
 
       {/* Selectores en cascada */}
-      <div className="space-y-2.5 rounded border border-neutral-800 bg-neutral-900/60 p-3">
-        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
-          <Filter className="h-3 w-3 text-orange-500" />
+      <div className="space-y-2.5 rounded border border-line bg-elevated/60 p-3">
+        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted">
+          <Filter className="h-3 w-3 text-accent" />
           <span>Filtro por Marca y Modelo</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {/* Marca */}
           <div>
-            <label className="block text-[10px] text-neutral-400 mb-0.5">1. Marca</label>
+            <label className="block text-[10px] text-muted mb-0.5">1. Marca</label>
             <select
               value={selectedBrand}
               onChange={(e) => handleBrandChange(e.target.value)}
-              className="w-full rounded border border-neutral-800 bg-neutral-900 px-2 py-1.5 text-xs text-white focus:border-orange-500 focus:outline-none"
+              className="w-full rounded border border-line bg-elevated px-2 py-1.5 text-xs text-fg focus:border-accent focus:outline-none"
             >
               <option value="">Selecciona Marca</option>
               {brands.map((b) => (
@@ -368,12 +353,12 @@ export function VehicleSelector({
 
           {/* Modelo */}
           <div>
-            <label className="block text-[10px] text-neutral-400 mb-0.5">2. Modelo</label>
+            <label className="block text-[10px] text-muted mb-0.5">2. Modelo</label>
             <select
               value={selectedModel}
               onChange={(e) => handleModelChange(e.target.value)}
               disabled={!selectedBrand}
-              className="w-full rounded border border-neutral-800 bg-neutral-900 px-2 py-1.5 text-xs text-white focus:border-orange-500 focus:outline-none disabled:opacity-40"
+              className="w-full rounded border border-line bg-elevated px-2 py-1.5 text-xs text-fg focus:border-accent focus:outline-none disabled:opacity-40"
             >
               <option value="">Selecciona Modelo</option>
               {models.map((m) => (
@@ -386,7 +371,7 @@ export function VehicleSelector({
 
           {/* Versión */}
           <div>
-            <label className="block text-[10px] text-neutral-400 mb-0.5">3. Versión / Año</label>
+            <label className="block text-[10px] text-muted mb-0.5">3. Versión / Año</label>
             <select
               value={selectedVersionId}
               onChange={(e) => {
@@ -399,7 +384,7 @@ export function VehicleSelector({
                 }
               }}
               disabled={!selectedModel || versions.length === 0}
-              className="w-full rounded border border-neutral-800 bg-neutral-900 px-2 py-1.5 text-xs text-white focus:border-orange-500 focus:outline-none disabled:opacity-40"
+              className="w-full rounded border border-line bg-elevated px-2 py-1.5 text-xs text-fg focus:border-accent focus:outline-none disabled:opacity-40"
             >
               <option value="">Selecciona Versión</option>
               {versions.map((v) => (

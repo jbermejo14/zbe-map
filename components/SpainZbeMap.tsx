@@ -9,6 +9,7 @@ import {
   getTileLayerOptions,
   type MapLayerType,
 } from '@/lib/map-config';
+import { zbeUiReadMapColor } from '@/lib/zbe-ui';
 import { Search, RotateCcw, Layers, Navigation } from 'lucide-react';
 
 interface SpainZbeMapProps {
@@ -55,31 +56,21 @@ export function SpainZbeMap({
     (map: any, L: any, list: CityEvaluationResult[], displayPolygons: boolean) => {
       // 1. Limpiar marcadores antiguos
       Object.values(markersRef.current).forEach((marker: any) => {
-        try {
-          marker.remove();
-        } catch {
-          // ignore
-        }
+        marker.remove();
       });
       markersRef.current = {};
 
       // 2. Limpiar capas GeoJSON antiguas
       Object.values(geojsonLayersRef.current).forEach((layer: any) => {
-        try {
-          layer.remove();
-        } catch {
-          // ignore
-        }
+        layer.remove();
       });
       geojsonLayersRef.current = {};
 
       list.forEach((city) => {
-        const isAllowed = city.status === 'allowed';
         const isRestricted = city.status === 'restricted';
         const isBanned = city.status === 'banned';
 
-        // Estilo solicitado: #e63946 (rojo suave) para vetado, #ea580c (naranja) para restringido, #16a34a (verde) para libre
-        const strokeColor = isAllowed ? '#16a34a' : isRestricted ? '#ea580c' : '#e63946';
+        const strokeColor = zbeUiReadMapColor(city.status);
 
         // A. Marcador central
         let markerClass = 'zbe-marker-allowed';
@@ -96,18 +87,10 @@ export function SpainZbeMap({
         const marker = L.marker([city.lat, city.lng], { icon: customIcon });
 
         const tooltipHtml = `
-          <div style="font-family: inherit; min-width: 170px; padding: 2px;">
-            <div style="font-size: 13px; font-weight: 700; color: #ffffff; margin-bottom: 2px;">
-              ${city.cityName}
-            </div>
-            <div style="font-size: 11px; font-weight: 700; color: ${
-              isAllowed ? '#22c55e' : isRestricted ? '#fb923c' : '#f87171'
-            }; text-transform: uppercase;">
-              ${city.statusLabel}
-            </div>
-            <div style="font-size: 10px; color: #a1a1aa; margin-top: 2px;">
-              ${city.perimeterName || 'Límite de Zona ZBE'}
-            </div>
+          <div class="zbe-tip">
+            <div class="zbe-tip-title">${city.cityName}</div>
+            <div class="zbe-tip-status zbe-status-${city.status}">${city.statusLabel}</div>
+            <div class="zbe-tip-detail">${city.perimeterName || 'Límite de Zona ZBE'}</div>
           </div>
         `;
 
@@ -166,7 +149,7 @@ export function SpainZbeMap({
                 color: strokeColor, // Color del borde
                 weight: 2.5, // Grosor perimetral
                 opacity: 0.9,
-                fillColor: strokeColor, 
+                fillColor: strokeColor,
                 fillOpacity: 0.22, // Transparencia para leer las calles debajo
                 dashArray: isRestricted ? '5, 5' : undefined, // Línea discontinua opcional
               },
@@ -175,18 +158,18 @@ export function SpainZbeMap({
                 const desc = feature.properties?.descripcion || city.summary;
                 const streetsHtml =
                   city.streets && city.streets.length > 0
-                    ? `<div style="margin-top: 6px; font-size: 11px; color: #52525b; border-top: 1px solid #e4e4e7; padding-top: 4px;">
+                    ? `<div class="zbe-popup-streets">
                         <strong>Vías perimetrales:</strong><br/>${city.streets.slice(0, 4).join(' &bull; ')}
                        </div>`
                     : '';
 
                 layer.bindPopup(
-                  `<div style="font-family: system-ui, sans-serif; font-size: 12px; line-height: 1.4; color: #18181b;">
-                    <strong style="font-size: 13px; color: #09090b;">${nombre}</strong><br/>
-                    <span style="color: ${strokeColor}; font-weight: bold; text-transform: uppercase; font-size: 10px;">
+                  `<div class="zbe-popup">
+                    <strong class="zbe-popup-title">${nombre}</strong><br/>
+                    <span class="zbe-popup-status zbe-status-${city.status}">
                       ${city.statusLabel} (${city.fineAmount} € sanción)
                     </span><br/>
-                    <div style="margin-top: 4px; color: #3f3f46;">${desc}</div>
+                    <div class="zbe-popup-desc">${desc}</div>
                     ${streetsHtml}
                   </div>`
                 );
@@ -331,9 +314,9 @@ export function SpainZbeMap({
   };
 
   return (
-    <div className="relative isolate flex flex-col h-full w-full rounded-xl overflow-hidden border border-neutral-800 bg-black shadow-lg">
-      {/* Barra de control superior - Negro y Naranja */}
-      <div className="z-10 flex flex-wrap items-center justify-between gap-2.5 p-3 bg-neutral-950 border-b border-neutral-800">
+    <div className="relative isolate flex flex-col h-full w-full rounded-xl overflow-hidden border border-line bg-surface shadow-lg">
+      {/* Barra de control superior */}
+      <div className="z-10 flex flex-wrap items-center justify-between gap-2.5 p-3 bg-surface border-b border-line">
         {/* Filtros de estado */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <button
@@ -341,8 +324,8 @@ export function SpainZbeMap({
             onClick={() => onFilterChange('all')}
             className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
               statusFilter === 'all'
-                ? 'bg-neutral-100 text-black'
-                : 'bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800'
+                ? 'bg-fg text-bg'
+                : 'bg-elevated text-muted hover:text-fg border border-line'
             }`}
           >
             Todas ({cities.length})
@@ -352,11 +335,11 @@ export function SpainZbeMap({
             onClick={() => onFilterChange('allowed')}
             className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
               statusFilter === 'allowed'
-                ? 'bg-green-600 text-white'
-                : 'bg-neutral-900 text-green-500 hover:text-green-400 border border-neutral-800'
+                ? 'bg-solid-positive text-on-btn'
+                : 'bg-elevated text-positive border border-line'
             }`}
           >
-            <span className="h-2 w-2 rounded-full bg-green-500" />
+            <span className="h-2 w-2 rounded-full bg-positive" />
             Libre ({cities.filter((c) => c.status === 'allowed').length})
           </button>
           <button
@@ -364,11 +347,11 @@ export function SpainZbeMap({
             onClick={() => onFilterChange('restricted')}
             className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
               statusFilter === 'restricted'
-                ? 'bg-orange-600 text-white'
-                : 'bg-neutral-900 text-orange-500 hover:text-orange-400 border border-neutral-800'
+                ? 'bg-solid-warning text-on-btn'
+                : 'bg-elevated text-warning border border-line'
             }`}
           >
-            <span className="h-2 w-2 rounded-full bg-orange-500" />
+            <span className="h-2 w-2 rounded-full bg-warning" />
             Restringido ({cities.filter((c) => c.status === 'restricted').length})
           </button>
           <button
@@ -376,11 +359,11 @@ export function SpainZbeMap({
             onClick={() => onFilterChange('banned')}
             className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
               statusFilter === 'banned'
-                ? 'bg-red-600 text-white'
-                : 'bg-neutral-900 text-red-500 hover:text-red-400 border border-neutral-800'
+                ? 'bg-solid-negative text-on-btn'
+                : 'bg-elevated text-negative border border-line'
             }`}
           >
-            <span className="h-2 w-2 rounded-full bg-red-500" />
+            <span className="h-2 w-2 rounded-full bg-negative" />
             Prohibido ({cities.filter((c) => c.status === 'banned').length})
           </button>
         </div>
@@ -391,7 +374,7 @@ export function SpainZbeMap({
           <button
             type="button"
             onClick={focusZaragoza}
-            className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold bg-orange-600 text-white hover:bg-orange-500 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold bg-btn text-on-btn hover:bg-btn-hover transition-colors shadow-sm"
             title="Ver trazado GeoJSON de la ZBE Casco Histórico de Zaragoza"
           >
             <Navigation className="h-3 w-3" />
@@ -402,7 +385,7 @@ export function SpainZbeMap({
           <button
             type="button"
             onClick={focusHuesca}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-neutral-900 text-neutral-300 hover:text-white border border-neutral-800 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium bg-elevated text-secondary hover:text-fg border border-line transition-colors"
             title="Ver trazado ZBE Huesca (Cosos)"
           >
             <span>Huesca</span>
@@ -414,24 +397,24 @@ export function SpainZbeMap({
             onClick={() => setShowPolygons(!showPolygons)}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold border transition-colors ${
               showPolygons
-                ? 'bg-orange-500/15 border-orange-500/60 text-orange-400'
-                : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
+                ? 'bg-accent-soft border-accent-line text-accent'
+                : 'bg-elevated border-line text-muted hover:text-fg'
             }`}
             title="Mostrar u ocultar capas GeoJSON de las ZBE"
           >
-            <Layers className="h-3.5 w-3.5 text-orange-500" />
+            <Layers className="h-3.5 w-3.5 text-accent" />
             <span>GeoJSON</span>
           </button>
 
           {/* Selector de capa de mapa */}
-          <div className="flex items-center bg-neutral-900 rounded border border-neutral-800 p-0.5 text-xs">
+          <div className="flex items-center bg-elevated rounded border border-line p-0.5 text-xs">
             {(Object.keys(MAP_TILE_SOURCES) as MapLayerType[]).map((layer) => (
               <button
                 key={layer}
                 type="button"
                 onClick={() => setMapLayer(layer)}
                 className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-                  mapLayer === layer ? 'bg-orange-600 text-white' : 'text-neutral-400 hover:text-neutral-200'
+                  mapLayer === layer ? 'bg-btn text-on-btn' : 'text-muted hover:text-secondary'
                 }`}
                 title={MAP_TILE_SOURCES[layer].title}
               >
@@ -442,20 +425,20 @@ export function SpainZbeMap({
 
           {/* Buscador */}
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-500" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted" />
             <input
               type="text"
               value={searchCityQuery}
               onChange={(e) => setSearchCityQuery(e.target.value)}
               placeholder="Buscar..."
-              className="w-24 sm:w-28 rounded border border-neutral-800 bg-neutral-900 py-1 pl-8 pr-2 text-xs text-white placeholder-neutral-500 focus:border-orange-500 focus:outline-none"
+              className="w-24 sm:w-28 rounded border border-line bg-elevated py-1 pl-8 pr-2 text-xs text-fg placeholder:text-muted focus:border-accent focus:outline-none"
             />
           </div>
 
           <button
             onClick={resetViewPeninsula}
             title="Centrar España"
-            className="rounded border border-neutral-800 bg-neutral-900 p-1 text-neutral-400 hover:text-white transition-colors"
+            className="rounded border border-line bg-elevated p-1 text-muted hover:text-fg transition-colors"
           >
             <RotateCcw className="h-3.5 w-3.5" />
           </button>
@@ -467,28 +450,28 @@ export function SpainZbeMap({
         <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
 
         {/* Indicador de trazado GeoJSON */}
-        <div className="absolute top-3 left-3 z-20 pointer-events-none bg-black/85 border border-neutral-800 rounded px-2.5 py-1 text-[11px] text-neutral-300 flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-orange-500" />
+        <div className="absolute top-3 left-3 z-20 pointer-events-none bg-surface/90 border border-line rounded px-2.5 py-1 text-[11px] text-secondary flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-accent" />
           <span>Trazado GeoJSON de cada ZBE &bull; Clic para ver delimitación exacta</span>
         </div>
 
         {/* Leyenda simple */}
-        <div className="absolute bottom-3 left-3 z-20 rounded-lg bg-black/90 border border-neutral-800 p-3 shadow-md pointer-events-auto">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-1">
+        <div className="absolute bottom-3 left-3 z-20 rounded-lg bg-surface/90 border border-line p-3 shadow-md pointer-events-auto">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted block mb-1">
             Zonas ZBE (GeoJSON)
           </span>
           <div className="space-y-1 text-xs">
-            <div className="flex items-center gap-2 text-green-400">
-              <span className="h-2 w-4 rounded-sm bg-green-500/25 border border-green-500 inline-block" />
+            <div className="flex items-center gap-2 text-positive">
+              <span className="h-2 w-4 rounded-sm bg-positive-soft border border-positive-line inline-block" />
               <span>Zona Permitida</span>
             </div>
-            <div className="flex items-center gap-2 text-orange-400">
-              <span className="h-2 w-4 rounded-sm bg-orange-500/25 border border-orange-500 inline-block border-dashed" />
+            <div className="flex items-center gap-2 text-warning">
+              <span className="h-2 w-4 rounded-sm bg-warning-soft border border-warning inline-block border-dashed" />
               <span>Zona Restringida (Parking)</span>
             </div>
-            <div className="flex items-center gap-2 text-red-400">
-              <span className="h-2 w-4 rounded-sm bg-red-500/25 border border-red-500 inline-block" />
-              <span>Zona Prohibida (#e63946)</span>
+            <div className="flex items-center gap-2 text-negative">
+              <span className="h-2 w-4 rounded-sm bg-negative-soft border border-negative-line inline-block" />
+              <span>Zona Prohibida</span>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getAllCities } from '../lib/cities-repository.ts';
 import { absoluteUrl } from '../lib/site.ts';
+import { ETIQUETA_FUEL_SLUGS, ETIQUETA_YEARS } from '../lib/etiqueta-routes.ts';
 
 // Exportación estática: el sitemap se genera en el build.
 export const dynamic = 'force-static';
@@ -42,14 +43,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }
 
   // 4. Páginas programáticas combustible x año (/etiqueta-dgt/[combustible]/[año])
-  const fuels = ['gasolina', 'diesel', 'hibrido', 'hibrido-enchufable', 'electrico', 'glp-gnc'];
-  const years = [
-    1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-    2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026,
-  ];
-
-  for (const fuel of fuels) {
-    for (const year of years) {
+  for (const fuel of ETIQUETA_FUEL_SLUGS) {
+    for (const year of ETIQUETA_YEARS) {
       routes.push({
         url: absoluteUrl(`/etiqueta-dgt/${fuel}/${year}`),
         lastModified,

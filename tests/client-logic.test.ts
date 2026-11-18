@@ -99,6 +99,28 @@ test('recomendaciones: enlaces comerciales limpios y con la marca y el modelo co
   }
 });
 
+const AFFILIATE_TAG_ENV = 'NEXT_PUBLIC_AFFILIATE_CLICARS_TAG';
+const AFFILIATE_TEST_TAG = 'placeholder & prueba';
+
+test('recomendaciones: con tag de afiliación, el enlace de Clicars lo añade codificado', () => {
+  const previous = process.env[AFFILIATE_TAG_ENV];
+  process.env[AFFILIATE_TAG_ENV] = AFFILIATE_TEST_TAG;
+  try {
+    const { recommendations } = buildRecommendations({ vehicleId: searchVehicles('A4')[0].id });
+    assert.ok(recommendations.length > 0);
+    for (const rec of recommendations) {
+      const query = encodeURIComponent(`${rec.brand} ${rec.model}`);
+      assert.equal(
+        rec.affiliateDeals.segundaMano.url,
+        `https://www.clicars.com/coches-segunda-mano?search=${query}&tag=placeholder%20%26%20prueba`
+      );
+    }
+  } finally {
+    if (previous === undefined) delete process.env[AFFILIATE_TAG_ENV];
+    else process.env[AFFILIATE_TAG_ENV] = previous;
+  }
+});
+
 test('recomendaciones: sin vehículo conocido usa los parámetros o el perfil por defecto', () => {
   const custom = buildRecommendations({ bodyType: 'SUV', wheelbaseMm: 2700, powerKw: 110 });
   assert.deepEqual(custom.target, { id: undefined, bodyType: 'SUV', wheelbaseMm: 2700, powerKw: 110 });

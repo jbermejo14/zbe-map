@@ -5,6 +5,8 @@ import 'leaflet/dist/leaflet.css';
 import { MAP_TILE_SOURCES, getTileLayerOptions } from '@/lib/map-config';
 import { PERIMETER_UNAVAILABLE_TEXT } from '@/lib/city-verification';
 import { parsePolygonPoints } from '@/lib/polygon-quality';
+import { zbeUiReadMapColor } from '@/lib/zbe-ui';
+import type { ZbeAccessStatus } from '@/lib/zbe-engine';
 
 interface CityMiniMapProps {
   city: {
@@ -69,9 +71,8 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
       // Parsear polígono
       const polygonCoords = parsePolygonPoints(city.polygon);
 
-      const status = city.status || 'allowed';
-      const color =
-        status === 'allowed' ? '#16a34a' : status === 'restricted' ? '#ea580c' : '#e63946';
+      const status = (city.status || 'allowed') as ZbeAccessStatus;
+      const color = zbeUiReadMapColor(status);
 
       // Si tiene polígono, dibujarlo y ajustar vista
       if (polygonCoords.length > 2) {
@@ -94,10 +95,10 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
 
       // Marcador central
       const markerIcon = L.divIcon({
-        className: 'zbe-mini-marker',
-        html: `<div style="width: 12px; height: 12px; border-radius: 50%; background: ${color}; border: 2px solid #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.4);"></div>`,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6],
+        className: `zbe-marker-${status}`,
+        html: '<div class="marker-core"></div>',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
       });
 
       const marker = L.marker([city.lat, city.lng], { icon: markerIcon }).addTo(map);
@@ -122,11 +123,11 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
 
   return (
     <div
-      className={`relative isolate w-full rounded-xl overflow-hidden border border-slate-200 dark:border-neutral-800 shadow-sm ${className}`}
+      className={`relative isolate w-full rounded-xl overflow-hidden border border-line shadow-sm ${className}`}
       style={{ height }}
     >
       <div ref={mapContainerRef} className="w-full h-full" />
-      <div className="absolute bottom-2 left-2 z-[400] bg-white/90 dark:bg-neutral-900/90 backdrop-blur px-2 py-0.5 rounded text-[10px] font-semibold text-neutral-600 dark:text-neutral-400 border border-slate-200 dark:border-neutral-800 pointer-events-none">
+      <div className="absolute bottom-2 left-2 z-[400] bg-surface/90 backdrop-blur px-2 py-0.5 rounded text-[10px] font-semibold text-secondary border border-line pointer-events-none">
         {hasPolygon ? `Perímetro ZBE ${cityLabel}` : PERIMETER_UNAVAILABLE_TEXT}
       </div>
     </div>

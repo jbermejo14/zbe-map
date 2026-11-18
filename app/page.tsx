@@ -1,24 +1,24 @@
 import type { Metadata } from 'next';
 import { SplitDashboard } from '@/components/SplitDashboard';
-import { absoluteUrl } from '@/lib/site';
+import { absoluteUrl, SECTION_NAME, SITE_NAME } from '@/lib/site';
 import { DgtBadgeType } from '@/lib/zbe-engine';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
 
 const homeUrl = absoluteUrl('/');
 
 export const metadata: Metadata = {
-  title: `Radar ZBE España ${SEO_CURRENT_YEAR}: Mapa y Restricciones de Bajas Emisiones`,
+  title: `Zonas de bajas emisiones (ZBE) ${SEO_CURRENT_YEAR}: mapa y restricciones por etiqueta DGT`,
   description:
     'Comprueba si tu vehículo puede circular o aparcar en las 152 Zonas de Bajas Emisiones (ZBE) de España según su distintivo DGT. Perímetros oficiales cuando están disponibles; el resto de datos, orientativos hasta su verificación.',
   alternates: {
     canonical: homeUrl,
   },
   openGraph: {
-    title: `Radar ZBE España ${SEO_CURRENT_YEAR}: Mapa y Restricciones de Bajas Emisiones`,
+    title: `Zonas de bajas emisiones (ZBE) ${SEO_CURRENT_YEAR}: mapa y restricciones por etiqueta DGT`,
     description:
       'Comprueba si tu vehículo puede circular o aparcar en las 152 Zonas de Bajas Emisiones (ZBE) de España según su distintivo DGT.',
     url: homeUrl,
-    siteName: 'Radar ZBE España',
+    siteName: SITE_NAME,
     type: 'website',
   },
 };
@@ -29,7 +29,7 @@ export default function HomePage() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'Radar ZBE España',
+    name: `${SITE_NAME} · ${SECTION_NAME}`,
     url: homeUrl,
     applicationCategory: 'TravelApplication',
     operatingSystem: 'All',
@@ -46,16 +46,16 @@ export default function HomePage() {
 
       {/* Hero Headline */}
       <div className="text-center max-w-2xl mx-auto mb-6">
-        <div className="inline-flex items-center gap-1.5 rounded bg-orange-950/30 border border-orange-500/40 px-2.5 py-0.5 text-xs font-semibold text-orange-400 mb-2.5">
+        <div className="tag tag-accent mb-3">
           <span>Perímetros ZBE actualizados a {SEO_CURRENT_YEAR}</span>
         </div>
-        <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+        <h1 className="text-2xl sm:text-4xl font-black text-fg tracking-tight">
           ¿Dónde puede circular tu coche?{' '}
-          <span className="text-orange-500">
+          <span className="text-accent">
             Zonas ZBE España
           </span>
         </h1>
-        <p className="mt-2 text-xs sm:text-sm text-neutral-400 leading-relaxed max-w-xl mx-auto">
+        <p className="mt-2 text-xs sm:text-sm text-secondary leading-relaxed max-w-xl mx-auto">
           Selecciona tu coche o etiqueta DGT y visualiza en el mapa el perímetro
           de cada Zona de Bajas Emisiones (ZBE), con horarios, condiciones de parking y multas.
         </p>

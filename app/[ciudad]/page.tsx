@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { absoluteUrl } from '@/lib/site';
+import { zbeUiAccessTagClass } from '@/lib/zbe-ui';
 import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
 import { DgtBadgeType } from '@/lib/zbe-engine';
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!city) {
     return {
-      title: 'Ciudad no encontrada | Radar ZBE',
+      title: 'Ciudad no encontrada',
     };
   }
 
@@ -140,67 +141,65 @@ export default async function CityZbeSeoPage({ params }: Props) {
       />
 
       {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-neutral-400 mb-6 flex-wrap">
-        <Link href="/" className="hover:text-orange-400 transition-colors">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-muted mb-6 flex-wrap">
+        <Link href="/" className="hover:text-accent transition-colors">
           Inicio
         </Link>
         <ChevronRight className="h-3 w-3" />
-        <span className="text-neutral-500">Zonas de Bajas Emisiones</span>
+        <span className="text-muted">Zonas de Bajas Emisiones</span>
         <ChevronRight className="h-3 w-3" />
-        <span className="text-neutral-300">{city.province}</span>
+        <span className="text-secondary">{city.province}</span>
         <ChevronRight className="h-3 w-3" />
-        <span className="text-orange-400 font-semibold">{city.name}</span>
+        <span className="text-accent font-semibold">{city.name}</span>
       </nav>
 
       {/* Hero Header */}
-      <div className="mb-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 sm:p-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-neutral-800">
+      <div className="mb-8 rounded-2xl border border-line bg-elevated/60 p-6 sm:p-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-line">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="rounded-full bg-neutral-800 border border-neutral-700 px-3 py-1 text-xs font-semibold text-neutral-300">
+              <span className="rounded-full bg-elevated border border-line px-3 py-1 text-xs font-semibold text-secondary">
                 {city.province} · {city.region}
               </span>
               <span
-                className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border ${
-                  city.status === 'activa'
-                    ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30'
-                    : 'text-amber-400 bg-amber-500/10 border-amber-500/30'
+                className={`flex items-center gap-1.5 tag-lg ${
+                  city.status === 'activa' ? 'tag tag-green' : 'tag tag-warning'
                 }`}
               >
                 <span
                   className={`h-2 w-2 rounded-full ${
-                    city.status === 'activa' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                    city.status === 'activa' ? 'bg-positive animate-pulse' : 'bg-warning'
                   }`}
                 />
                 {city.status === 'activa' ? 'ZBE Activa' : 'En tramitación / Pruebas'}
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight flex items-center gap-3">
-              <MapPin className="h-7 w-7 text-orange-500" />
+            <h1 className="text-3xl sm:text-4xl font-black text-fg tracking-tight flex items-center gap-3">
+              <MapPin className="h-7 w-7 text-accent" />
               ZBE {city.name}
             </h1>
-            <p className="mt-2 text-xs sm:text-sm text-neutral-300 max-w-2xl leading-relaxed">
+            <p className="mt-2 text-xs sm:text-sm text-secondary max-w-2xl leading-relaxed">
               {city.summary}
             </p>
           </div>
 
           {/* Sanción y Horario */}
           <div className="grid grid-cols-2 gap-3 flex-shrink-0">
-            <div className="rounded-xl bg-neutral-950 border border-neutral-800 p-3.5 text-center">
-              <span className="flex items-center justify-center gap-1 text-[11px] font-bold text-red-400 uppercase tracking-wider">
+            <div className="rounded-xl bg-surface border border-line p-3.5 text-center">
+              <span className="flex items-center justify-center gap-1 text-[11px] font-bold text-negative uppercase tracking-wider">
                 <AlertOctagon className="h-3.5 w-3.5" />
                 Sanción
               </span>
-              <span className="text-2xl font-black text-white mt-1 block">{city.fineAmount} €</span>
-              <span className="text-[10px] text-neutral-400">según ordenanza</span>
+              <span className="text-2xl font-black text-fg mt-1 block">{city.fineAmount} €</span>
+              <span className="text-[10px] text-muted">según ordenanza</span>
             </div>
 
-            <div className="rounded-xl bg-neutral-950 border border-neutral-800 p-3.5 text-center">
-              <span className="flex items-center justify-center gap-1 text-[11px] font-bold text-sky-400 uppercase tracking-wider">
+            <div className="rounded-xl bg-surface border border-line p-3.5 text-center">
+              <span className="flex items-center justify-center gap-1 text-[11px] font-bold text-secondary uppercase tracking-wider">
                 <Clock className="h-3.5 w-3.5" />
                 Horario
               </span>
-              <span className="text-xs font-bold text-neutral-200 mt-2 block line-clamp-2">
+              <span className="text-xs font-bold text-secondary mt-2 block line-clamp-2">
                 {city.schedule}
               </span>
             </div>
@@ -208,12 +207,12 @@ export default async function CityZbeSeoPage({ params }: Props) {
         </div>
 
         {/* Verificación de Datos Municipales */}
-        <div className="py-3 px-4 mt-4 rounded-lg bg-neutral-950/80 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-neutral-400">
+        <div className="py-3 px-4 mt-4 rounded-lg bg-surface/80 border border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-muted">
           <div className="flex items-center gap-2">
-            <CalendarCheck2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+            <CalendarCheck2 className="h-4 w-4 text-positive flex-shrink-0" />
             <span>{getVerificationText(city)}</span>
             {city.noticePeriod && (
-              <span className="inline-flex items-center gap-1 text-amber-400 bg-amber-950/30 px-2 py-0.5 rounded border border-amber-900/40 text-[11px]">
+              <span className="inline-flex items-center gap-1 text-warning bg-warning-soft px-2 py-0.5 rounded border border-warning-line text-[11px]">
                 <BellRing className="h-3 w-3" />
                 {city.noticePeriod}
               </span>
@@ -225,7 +224,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
               href={city.sourceUrl}
               target="_blank"
               rel="nofollow noopener noreferrer"
-              className="text-orange-400 hover:text-orange-300 underline font-medium inline-flex items-center gap-1"
+              className="text-accent hover:text-accent-hover underline font-medium inline-flex items-center gap-1"
             >
               {city.sourceName}
               <ExternalLink className="h-3 w-3" />
@@ -234,13 +233,13 @@ export default async function CityZbeSeoPage({ params }: Props) {
         </div>
 
         {/* Mapa Compacto ZBE */}
-        <div className="mt-6 pt-6 border-b border-neutral-800 pb-6">
+        <div className="mt-6 pt-6 border-b border-line pb-6">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-300 flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 text-orange-400" />
+            <span className="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+              <MapPin className="h-4 w-4 text-accent" />
               {city.polygon ? `Perímetro ZBE ${city.name}` : `ZBE ${city.name}`}
             </span>
-            <span className="text-xs text-neutral-400 font-medium">
+            <span className="text-xs text-muted font-medium">
               {city.perimeterName || `Límites municipales ZBE ${city.name}`}
             </span>
           </div>
@@ -260,8 +259,8 @@ export default async function CityZbeSeoPage({ params }: Props) {
 
         {/* Matriz de Reglas por Etiqueta DGT con enlaces individuales */}
         <div className="mt-8">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-300 mb-4 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-orange-400" />
+          <h2 className="text-sm font-bold uppercase tracking-wider text-secondary mb-4 flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-accent" />
             ¿Puede entrar tu coche en la ZBE de {city.name}? Consulta por etiqueta
           </h2>
 
@@ -277,37 +276,29 @@ export default async function CityZbeSeoPage({ params }: Props) {
                   href={`/${city.slug}/${slug}`}
                   className={`group rounded-xl p-4 border flex flex-col justify-between transition-all hover:scale-[1.01] ${
                     status === 'allowed'
-                      ? 'bg-emerald-950/20 border-emerald-500/30 hover:border-emerald-400'
+                      ? 'bg-positive-soft border-positive-line hover:border-positive'
                       : status === 'restricted'
-                      ? 'bg-amber-950/20 border-amber-500/30 hover:border-amber-400'
-                      : 'bg-red-950/20 border-red-500/30 hover:border-red-400'
+                      ? 'bg-warning-soft border-warning-line hover:border-warning'
+                      : 'bg-negative-soft border-negative-line hover:border-negative'
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <DgtSticker badge={key} size={48} />
-                      <span
-                        className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider border ${
-                          status === 'allowed'
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                            : status === 'restricted'
-                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                            : 'bg-red-500/10 text-red-400 border-red-500/30'
-                        }`}
-                      >
+                      <span className={`${zbeUiAccessTagClass(status)} font-black uppercase tracking-wider`}>
                         {status === 'allowed' ? 'Permitido' : status === 'restricted' ? 'Restringido' : 'Prohibido'}
                       </span>
                     </div>
 
-                    <h3 className="text-xs font-black text-white group-hover:text-orange-400 transition-colors">
+                    <h3 className="text-xs font-black text-fg group-hover:text-accent transition-colors">
                       {name}
                     </h3>
-                    <p className="text-[11px] text-neutral-300 mt-2 leading-relaxed line-clamp-3">
+                    <p className="text-[11px] text-secondary mt-2 leading-relaxed line-clamp-3">
                       {reason}
                     </p>
                   </div>
 
-                  <div className="mt-3 pt-2 border-t border-neutral-800/60 flex items-center justify-between text-[11px] text-orange-400 font-semibold">
+                  <div className="mt-3 pt-2 border-t border-line flex items-center justify-between text-[11px] text-accent font-semibold">
                     <span>Ver detalle</span>
                     <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                   </div>
@@ -319,13 +310,13 @@ export default async function CityZbeSeoPage({ params }: Props) {
 
         {/* Condición de Parking si aplica */}
         {city.parkingCondition && (
-          <div className="mt-6 p-4 rounded-xl bg-amber-950/20 border border-amber-500/30 flex items-start gap-3">
-            <ParkingSquare className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="mt-6 p-4 rounded-xl bg-warning-soft border border-warning-line flex items-start gap-3">
+            <ParkingSquare className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-xs font-bold text-amber-300 uppercase tracking-wide">
+              <h3 className="text-xs font-bold text-warning uppercase tracking-wide">
                 Condición de Estacionamiento en Parkings Subterráneos
               </h3>
-              <p className="text-xs text-neutral-300 mt-1 leading-relaxed">
+              <p className="text-xs text-secondary mt-1 leading-relaxed">
                 {city.parkingCondition}
               </p>
             </div>
@@ -334,18 +325,18 @@ export default async function CityZbeSeoPage({ params }: Props) {
 
         {/* Excepciones tasadas */}
         {city.exemptions && city.exemptions.length > 0 && (
-          <div className="mt-8 pt-6 border-t border-neutral-800">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-3 flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-orange-400" />
+          <div className="mt-8 pt-6 border-t border-line">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted mb-3 flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-accent" />
               Excepciones y Vehículos Autorizados en {city.name}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {city.exemptions.map((ex, idx) => (
                 <div
                   key={idx}
-                  className="flex items-start gap-2.5 bg-neutral-950/50 border border-neutral-800/80 rounded-xl p-3 text-xs text-neutral-300"
+                  className="flex items-start gap-2.5 bg-surface/50 border border-line rounded-xl p-3 text-xs text-secondary"
                 >
-                  <span className="h-2 w-2 rounded-full bg-orange-400 mt-1 flex-shrink-0" />
+                  <span className="h-2 w-2 rounded-full bg-accent mt-1 flex-shrink-0" />
                   <span>{ex}</span>
                 </div>
               ))}

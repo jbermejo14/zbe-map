@@ -1,5 +1,5 @@
 /**
- * ZBE Engine - Radar ZBE España
+ * Motor ZBE de Ododex
  * Lógica oficial de deducción de Distintivo Ambiental DGT y evaluación de acceso municipal.
  */
 

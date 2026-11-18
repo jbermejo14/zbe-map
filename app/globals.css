@@ -1,209 +1,785 @@
 @import "tailwindcss";
 
-/* El tema se aplica con la clase .dark en <html> (ver layout y ThemeToggle). */
-@custom-variant dark (&:where(.dark, .dark *));
+/* Tema controlado por data-theme en <html> (lo fija el script de layout.tsx),
+   para que las variantes dark: de Tailwind sigan el mismo atributo. */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-/* Colores oficiales de las etiquetas y estados de acceso DGT. */
-@theme {
-  --color-dgt-zero: #008ece;
-  --color-dgt-eco: #00a651;
-  --color-dgt-c: #10b981;
-  --color-dgt-b: #eab308;
-  --color-dgt-none: #6b7280;
-  --color-dgt-banned: #ef4444;
-  --color-dgt-restricted: #f59e0b;
-  --color-dgt-allowed: #10b981;
+/* ==========================================================================
+   Ododex - Zonas de bajas emisiones
+   Tokens de color por tema (WCAG AA, 4,5:1 en texto). El tema se controla con
+   el atributo data-theme de <html>. Sin atributo se usa el tema claro.
+   ========================================================================== */
+
+:root,
+[data-theme="light"] {
+  --bg-body: #ffffff;
+  --bg-surface: #fafafa;
+  --bg-surface-elevated: #f4f4f5;
+  --bg-input: #ffffff;
+  --border-color: #e4e4e7;
+  --border-hover: #d4d4d8;
+  --text-primary: #111111;
+  --text-secondary: #525252;
+  --text-muted: #525252;
+  --accent-primary: #c2410c;
+  --accent-hover: #9a3412;
+  --accent-subtle: #fff7ed;
+  --accent-border: #fdba74;
+  --positive: #166534;
+  --positive-border: rgba(22, 101, 52, 0.4);
+  --positive-bg: rgba(22, 101, 52, 0.1);
+  --negative: #b91c1c;
+  --negative-border: rgba(185, 28, 28, 0.4);
+  --negative-bg: rgba(185, 28, 28, 0.1);
+  --warning: #92400e;
+  --warning-border: rgba(146, 64, 14, 0.4);
+  --warning-bg: rgba(146, 64, 14, 0.1);
+  --focus-glow: rgba(194, 65, 12, 0.25);
+  --overlay: rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 1px 3px rgba(17, 17, 17, 0.06);
 }
 
+[data-theme="dark"] {
+  --bg-body: #0a0a0a;
+  --bg-surface: #141414;
+  --bg-surface-elevated: #1c1c1c;
+  --bg-input: #1c1c1c;
+  --border-color: #2a2a2a;
+  --border-hover: #3f3f46;
+  --text-primary: #f5f5f5;
+  --text-secondary: #a3a3a3;
+  --text-muted: #a3a3a3;
+  --accent-primary: #ff6b00;
+  --accent-hover: #ff8533;
+  --accent-subtle: #2a1708;
+  --accent-border: rgba(255, 107, 0, 0.4);
+  --positive: #4ade80;
+  --positive-border: rgba(74, 222, 128, 0.4);
+  --positive-bg: rgba(74, 222, 128, 0.12);
+  --negative: #f87171;
+  --negative-border: rgba(248, 113, 113, 0.4);
+  --negative-bg: rgba(248, 113, 113, 0.12);
+  --warning: #fbbf24;
+  --warning-border: rgba(251, 191, 36, 0.4);
+  --warning-bg: rgba(251, 191, 36, 0.12);
+  --focus-glow: rgba(255, 107, 0, 0.3);
+  --overlay: rgba(0, 0, 0, 0.75);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Constantes que no cambian con el tema. El texto blanco sobre naranja usa el
+   naranja oscuro en los dos modos: sobre #ff6b00 el blanco no llega a 4,5:1.
+   Los fondos --solid-* llevan siempre texto --on-accent-text (blanco). */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --on-accent-bg: #c2410c;
+  --on-accent-bg-hover: #9a3412;
+  --on-accent-text: #ffffff;
+  --solid-positive: #15803d;
+  --solid-negative: #b91c1c;
+  --solid-warning: #92400e;
+
+  /* Colores oficiales de las etiquetas ambientales de la DGT, cada uno con el
+     color del texto que va encima (contraste de 4,5:1 comprobado en las pruebas). */
+  --dgt-cero: #008ece;
+  --on-dgt-cero: #111111;
+  --dgt-eco: #00a651;
+  --on-dgt-eco: #111111;
+  --dgt-c: #10b981;
+  --on-dgt-c: #111111;
+  --dgt-b: #eab308;
+  --on-dgt-b: #111111;
+  --dgt-sin: #6b7280;
+  --on-dgt-sin: #ffffff;
+
+  /* Trazado de las ZBE en el mapa (OpenStreetMap es claro en los dos temas). */
+  --map-allowed: #15803d;
+  --map-restricted: #b45309;
+  --map-banned: #b91c1c;
+
+  /* Matrícula europea del comprobador: blanca y con franja azul en los dos temas. */
+  --plate-bg: #ffffff;
+  --plate-text: #111111;
+  --plate-text-muted: #525252;
+  --plate-band: #003399;
+  --plate-band-text: #ffffff;
+  --plate-band-star: #ffdd00;
+
+  --header-offset: 7rem;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dark {
-  --background: #09090b;
-  --foreground: #f4f4f5;
+/* Colores semánticos para las utilidades de Tailwind: text-muted, bg-surface... */
+@theme inline {
+  --color-bg: var(--bg-body);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-surface-elevated);
+  --color-line: var(--border-color);
+  --color-line-hover: var(--border-hover);
+  --color-fg: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-accent: var(--accent-primary);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-subtle);
+  --color-accent-line: var(--accent-border);
+  --color-positive: var(--positive);
+  --color-positive-soft: var(--positive-bg);
+  --color-positive-line: var(--positive-border);
+  --color-negative: var(--negative);
+  --color-negative-soft: var(--negative-bg);
+  --color-negative-line: var(--negative-border);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-bg);
+  --color-warning-line: var(--warning-border);
+  --color-btn: var(--on-accent-bg);
+  --color-btn-hover: var(--on-accent-bg-hover);
+  --color-on-btn: var(--on-accent-text);
+  --color-solid-positive: var(--solid-positive);
+  --color-solid-negative: var(--solid-negative);
+  --color-solid-warning: var(--solid-warning);
+  --color-overlay: var(--overlay);
+  --color-plate: var(--plate-bg);
+  --color-on-plate: var(--plate-text);
+  --color-on-plate-muted: var(--plate-text-muted);
+  --color-plate-band: var(--plate-band);
+  --color-on-plate-band: var(--plate-band-text);
+  --color-plate-star: var(--plate-band-star);
+}
+
+/* Reset y base */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  overflow-x: hidden;
+  font-family: var(--font-sans);
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Soporte de Modo Claro para componentes con clases fijas neutral */
-html:not(.dark) body {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
+main {
+  min-width: 0;
 }
 
-html:not(.dark) .bg-neutral-950 {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
-html:not(.dark) .bg-neutral-900,
-html:not(.dark) .bg-neutral-900\/80,
-html:not(.dark) .bg-neutral-900\/60 {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
+/* Header */
+.site-header {
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
-html:not(.dark) .border-neutral-800,
-html:not(.dark) .border-neutral-800\/60,
-html:not(.dark) .border-neutral-700 {
-  border-color: #e2e8f0 !important;
+.header-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0.375rem 1rem;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-html:not(.dark) .text-white {
-  color: #0f172a !important;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  text-decoration: none;
 }
 
-html:not(.dark) .text-neutral-400 {
-  color: #64748b !important;
+.brand-logo {
+  height: 28px;
+  width: auto;
+  display: block;
 }
 
-html:not(.dark) .text-neutral-300 {
-  color: #475569 !important;
+.brand-logo-dark {
+  display: none;
 }
 
-html:not(.dark) .text-neutral-200 {
-  color: #334155 !important;
+[data-theme="dark"] .brand-logo-light {
+  display: none;
 }
 
-html:not(.dark) .bg-black {
-  background-color: #ffffff !important;
+[data-theme="dark"] .brand-logo-dark {
+  display: block;
 }
 
-html:not(.dark) .bg-black\/90 {
-  background-color: rgba(255, 255, 255, 0.95) !important;
+.brand-separator {
+  display: none;
+  width: 1px;
+  height: 24px;
+  background-color: var(--border-color);
 }
 
-html:not(.dark) .bg-\[\#090d16\] {
-  background-color: #f8fafc !important;
+.brand-section {
+  display: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
-html:not(.dark) .hover\:bg-neutral-800:hover {
-  background-color: #e2e8f0 !important;
+.header-actions {
+  display: flex;
+  align-items: center;
 }
 
-html:not(.dark) .hover\:bg-neutral-900:hover {
-  background-color: #f1f5f9 !important;
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 44px;
+  height: 44px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
 }
 
-/* Estilo de los mapas Leaflet. Dentro de @layer base para que las utilidades de Tailwind
-   (h-full, h-[580px]...) ganen. No fija width ni height: sin capa, estas reglas se
-   imponían a las utilidades y el mapa medía 2 px. */
+.theme-toggle-btn:hover {
+  border-color: var(--accent-primary);
+}
+
+/* El icono y el texto de cada tema se alternan por CSS: así el marcado inicial
+   es idéntico en servidor y cliente y no hace falta estado en React. */
+.theme-when-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-when-dark {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+[data-theme="dark"] .theme-when-light {
+  display: none;
+}
+
+[data-theme="dark"] .theme-when-dark {
+  display: inline-flex;
+}
+
+/* Segunda fila de la cabecera: enlaces a las secciones de la web. */
+.header-nav {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 0.25rem;
+}
+
+.header-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.header-nav a:hover {
+  color: var(--accent-primary);
+}
+
+/* Layout */
+.main-wrapper {
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2.5rem;
+  flex: 1;
+}
+
+/* Destino de un ancla (/#ciudades, /#buscador): deja sitio a la cabecera fija. */
+.anchor-target {
+  scroll-margin-top: var(--header-offset);
+}
+
+@layer components {
+.card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: 2rem;
+  }
+}
+
+.card-compact {
+  padding: 1rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  text-decoration: none;
+}
+
+.btn svg {
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  min-width: 44px;
+  padding: 0;
+}
+
+.btn-primary {
+  background-color: var(--on-accent-bg);
+  color: var(--on-accent-text);
+}
+
+.btn-primary:hover {
+  background-color: var(--on-accent-bg-hover);
+}
+
+.btn-secondary {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+}
+
+/* Footer */
+
+.site-footer {
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  padding: 2rem 1rem;
+  margin-top: 4rem;
+  text-align: center;
+}
+
+.footer-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.footer-text {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.footer-subtext {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.footer-legal a,
+.footer-link-button {
+  color: var(--text-muted);
+  background: none;
+  border: 0;
+  padding: 0.5rem 0;
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.footer-legal a:hover,
+.footer-link-button:hover {
+  color: var(--accent-primary);
+}
+
+.legal-text h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.legal-text h2:first-child {
+  margin-top: 0;
+}
+
+.legal-text p,
+.legal-text li {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.legal-text p {
+  margin-bottom: 0.75rem;
+}
+
+.legal-text ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.legal-text a {
+  color: var(--accent-primary);
+  text-decoration: underline;
+}
+
+/* Breadcrumbs */
+
+@layer components {
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumbs a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.breadcrumbs a:hover {
+  color: var(--accent-primary);
+}
+
+.breadcrumbs .sep {
+  color: var(--text-muted);
+}
+
+.breadcrumbs .current {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+/* Tablas */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.guide-table th, .guide-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.guide-table th {
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* Pastillas de estado. Los estados de acceso a una ZBE usan tag-green (libre),
+   tag-warning (restringido) y tag-red (prohibido). */
+.tag {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.tag-green {
+  border-color: var(--positive-border);
+  color: var(--positive);
+}
+
+.tag-red {
+  border-color: var(--negative-border);
+  color: var(--negative);
+}
+
+.tag-warning {
+  border-color: var(--warning-border);
+  color: var(--warning);
+}
+
+.tag-accent {
+  border-color: var(--accent-border);
+  color: var(--accent-primary);
+}
+
+.tag-lg {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Pastilla con el color oficial de una etiqueta ambiental de la DGT. */
+.dgt-chip {
+  display: inline-block;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.dgt-chip-cero {
+  background-color: var(--dgt-cero);
+  color: var(--on-dgt-cero);
+}
+
+.dgt-chip-eco {
+  background-color: var(--dgt-eco);
+  color: var(--on-dgt-eco);
+}
+
+.dgt-chip-c {
+  background-color: var(--dgt-c);
+  color: var(--on-dgt-c);
+}
+
+.dgt-chip-b {
+  background-color: var(--dgt-b);
+  color: var(--on-dgt-b);
+}
+
+.dgt-chip-sin {
+  background-color: var(--dgt-sin);
+  color: var(--on-dgt-sin);
+}
+}
+
+/* Mapas de Leaflet. Dentro de @layer base para que las utilidades de Tailwind
+   (h-full, h-[580px]...) ganen: sin capa, estas reglas se imponían y el mapa medía 2 px.
+   Por eso .leaflet-container no fija width ni height. Los !important compiten con
+   leaflet.css, que se importa sin capa. */
 @layer base {
   .leaflet-container {
-    background-color: #f1f5f9 !important;
-    font-family: inherit;
-    transition: background-color 0.2s ease;
+    font-family: inherit !important;
+    background-color: var(--bg-surface-elevated) !important;
+    z-index: 10;
   }
 
-  .dark .leaflet-container {
-    background-color: #121212 !important;
+  .leaflet-popup-content-wrapper {
+    background: var(--bg-surface) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-sm) !important;
+  }
+
+  .leaflet-popup-tip {
+    background: var(--bg-surface) !important;
+  }
+
+  .leaflet-tooltip {
+    background: var(--bg-surface) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    box-shadow: var(--shadow-sm) !important;
+  }
+
+  .leaflet-tooltip-top:before {
+    border-top-color: var(--bg-surface) !important;
   }
 }
 
-/* Marcadores simplificados limpios */
-.zbe-marker-allowed {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Contenido de tooltips y popups del mapa (HTML generado al pintar las ciudades). */
+@layer components {
+  .zbe-tip {
+    min-width: 170px;
+    padding: 2px;
+  }
+
+  .zbe-tip-title,
+  .zbe-popup-title {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .zbe-tip-status,
+  .zbe-popup-status {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .zbe-status-allowed {
+    color: var(--positive);
+  }
+
+  .zbe-status-restricted {
+    color: var(--warning);
+  }
+
+  .zbe-status-banned {
+    color: var(--negative);
+  }
+
+  .zbe-tip-detail {
+    margin-top: 2px;
+    font-size: 0.625rem;
+    color: var(--text-secondary);
+  }
+
+  .zbe-popup {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+  }
+
+  .zbe-popup-desc {
+    margin-top: 4px;
+    color: var(--text-secondary);
+  }
+
+  .zbe-popup-streets {
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+  }
+
+  /* Marcadores de ciudad: un punto con el color del estado de acceso. */
+  .zbe-marker-allowed,
+  .zbe-marker-restricted,
+  .zbe-marker-banned {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .marker-core {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-body);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .zbe-marker-allowed .marker-core {
+    background: var(--map-allowed);
+  }
+
+  .zbe-marker-restricted .marker-core {
+    background: var(--map-restricted);
+  }
+
+  .zbe-marker-banned .marker-core {
+    background: var(--map-banned);
+  }
 }
 
-.zbe-marker-allowed .marker-core {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #22c55e;
-  border: 2px solid #000000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .site-header, .header-actions {
+    display: none !important;
+  }
 }
 
-.zbe-marker-restricted {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Pantallas medianas y grandes */
+@media (min-width: 768px) {
+  .main-wrapper {
+    padding: 2rem 1.5rem 3.5rem;
+  }
 
-.zbe-marker-restricted .marker-core {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #f97316;
-  border: 2px solid #000000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-}
+  .header-container {
+    padding: 0.5rem 1.5rem;
+  }
 
-.zbe-marker-banned {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .header-nav {
+    padding: 0 1.5rem;
+    justify-content: flex-start;
+    gap: 0 1.25rem;
+  }
 
-.zbe-marker-banned .marker-core {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #ef4444;
-  border: 2px solid #000000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-}
+  .brand-logo {
+    height: 32px;
+  }
 
-/* Tooltip limpio */
-.leaflet-tooltip {
-  background: #18181b !important;
-  color: #f4f4f5 !important;
-  border: 1px solid #3f3f46 !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
-}
+  .brand-separator,
+  .brand-section {
+    display: block;
+  }
 
-html:not(.dark) .leaflet-tooltip {
-  background: #ffffff !important;
-  color: #0f172a !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-}
-
-.leaflet-tooltip-top:before {
-  border-top-color: #18181b !important;
-}
-
-html:not(.dark) .leaflet-tooltip-top:before {
-  border-top-color: #ffffff !important;
-}
-
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #09090b;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #27272a;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  .theme-toggle-btn {
+    width: auto;
+    padding: 0 1rem;
+  }
 }
