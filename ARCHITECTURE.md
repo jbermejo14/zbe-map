@@ -154,7 +154,22 @@ Se mantienen:
 - la consulta por matrícula;
 - el selector rápido de etiqueta.
 
-Las recomendaciones de alternativas ECO o CERO siguen usando `data/reference-vehicles.json` como catálogo de candidatos, con los valores por defecto actuales de carrocería y potencia. El selector de los 49 vehículos desaparece. El vehículo de ejemplo de la home pasa a ser una selección de marca, combustible y año (Audi, diésel, 2012 → B) que se ve en el HTML exportado.
+Las recomendaciones de alternativas ECO o CERO siguen usando `data/reference-vehicles.json` como catálogo de candidatos, con los valores por defecto actuales de carrocería y potencia. El selector de los 49 vehículos desaparece.
+
+**Sin vehículo por defecto (petición del titular):**
+
+- La home arranca sin vehículo ni etiqueta seleccionados.
+- El veredicto nacional, la tarjeta de etiqueta, la evaluación por ciudad y las recomendaciones muestran un estado vacío que invita a elegir ("Elige tu vehículo o tu etiqueta para ver dónde puedes circular").
+- El mapa nacional se ve con los perímetros en el color neutro de la marca, sin colores de acceso, hasta que haya etiqueta.
+- El vehículo o la etiqueta solo aparecen cuando el usuario elige marca, combustible y año, o una etiqueta directamente, o consulta una matrícula.
+
+**Mejoras de uso del selector:**
+
+- Los tres pasos (marca, combustible, año) se ven a la vez en una tarjeta. El resultado aparece en cuanto hay combustible y año (la marca es opcional), sin botón de "calcular".
+- Botón "Empezar de nuevo", que vuelve al estado vacío.
+- Cada campo con `<label>` asociado (`htmlFor` o `id`); todos los controles con un área táctil de 44 px o más.
+- Junto al resultado, el enlace "Confirmar en la DGT" a la consulta oficial del distintivo (`DGT_LEGAL_SOURCE.dgtPortalUrl`, en una pestaña nueva con `rel="noopener noreferrer"`).
+- La consulta por matrícula se mantiene, rotulada claramente como **estimación por la serie de la matrícula**. El campo de matrícula lleva `<label>` asociado (hoy no lo tiene). Su resultado rellena el combustible y el año del selector, de modo que el usuario puede corregirlos.
 
 ### Z5.2 Página de ciudades y botón "Ciudades"
 
@@ -202,7 +217,7 @@ Sección nueva en la home, "Consulta varias ciudades" (`components/MultiCitySele
   - ningún fichero contiene `focusZaragoza`, `focusHuesca` ni el texto "GeoJSON" en la interfaz.
 - `npx tsc --noEmit` y `npm run build` pasan.
 - En pantalla (sesión principal):
-  - el selector con BMW, diésel y 2010 da B;
+  - la home arranca sin vehículo ni etiqueta; con BMW, diésel y 2010 da B; "Empezar de nuevo" vuelve al estado vacío;
   - `/ciudades` funciona;
   - el selector de varias ciudades muestra 2 tarjetas con su mapa;
   - el mapa no tiene los botones eliminados;
