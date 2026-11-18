@@ -13,6 +13,46 @@ import {
 import { CityInfoCard } from './CityInfoCard';
 import { X } from 'lucide-react';
 
+const NO_ACTIVE_SUGGESTION = -1;
+
+export interface MultiCityKeyState {
+  isOpen: boolean;
+  /** Posición de la sugerencia resaltada; NO_ACTIVE_SUGGESTION si ninguna. */
+  activeIndex: number;
+}
+
+export interface MultiCityKeyResult extends MultiCityKeyState {
+  /** Posición de la sugerencia que hay que añadir, o null si la tecla no añade. */
+  addIndex: number | null;
+  /** Si la tecla ha tenido efecto y hay que evitar su acción por defecto. */
+  handled: boolean;
+}
+
+/** Lógica de teclado del buscador: flechas mueven, Intro añade (la primera si no hay resaltada) y Escape cierra. */
+export function multiCityHandleKey(
+  state: MultiCityKeyState,
+  key: string,
+  suggestionCount: number
+): MultiCityKeyResult {
+  const unchanged: MultiCityKeyResult = { ...state, addIndex: null, handled: false };
+  if (suggestionCount === 0) return unchanged;
+  const last = suggestionCount - 1;
+  switch (key) {
+    case 'ArrowDown':
+      return { isOpen: true, activeIndex: state.activeIndex >= last ? 0 : state.activeIndex + 1, addIndex: null, handled: true };
+    case 'ArrowUp':
+      return { isOpen: true, activeIndex: state.activeIndex <= 0 ? last : state.activeIndex - 1, addIndex: null, handled: true };
+    case 'Enter':
+      if (!state.isOpen) return unchanged;
+      return { isOpen: false, activeIndex: NO_ACTIVE_SUGGESTION, addIndex: Math.max(state.activeIndex, 0), handled: true };
+    case 'Escape':
+      if (!state.isOpen) return unchanged;
+      return { isOpen: false, activeIndex: NO_ACTIVE_SUGGESTION, addIndex: null, handled: true };
+    default:
+      return unchanged;
+  }
+}
+
 interface MultiCitySelectorProps {
   /** Datos ligeros de todas las ciudades; null mientras se cargan. */
   cities: CityData[] | null;
@@ -24,6 +64,8 @@ interface MultiCitySelectorProps {
 export function MultiCitySelector({ cities, badge }: MultiCitySelectorProps) {
   const ids = useId();
   const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_SUGGESTION);
   const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
 
   const allCities = cities ?? [];
@@ -34,7 +76,28 @@ export function MultiCitySelector({ cities, badge }: MultiCitySelectorProps) {
   const handleAdd = (slug: string) => {
     setSelectedSlugs((current) => addSelectedCity(current, slug));
     setQuery('');
+    setIsOpen(false);
+    setActiveIndex(NO_ACTIVE_SUGGESTION);
   };
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setIsOpen(true);
+    setActiveIndex(NO_ACTIVE_SUGGESTION);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const result = multiCityHandleKey({ isOpen, activeIndex }, event.key, suggestions.length);
+    if (!result.handled) return;
+    event.preventDefault();
+    setIsOpen(result.isOpen);
+    setActiveIndex(result.activeIndex);
+    if (result.addIndex !== null) handleAdd(suggestions[result.addIndex].slug);
+  };
+
+  const showSuggestions = isOpen && suggestions.length > 0;
+  const listboxId = `${ids}-suggestions`;
+  const optionId = (index: number) => `${ids}-option-${index}`;
 
   const handleRemove = (slug: string) => setSelectedSlugs((current) => removeSelectedCity(current, slug));
 
@@ -53,23 +116,37 @@ export function MultiCitySelector({ cities, badge }: MultiCitySelectorProps) {
           id={`${ids}-city`}
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => handleQueryChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          role="combobox"
+          aria-expanded={showSuggestions}
+          aria-controls={listboxId}
+          aria-autocomplete="list"
+          aria-activedescendant={showSuggestions && activeIndex >= 0 ? optionId(activeIndex) : undefined}
           disabled={isFull || cities === null}
           placeholder={cities === null ? 'Cargando ciudades…' : 'Escribe el nombre: Madrid, Zaragoza…'}
           autoComplete="off"
           className="w-full min-h-11 rounded border border-line bg-elevated px-3 text-sm text-fg placeholder:text-muted focus:border-accent focus:outline-none disabled:opacity-50"
         />
-        {suggestions.length > 0 && (
-          <ul className="absolute z-30 mt-1 w-full rounded border border-line bg-surface shadow-lg max-h-72 overflow-y-auto">
-            {suggestions.map((city) => (
-              <li key={city.slug}>
-                <button
-                  type="button"
-                  onClick={() => handleAdd(city.slug)}
-                  className="w-full min-h-11 px-3 text-left text-sm text-fg hover:bg-elevated"
-                >
-                  {city.name} <span className="text-xs text-muted">({city.province})</span>
-                </button>
+        {showSuggestions && (
+          <ul
+            id={listboxId}
+            role="listbox"
+            aria-label="Ciudades sugeridas"
+            className="absolute z-30 mt-1 w-full rounded border border-line bg-surface shadow-lg max-h-72 overflow-y-auto"
+          >
+            {suggestions.map((city, index) => (
+              <li
+                key={city.slug}
+                id={optionId(index)}
+                role="option"
+                aria-selected={index === activeIndex}
+                onClick={() => handleAdd(city.slug)}
+                className={`flex items-center min-h-11 px-3 text-sm text-fg cursor-pointer hover:bg-elevated ${
+                  index === activeIndex ? 'bg-elevated' : ''
+                }`}
+              >
+                {city.name} <span className="ml-1 text-xs text-muted">({city.province})</span>
               </li>
             ))}
           </ul>

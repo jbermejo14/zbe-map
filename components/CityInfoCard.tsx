@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import type { CityData } from '@/lib/cities-repository';
+import { canonicalRegion } from '@/lib/regions';
 import { getVerificationText, isCityVerified } from '@/lib/city-verification';
 import { evaluateCitiesForBadge, getAccessStatusPresentation } from '@/lib/zbe-engine';
 import type { DgtBadgeType } from '@/lib/zbe-engine';
@@ -64,7 +65,7 @@ export function CityInfoCard({ city, badge, onRemove }: CityInfoCardProps) {
       <header className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="text-base font-black text-fg break-words">{city.name}</h3>
-          <p className="text-xs text-muted">{city.province} · {city.region}</p>
+          <p className="text-xs text-muted">{city.province} · {canonicalRegion(city.region)}</p>
         </div>
         <button
           type="button"

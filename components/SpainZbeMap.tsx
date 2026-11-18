@@ -87,7 +87,11 @@ export function SpainZbeMap({
           iconAnchor: [8, 8],
         });
 
-        const marker = L.marker([city.lat, city.lng], { icon: customIcon });
+        const marker = L.marker([city.lat, city.lng], {
+          icon: customIcon,
+          title: city.cityName,
+          alt: city.cityName,
+        });
 
         const tooltipHtml = `
           <div class="zbe-tip">
@@ -116,6 +120,8 @@ export function SpainZbeMap({
         });
 
         marker.addTo(map);
+        // Leaflet expone el icono como botón; sin aria-label no tendría nombre accesible.
+        marker.getElement()?.setAttribute('aria-label', city.cityName);
         markersRef.current[city.cityId] = marker;
 
         // B. Perímetro de la ZBE

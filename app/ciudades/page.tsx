@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { CitiesDirectory } from '@/components/CitiesDirectory';
 import type { DirectoryCity } from '@/components/CitiesDirectory';
 import { getAllCities } from '@/lib/cities-repository';
+import { canonicalRegion } from '@/lib/regions';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/site';
 
@@ -28,7 +29,7 @@ export default function CitiesPage() {
     slug,
     name,
     province,
-    region,
+    region: canonicalRegion(region),
     status,
   }));
 

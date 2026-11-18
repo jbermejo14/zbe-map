@@ -11,6 +11,7 @@ import {
 } from '@/lib/zbe-engine';
 import { zbeUiAccessTextClass } from '@/lib/zbe-ui';
 import { PENDING_VERIFICATION_TEXT, isCityVerified } from '@/lib/city-verification';
+import { canonicalRegion } from '@/lib/regions';
 import {
   X,
   MapPin,
@@ -77,7 +78,7 @@ export function CityDetailDrawer({
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="rounded bg-elevated border border-line px-2 py-0.5 text-[11px] font-semibold text-secondary">
-                  {city.province} · {city.region}
+                  {city.province} · {canonicalRegion(city.region)}
                 </span>
                 <span className="text-[11px] text-accent font-bold uppercase tracking-wider">
                   ZBE en vigor

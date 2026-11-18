@@ -129,13 +129,6 @@ test('contraste: --on-accent-text sobre el naranja de botón, su hover y los fon
   }
 });
 
-test('contraste: texto de la matrícula y de su franja azul', () => {
-  uiAssertContrast(CONSTANTS['--plate-text'], CONSTANTS['--plate-bg'], '--plate-text sobre --plate-bg');
-  uiAssertContrast(CONSTANTS['--plate-text-muted'], CONSTANTS['--plate-bg'], '--plate-text-muted sobre --plate-bg');
-  uiAssertContrast(CONSTANTS['--plate-band-text'], CONSTANTS['--plate-band'], '--plate-band-text sobre --plate-band');
-  uiAssertContrast(CONSTANTS['--plate-band-star'], CONSTANTS['--plate-band'], '--plate-band-star sobre --plate-band');
-});
-
 test('contraste: colores oficiales de las etiquetas DGT con su texto encima', () => {
   for (const badge of DGT_BADGES) {
     const background = CONSTANTS[`--dgt-${badge}`];

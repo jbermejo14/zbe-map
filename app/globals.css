@@ -97,13 +97,8 @@
   --map-banned: #b91c1c;
   --map-neutral: var(--dgt-sin);
 
-  /* Matrícula europea del comprobador: blanca y con franja azul en los dos temas. */
-  --plate-bg: #ffffff;
-  --plate-text: #111111;
-  --plate-text-muted: #525252;
-  --plate-band: #003399;
-  --plate-band-text: #ffffff;
-  --plate-band-star: #ffdd00;
+  /* Punto de la posición del usuario en el mapa. */
+  --map-user: #003399;
 
   --header-offset: 7rem;
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -145,12 +140,6 @@
   --color-solid-negative: var(--solid-negative);
   --color-solid-warning: var(--solid-warning);
   --color-overlay: var(--overlay);
-  --color-plate: var(--plate-bg);
-  --color-on-plate: var(--plate-text);
-  --color-on-plate-muted: var(--plate-text-muted);
-  --color-plate-band: var(--plate-band);
-  --color-on-plate-band: var(--plate-band-text);
-  --color-plate-star: var(--plate-band-star);
 }
 
 /* Reset y base */
@@ -753,7 +742,7 @@ main {
   }
 
   .zbe-marker-user .marker-core {
-    background: var(--plate-band);
+    background: var(--map-user);
   }
 }
 

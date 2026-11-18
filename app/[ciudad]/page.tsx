@@ -7,6 +7,7 @@ import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
 import { DgtBadgeType } from '@/lib/zbe-engine';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
+import { canonicalRegion } from '@/lib/regions';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
 import { getVerificationText, isCityVerified } from '@/lib/city-verification';
 import {
@@ -159,7 +160,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="rounded-full bg-elevated border border-line px-3 py-1 text-xs font-semibold text-secondary">
-                {city.province} · {city.region}
+                {city.province} · {canonicalRegion(city.region)}
               </span>
               <span
                 className={`flex items-center gap-1.5 tag-lg ${

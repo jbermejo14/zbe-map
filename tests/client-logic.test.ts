@@ -8,17 +8,24 @@ import {
   DEFAULT_RECOMMENDATION_WHEELBASE_MM,
 } from '../lib/client-logic.ts';
 import {
-  getBrands,
   getEcoCandidates,
-  getModelsByBrand,
   getVehicleById,
-  getVersionsByModel,
-  searchVehicles,
+  getAllReferenceVehicles,
 } from '../lib/vehicles-repository.ts';
 import type { DgtBadgeType } from '../lib/zbe-engine.ts';
 
 const ALL_BADGES: DgtBadgeType[] = ['CERO', 'ECO', 'C', 'B', 'SIN_ETIQUETA'];
 const RECOMMENDATION_COUNT = 3;
+const RECOMMENDATION_TARGET_BRAND = 'Audi';
+const RECOMMENDATION_TARGET_MODEL = 'A4';
+
+function recommendationTargetVehicle() {
+  const vehicle = getAllReferenceVehicles().find(
+    (v) => v.brand === RECOMMENDATION_TARGET_BRAND && v.model === RECOMMENDATION_TARGET_MODEL
+  );
+  assert.ok(vehicle, 'Debe existir un Audi A4 de referencia');
+  return vehicle;
+}
 
 // /api/zbe-cities devolvía evaluateAllCities(badge) y un resumen con los recuentos por estado.
 test('ciudades: evaluateAllCities cubre las 152 ciudades y los recuentos suman el total', () => {
@@ -40,36 +47,9 @@ test('ciudades: una ciudad prohibida para B es libre para CERO', () => {
   assert.equal(madridCero.status, 'allowed');
 });
 
-// /api/vehicles: action=brands, models, versions y search.
-test('vehículos: marcas, modelos y versiones encadenados', () => {
-  const brands = getBrands();
-  assert.ok(brands.length > 0);
-  assert.deepEqual(brands, [...brands].sort());
-
-  const brand = brands[0];
-  const models = getModelsByBrand(brand);
-  assert.ok(models.length > 0);
-
-  const versions = getVersionsByModel(brand, models[0]);
-  assert.ok(versions.length > 0);
-  assert.ok(versions.every((v) => v.brand === brand && v.model === models[0]));
-});
-
-test('vehículos: la búsqueda no distingue mayúsculas y respeta el límite de 15', () => {
-  const results = searchVehicles('A4');
-  assert.ok(results.length > 0);
-  assert.equal(results[0].brand, 'Audi');
-  assert.deepEqual(
-    searchVehicles('a4').map((v) => v.id),
-    results.map((v) => v.id)
-  );
-  assert.ok(searchVehicles('a').length <= 15);
-  assert.deepEqual(searchVehicles('zzz-no-existe'), []);
-});
-
 // /api/recommendations: objetivo desde vehicleId o parámetros; 3 candidatos ECO/CERO con enlaces.
 test('recomendaciones: para un vehículo conocido usa sus datos y devuelve 3 ECO/CERO distintos', () => {
-  const vehicle = searchVehicles('A4')[0];
+  const vehicle = recommendationTargetVehicle();
   const { target, recommendations } = buildRecommendations({ vehicleId: vehicle.id });
 
   assert.deepEqual(target, {
@@ -87,7 +67,7 @@ test('recomendaciones: para un vehículo conocido usa sus datos y devuelve 3 ECO
 });
 
 test('recomendaciones: enlaces comerciales limpios y con la marca y el modelo codificados', () => {
-  const { recommendations } = buildRecommendations({ vehicleId: searchVehicles('A4')[0].id });
+  const { recommendations } = buildRecommendations({ vehicleId: recommendationTargetVehicle().id });
   for (const rec of recommendations) {
     const query = encodeURIComponent(`${rec.brand} ${rec.model}`);
     assert.equal(rec.affiliateDeals.segundaMano.url, `https://www.clicars.com/coches-segunda-mano?search=${query}`);
@@ -104,7 +84,7 @@ test('recomendaciones: con tag de afiliación, el enlace de Clicars lo añade co
   const previous = process.env[AFFILIATE_TAG_ENV];
   process.env[AFFILIATE_TAG_ENV] = AFFILIATE_TEST_TAG;
   try {
-    const { recommendations } = buildRecommendations({ vehicleId: searchVehicles('A4')[0].id });
+    const { recommendations } = buildRecommendations({ vehicleId: recommendationTargetVehicle().id });
     assert.ok(recommendations.length > 0);
     for (const rec of recommendations) {
       const query = encodeURIComponent(`${rec.brand} ${rec.model}`);
