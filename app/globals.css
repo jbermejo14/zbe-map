@@ -482,6 +482,31 @@ main {
 /* Breadcrumbs */
 
 @layer components {
+.ad-slot {
+  width: 100%;
+  min-height: 280px;
+  margin: 1.5rem 0;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .ad-slot {
+    min-height: 250px;
+  }
+}
+
+.ad-slot-label {
+  display: block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+}
+
+@layer components {
 .breadcrumbs {
   display: flex;
   align-items: center;

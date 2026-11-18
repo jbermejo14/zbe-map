@@ -13,6 +13,7 @@ import {
   selectionNeedsFuel,
 } from '@/lib/vehicle-selection';
 import type { VehicleSelection } from '@/lib/vehicle-selection';
+import { AdSlot } from './AdSlot';
 import { VehicleSelector } from './VehicleSelector';
 import { VehicleResultCard, VehicleResultPlaceholder } from './VehicleResultCard';
 import { CityDetailDrawer } from './CityDetailDrawer';
@@ -190,6 +191,8 @@ export function SplitDashboard() {
           </div>
         </div>
       </div>
+
+      <AdSlot />
 
       <MultiCitySelector cities={allCities} badge={currentBadge} />
 

@@ -26,6 +26,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   });
 
+  routes.push({
+    url: absoluteUrl('/etiqueta-dgt'),
+    lastModified,
+    changeFrequency: 'monthly',
+    priority: 0.9,
+  });
+
   const cities = getAllCities();
   const badges = ['cero', 'eco', 'c', 'b', 'sin-etiqueta'];
 

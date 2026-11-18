@@ -33,9 +33,8 @@ export interface AffiliateDeal {
 
 export interface EnrichedRecommendation extends VehicleRecord {
   affiliateDeals: {
-    segundaMano: AffiliateDeal;
-    renting: AffiliateDeal;
-    tasacion: AffiliateDeal;
+    segundaMano?: AffiliateDeal;
+    renting?: AffiliateDeal;
   };
 }
 
@@ -62,34 +61,44 @@ function resolveRecommendationTarget(input: RecommendationInput): Recommendation
   };
 }
 
-function withAffiliateParam(url: string, separator: '&' | '?', name: string, tag: string | undefined): string {
-  return tag ? `${url}${separator}${name}=${encodeURIComponent(tag)}` : url;
+function withAffiliateParam(url: string, separator: '&' | '?', name: string, tag: string): string {
+  return `${url}${separator}${name}=${encodeURIComponent(tag)}`;
 }
 
-function buildAffiliateDeals(rec: VehicleRecord): EnrichedRecommendation['affiliateDeals'] {
+/** Enlace de tasación; null si no hay código de afiliación (NEXT_PUBLIC_AFFILIATE_TASACION_TAG). */
+export function buildTasacionDeal(): AffiliateDeal | null {
   // Next solo sustituye NEXT_PUBLIC_* si se referencian con nombre literal.
+  const tag = process.env.NEXT_PUBLIC_AFFILIATE_TASACION_TAG;
+  if (!tag) return null;
+  return {
+    platform: 'Compramostucoche',
+    label: 'Tasación online de vehículo actual',
+    url: withAffiliateParam('https://www.compramostucoche.es/', '?', 'tag', tag),
+  };
+}
+
+/** Solo los enlaces cuyo código de afiliación existe: sin código no hay enlace. */
+function buildAffiliateDeals(rec: VehicleRecord): EnrichedRecommendation['affiliateDeals'] {
   const clicarsTag = process.env.NEXT_PUBLIC_AFFILIATE_CLICARS_TAG;
   const rentingTag = process.env.NEXT_PUBLIC_AFFILIATE_RENTING_TAG;
-  const tasacionTag = process.env.NEXT_PUBLIC_AFFILIATE_TASACION_TAG;
   const query = encodeURIComponent(`${rec.brand} ${rec.model}`);
+  const deals: EnrichedRecommendation['affiliateDeals'] = {};
 
-  return {
-    segundaMano: {
+  if (clicarsTag) {
+    deals.segundaMano = {
       platform: 'Clicars',
       label: `Ver ${rec.brand} ${rec.model} de segunda mano y ocasión`,
       url: withAffiliateParam(`https://www.clicars.com/coches-segunda-mano?search=${query}`, '&', 'tag', clicarsTag),
-    },
-    renting: {
+    };
+  }
+  if (rentingTag) {
+    deals.renting = {
       platform: 'Renting Finders',
       label: `Consultar renting para particulares de ${rec.brand} ${rec.model}`,
       url: withAffiliateParam(`https://rentingfinders.com/coches/?search=${query}`, '&', 'ref', rentingTag),
-    },
-    tasacion: {
-      platform: 'Compramostucoche',
-      label: 'Tasación online de vehículo actual',
-      url: withAffiliateParam('https://www.compramostucoche.es/', '?', 'tag', tasacionTag),
-    },
-  };
+    };
+  }
+  return deals;
 }
 
 /** Coches ECO/CERO equivalentes al vehículo (o al perfil dado), con enlaces comerciales. */

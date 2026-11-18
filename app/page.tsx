@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { AdSlot } from '@/components/AdSlot';
 import { SplitDashboard } from '@/components/SplitDashboard';
 import { absoluteUrl, SECTION_NAME, SITE_NAME } from '@/lib/site';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
@@ -60,6 +61,8 @@ export default function HomePage() {
 
       {/* Split Dashboard */}
       <SplitDashboard />
+
+      <AdSlot />
     </div>
   );
 }

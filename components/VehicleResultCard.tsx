@@ -86,15 +86,20 @@ export function VehicleResultCard({
   );
 }
 
-/** Marcador de posición mientras no hay etiqueta; `message` pregunta lo que falta para obtenerla. */
-export function VehicleResultPlaceholder({ message }: { message?: string }) {
+const DEFAULT_PLACEHOLDER_HINT = 'Elige tu vehículo (marca, combustible y año) para ver dónde puedes circular.';
+
+/**
+ * Marcador de posición mientras no hay etiqueta; `message` pregunta lo que falta para obtenerla.
+ * `hint` sustituye la explicación por defecto (la de la home habla de la marca y de las ZBE).
+ */
+export function VehicleResultPlaceholder({ message, hint }: { message?: string; hint?: string }) {
   return (
     <div className="card card-compact border-dashed text-center">
       <p className="text-sm font-semibold text-fg">{message ?? 'Aquí verás tu etiqueta DGT'}</p>
       <p className="text-xs text-muted mt-1">
         {message
           ? 'Con ese año la etiqueta depende del combustible: elígelo arriba y la verás aquí.'
-          : 'Elige tu vehículo (marca, combustible y año) para ver dónde puedes circular.'}
+          : (hint ?? DEFAULT_PLACEHOLDER_HINT)}
       </p>
     </div>
   );

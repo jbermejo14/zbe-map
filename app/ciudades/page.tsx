@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { AdSlot } from '@/components/AdSlot';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { CitiesDirectory } from '@/components/CitiesDirectory';
 import type { DirectoryCity } from '@/components/CitiesDirectory';
@@ -48,6 +49,7 @@ export default function CitiesPage() {
         {cities.length} ciudades agrupadas por comunidad autónoma. Elige una para ver su horario, su multa y qué etiquetas DGT pueden entrar.
       </p>
       <CitiesDirectory cities={cities} />
+      <AdSlot />
     </div>
   );
 }

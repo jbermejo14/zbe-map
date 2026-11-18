@@ -2,6 +2,7 @@
 
 import React, { useId, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { AdSlot } from './AdSlot';
 import { filterCitiesByName, groupCitiesByRegion } from '@/lib/city-search';
 
 export interface DirectoryCity {
@@ -11,6 +12,9 @@ export interface DirectoryCity {
   region: string;
   status: 'activa' | 'en_tramitacion';
 }
+
+/** Grupos de comunidades tras los que va el anuncio intermedio. */
+const AD_AFTER_GROUP_COUNT = 3;
 
 interface CitiesDirectoryProps {
   cities: DirectoryCity[];
@@ -43,8 +47,9 @@ export function CitiesDirectory({ cities }: CitiesDirectoryProps) {
         </p>
       )}
 
-      {groups.map((group) => (
-        <section key={group.region} className="mt-6" aria-labelledby={`${searchId}-${group.region}`}>
+      {groups.map((group, index) => (
+        <React.Fragment key={group.region}>
+        <section className="mt-6" aria-labelledby={`${searchId}-${group.region}`}>
           <h2 id={`${searchId}-${group.region}`} className="text-base font-bold text-fg mb-2">
             {group.region} <span className="text-xs font-normal text-muted">({group.cities.length})</span>
           </h2>
@@ -67,6 +72,8 @@ export function CitiesDirectory({ cities }: CitiesDirectoryProps) {
             ))}
           </ul>
         </section>
+        {index === AD_AFTER_GROUP_COUNT - 1 && <AdSlot />}
+        </React.Fragment>
       ))}
     </div>
   );

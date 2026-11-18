@@ -10,7 +10,7 @@ import { SECTION_NAME, SITE_NAME } from '../lib/site.ts';
 
 const SOURCE_DIRECTORIES = ['app', 'components', 'lib'];
 const OLD_BRAND_PATTERN = /radar-zbe|Radar ZBE/i;
-const SECTION_LINKS = ['/', '/etiqueta-dgt/gasolina/2018', '/ciudades'];
+const SECTION_LINKS = ['/', '/etiqueta-dgt', '/ciudades'];
 
 function brandListFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {

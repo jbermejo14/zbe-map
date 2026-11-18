@@ -5,6 +5,7 @@ import { absoluteUrl } from '@/lib/site';
 import { getOfficialDgtBadge, normalizeFuel, FuelCategory, DGT_LEGAL_SOURCE } from '@/lib/dgt-rules';
 import { evaluateAllCities } from '@/lib/cities-repository';
 import { ETIQUETA_FUEL_SLUGS, ETIQUETA_YEARS } from '@/lib/etiqueta-routes';
+import { AdSlot } from '@/components/AdSlot';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { DgtBadgeType } from '@/lib/zbe-engine';
 import {
@@ -144,8 +145,8 @@ export default async function FuelYearDgtPage({ params }: Props) {
       {
         '@type': 'ListItem',
         position: 2,
-        name: 'Distintivo DGT',
-        item: `${absoluteUrl('/')}#buscador`,
+        name: 'Etiqueta DGT',
+        item: absoluteUrl('/etiqueta-dgt'),
       },
       {
         '@type': 'ListItem',
@@ -186,7 +187,9 @@ export default async function FuelYearDgtPage({ params }: Props) {
           Inicio
         </Link>
         <ChevronRight className="h-3 w-3" />
-        <span className="text-muted">Distintivo Ambiental DGT</span>
+        <Link href="/etiqueta-dgt" className="hover:text-accent transition-colors">
+          Distintivo Ambiental DGT
+        </Link>
         <ChevronRight className="h-3 w-3" />
         <span className="text-secondary">{fuelInfo.label}</span>
         <ChevronRight className="h-3 w-3" />
@@ -256,6 +259,8 @@ export default async function FuelYearDgtPage({ params }: Props) {
           </a>
         </div>
       </div>
+
+      <AdSlot />
 
       {/* Resumen de Acceso a Zonas de Bajas Emisiones en España */}
       <div className="mb-8 rounded-2xl border border-line bg-elevated/60 p-6 sm:p-8">
@@ -423,6 +428,8 @@ export default async function FuelYearDgtPage({ params }: Props) {
             ))}
         </div>
       </div>
+
+      <AdSlot />
     </div>
   );
 }

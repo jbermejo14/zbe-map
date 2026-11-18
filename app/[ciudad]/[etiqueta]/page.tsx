@@ -6,6 +6,7 @@ import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
 import { DgtBadgeType, getBadgeMetadata } from '@/lib/zbe-engine';
 import { zbeUiAccessTagClass } from '@/lib/zbe-ui';
+import { AdSlot } from '@/components/AdSlot';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
 import { getVerificationText, isCityVerified } from '@/lib/city-verification';
@@ -313,6 +314,8 @@ export default async function CityBadgePage({ params }: Props) {
         </div>
       </div>
 
+      <AdSlot />
+
       {/* Mapa ZBE */}
       <div className="mb-8 rounded-2xl border border-line bg-elevated/60 p-6">
         <h2 className="text-xs font-bold uppercase tracking-wider text-secondary mb-3 flex items-center gap-1.5">
@@ -399,6 +402,8 @@ export default async function CityBadgePage({ params }: Props) {
           </Link>
         </div>
       </div>
+
+      <AdSlot />
     </div>
   );
 }

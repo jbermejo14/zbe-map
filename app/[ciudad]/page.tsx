@@ -6,6 +6,7 @@ import { zbeUiAccessTagClass } from '@/lib/zbe-ui';
 import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
 import { DgtBadgeType } from '@/lib/zbe-engine';
+import { AdSlot } from '@/components/AdSlot';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { canonicalRegion } from '@/lib/regions';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
@@ -258,6 +259,8 @@ export default async function CityZbeSeoPage({ params }: Props) {
           />
         </div>
 
+        <AdSlot />
+
         {/* Matriz de Reglas por Etiqueta DGT con enlaces individuales */}
         <div className="mt-8">
           <h2 className="text-sm font-bold uppercase tracking-wider text-secondary mb-4 flex items-center gap-2">
@@ -345,6 +348,8 @@ export default async function CityZbeSeoPage({ params }: Props) {
           </div>
         )}
       </div>
+
+      <AdSlot />
     </div>
   );
 }

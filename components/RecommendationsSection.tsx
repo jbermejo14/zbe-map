@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import type { DgtBadgeType } from '@/lib/zbe-engine';
-import { buildRecommendations } from '@/lib/client-logic';
+import { buildRecommendations, buildTasacionDeal } from '@/lib/client-logic';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { zbeUiBadgeChipClass, zbeUiBadgeSentenceLabel } from '@/lib/zbe-ui';
 import { ArrowRight, ShoppingBag, Zap, Coins } from 'lucide-react';
@@ -23,6 +23,8 @@ export function RecommendationsSection({ currentBadge, vehicleTitle }: Recommend
         : [],
     [shouldShow]
   );
+
+  const tasacionDeal = useMemo(() => buildTasacionDeal(), []);
 
   if (currentBadge === null) {
     return (
@@ -53,7 +55,8 @@ export function RecommendationsSection({ currentBadge, vehicleTitle }: Recommend
           </p>
         </div>
 
-        {/* External Tasación Box */}
+        {/* Tasación: solo existe con código de afiliación */}
+        {tasacionDeal && (
         <div className="flex-shrink-0 bg-elevated border border-line rounded-lg p-3 text-center sm:text-left">
           <span className="text-[11px] font-bold text-accent uppercase tracking-wider block">
             Tasación de tu coche actual
@@ -62,15 +65,16 @@ export function RecommendationsSection({ currentBadge, vehicleTitle }: Recommend
             Comprueba el valor de mercado en plataformas externas de tasación.
           </p>
           <a
-            href="https://www.compramostucoche.es/"
+            href={tasacionDeal.url}
             target="_blank"
-            rel="nofollow noopener noreferrer"
+            rel="nofollow sponsored noopener noreferrer"
             className="mt-2 inline-flex items-center justify-center gap-1.5 w-full rounded bg-btn hover:bg-btn-hover text-on-btn text-xs font-bold py-1.5 px-3 transition-colors"
           >
             <Coins className="h-3 w-3" />
             Tasación orientativa
           </a>
         </div>
+        )}
       </div>
 
       {/* Grid de Coches */}
@@ -116,33 +120,38 @@ export function RecommendationsSection({ currentBadge, vehicleTitle }: Recommend
                 </div>
               </div>
 
-              <div className="space-y-1.5 pt-2 border-t border-line">
-                <a
-                  href={car.affiliateDeals?.segundaMano?.url || '#'}
-                  target="_blank"
-                  rel="nofollow noopener noreferrer"
-                  className="flex items-center justify-between w-full px-2.5 py-1.5 rounded bg-elevated hover:bg-line text-fg text-xs font-medium transition-colors"
-                >
-                  <span className="flex items-center gap-1.5">
-                    <ShoppingBag className="h-3 w-3 text-accent" />
-                    <span>Ver ofertas de ocasión</span>
-                  </span>
-                  <span className="text-[10px] text-muted">Segunda mano</span>
-                </a>
-
-                <a
-                  href={car.affiliateDeals?.renting?.url || '#'}
-                  target="_blank"
-                  rel="nofollow noopener noreferrer"
-                  className="flex items-center justify-between w-full px-2.5 py-1.5 rounded border border-accent-line bg-accent-soft text-accent text-xs font-medium transition-colors hover:border-accent"
-                >
-                  <span className="flex items-center gap-1.5">
-                    <Zap className="h-3 w-3 text-accent" />
-                    <span>Consultar cuotas de renting</span>
-                  </span>
-                  <ArrowRight className="h-3 w-3" />
-                </a>
-              </div>
+              {(car.affiliateDeals.segundaMano || car.affiliateDeals.renting) && (
+                <div className="space-y-1.5 pt-2 border-t border-line">
+                  {car.affiliateDeals.segundaMano && (
+                    <a
+                      href={car.affiliateDeals.segundaMano.url}
+                      target="_blank"
+                      rel="nofollow sponsored noopener noreferrer"
+                      className="flex items-center justify-between w-full px-2.5 py-1.5 rounded bg-elevated hover:bg-line text-fg text-xs font-medium transition-colors"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <ShoppingBag className="h-3 w-3 text-accent" aria-hidden="true" />
+                        <span>Ver ofertas de ocasión</span>
+                      </span>
+                      <span className="text-[10px] text-muted">Segunda mano</span>
+                    </a>
+                  )}
+                  {car.affiliateDeals.renting && (
+                    <a
+                      href={car.affiliateDeals.renting.url}
+                      target="_blank"
+                      rel="nofollow sponsored noopener noreferrer"
+                      className="flex items-center justify-between w-full px-2.5 py-1.5 rounded border border-accent-line bg-accent-soft text-accent text-xs font-medium transition-colors hover:border-accent"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Zap className="h-3 w-3 text-accent" aria-hidden="true" />
+                        <span>Consultar cuotas de renting</span>
+                      </span>
+                      <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

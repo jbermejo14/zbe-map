@@ -6,7 +6,7 @@ import { SECTION_NAME } from '@/lib/site';
 
 const SECTION_LINKS = [
   { label: 'Mapa', href: '/' },
-  { label: 'Etiqueta DGT', href: '/etiqueta-dgt/gasolina/2018' },
+  { label: 'Etiqueta DGT', href: '/etiqueta-dgt' },
   { label: 'Ciudades', href: '/ciudades' }
 ] as const;
 
