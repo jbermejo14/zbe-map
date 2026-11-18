@@ -125,3 +125,86 @@ Igual que el R4 de `../recalls-web/ARCHITECTURE.md` y las secciones 2.2, 2.3 y 2
   - el selector de vehículo, la consulta por matrícula y las recomendaciones;
   - los legales;
   - todo en claro y oscuro, a 375 y 1280 px.
+
+---
+
+## Z5 — Mejoras de uso (18/11/2026)
+
+Peticiones del titular tras la primera publicación.
+
+### Z5.1 Selector de vehículo: marca, combustible y año
+
+Problema: el selector solo ofrece los 49 vehículos de `data/reference-vehicles.json` (de BMW, solo el Serie 3). La etiqueta DGT no depende del modelo: depende del combustible, del año (y del mes si es diésel de 2015) y de la autonomía eléctrica de los híbridos enchufables (`getOfficialDgtBadge` en `lib/dgt-rules.ts`).
+
+Nuevo selector (`components/VehicleSelector.tsx`, sin cambiar `lib/dgt-rules.ts`):
+
+1. **Marca:** lista de `data/brands.json` (fichero nuevo), con buscador. La lista se forma con:
+   - las 44 marcas de turismos de `../vehicle-stats/data/aggregated/brands.json` (matriculaciones DGT 2024-2026), normalizadas en mayúscula inicial ("TOYOTA" → "Toyota");
+   - las marcas históricas habituales en España que falten (Rover, Daewoo, Saab, Lancia, Chevrolet, Chrysler, Dodge, Alfa Romeo, Smart, Mini, Jaguar, Land Rover, Porsche, Subaru, Mitsubishi, SsangYong, Infiniti, Lexus, Cupra, DS, Dacia y las que falten de las grandes);
+   - la opción "Otra marca".
+
+   El fichero lleva en su cabecera JSON un campo `fuente` que lo explica. La marca solo sirve para mostrar el resultado ("Tu BMW…"); no cambia la etiqueta.
+2. **Modelo:** texto libre opcional. Solo se muestra en el resultado.
+3. **Combustible:** gasolina, diésel, híbrido (HEV/MHEV), híbrido enchufable, eléctrico, GLP/GNC. Con híbrido enchufable aparece "Autonomía eléctrica (km)", numérico.
+4. **Año de matriculación:** de `ANIO_MIN` (1990) al año actual. Con diésel de 2015 aparece "Mes de matriculación", porque la frontera Euro 6 es septiembre de 2015.
+5. **Resultado:** `getOfficialDgtBadge({ fuel, year, month, electricRangeKm })` y la misma tarjeta de etiqueta y la misma evaluación de ciudades de hoy. El enlace a `/etiqueta-dgt/<combustible>/<año>` va solo si esa ruta existe (`lib/etiqueta-routes.ts`).
+
+Se mantienen:
+
+- la consulta por matrícula;
+- el selector rápido de etiqueta.
+
+Las recomendaciones de alternativas ECO o CERO siguen usando `data/reference-vehicles.json` como catálogo de candidatos, con los valores por defecto actuales de carrocería y potencia. El selector de los 49 vehículos desaparece. El vehículo de ejemplo de la home pasa a ser una selección de marca, combustible y año (Audi, diésel, 2012 → B) que se ve en el HTML exportado.
+
+### Z5.2 Página de ciudades y botón "Ciudades"
+
+- Página nueva `app/ciudades/page.tsx` (`/es/zbe/ciudades`):
+  - las 152 ciudades agrupadas por comunidad autónoma (campo `region`), en orden alfabético;
+  - cada una con nombre, provincia, estado (activa o en tramitación, con `tag`) y enlace a `/[ciudad]`;
+  - buscador en el cliente para filtrar por nombre;
+  - metadatos y canonical con `absoluteUrl`, incluida en el sitemap;
+  - JSON-LD `BreadcrumbList`.
+- El enlace "Ciudades" de la cabecera y los JSON-LD que apuntaban a `/#ciudades` pasan a `/ciudades`.
+
+### Z5.3 Selector de varias ciudades (home)
+
+Sección nueva en la home, "Consulta varias ciudades" (`components/MultiCitySelector.tsx`):
+
+- buscador con autocompletado para añadir ciudades como fichas (chips) que se pueden quitar, hasta `MAX_CIUDADES_SELECCIONADAS` (4), para no cargar demasiados mapas a la vez. Al llegar al máximo, un aviso visible lo dice;
+- por cada ciudad, una tarjeta con:
+  - estado de la ZBE, horario, multa, aparcamiento, perímetro y fuente con fecha de verificación (los mismos datos que `/[ciudad]`);
+  - el acceso para la etiqueta seleccionada en ese momento en la home (permitido, restringido o prohibido), con `tag`;
+  - el mapa de esa ciudad (`CityMiniMap`, con su polígono si lo tiene);
+  - el enlace a su página;
+- las tarjetas usan los datos ligeros de ciudad. Los polígonos se cargan con el mismo `import()` dinámico que ya usa el mapa nacional; no se añaden al paquete inicial.
+
+### Z5.4 Mapa: limpieza y "Mi ubicación"
+
+- Se eliminan de `components/SpainZbeMap.tsx`:
+  - los botones "Zaragoza" y "Huesca" y sus funciones;
+  - el botón "GeoJSON" y su estado: los perímetros se muestran siempre;
+  - el texto "Trazado GeoJSON de cada ZBE…", que se sustituye por "Haz clic en una ZBE para ver su perímetro".
+- Botón nuevo "Mi ubicación" en la barra del mapa, con icono `LocateFixed` de lucide y `aria-label`:
+  - usa `navigator.geolocation.getCurrentPosition` (alta precisión desactivada y tiempo de espera `TIEMPO_ESPERA_UBICACION_MS`) solo cuando se pulsa;
+  - centra el mapa en el usuario con un zoom de ciudad y pone un marcador ("Tu ubicación");
+  - calcula la ZBE más cercana con la distancia de Haversine al centro (`lat`, `lng`) de cada ciudad, en una función pura `nearestZbe(lat, lng, ciudades)` en `lib/geo.ts`, con pruebas. Muestra "ZBE más cercana: <ciudad>, a <n> km" con el acceso para la etiqueta actual y el enlace a la ciudad;
+  - los errores (permiso denegado, no disponible, tiempo agotado, navegador sin geolocalización) se muestran como aviso visible con `role="alert"` y un texto que dice qué hacer;
+  - la ubicación no se guarda ni se envía a ningún sitio.
+- `app/privacidad/page.tsx` añade que la ubicación, si se pide, se usa solo en el navegador para centrar el mapa y no se envía ni se guarda.
+
+### Z5.5 Criterios de aceptación
+
+- `npm test` pasa, con pruebas nuevas de:
+  - `nearestZbe`: ciudad correcta y distancia aproximada para 2 puntos conocidos, y lista vacía;
+  - `data/brands.json`: sin duplicados, en orden alfabético, con BMW, Seat y Rover, y "Otra marca" al final;
+  - el selector: combustible y año dan la misma etiqueta que `getOfficialDgtBadge`, también para diésel de septiembre de 2015 frente a agosto y para un PHEV de 40 km frente a 39;
+  - la página `/ciudades`: incluye las 152 ciudades y está en el sitemap;
+  - ningún fichero contiene `focusZaragoza`, `focusHuesca` ni el texto "GeoJSON" en la interfaz.
+- `npx tsc --noEmit` y `npm run build` pasan.
+- En pantalla (sesión principal):
+  - el selector con BMW, diésel y 2010 da B;
+  - `/ciudades` funciona;
+  - el selector de varias ciudades muestra 2 tarjetas con su mapa;
+  - el mapa no tiene los botones eliminados;
+  - "Mi ubicación" muestra su aviso si se deniega el permiso;
+  - todo sin desbordamiento a 375 px.
