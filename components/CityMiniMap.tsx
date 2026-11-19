@@ -146,7 +146,7 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
         {hasPolygon ? `Perímetro ZBE ${cityLabel}` : unavailableText}
       </div>
       {hasPolygon && isApproximate && (
-        <div className="absolute bottom-2 right-2 z-[400] bg-surface/90 backdrop-blur px-2 py-0.5 rounded text-[10px] text-secondary border border-line pointer-events-none">
+        <div className="absolute top-2 right-2 z-[400] bg-surface/90 backdrop-blur px-2 py-0.5 rounded text-[10px] text-secondary border border-line pointer-events-none">
           {MAP_APPROXIMATE_LEGEND_TEXT}
         </div>
       )}
