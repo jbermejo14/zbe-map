@@ -2,15 +2,19 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { absoluteUrl } from '@/lib/site';
-import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
+import { getAllCities, getCityBySlug, type CityEnforcement } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
 import { DgtBadgeType, getBadgeMetadata } from '@/lib/zbe-engine';
-import { zbeUiAccessTagClass } from '@/lib/zbe-ui';
+import { zbeUiAccessCardClass, zbeUiAccessTagClass, zbeUiFineText } from '@/lib/zbe-ui';
 import { AdSlot } from '@/components/AdSlot';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
+import { NO_RESTRICTIONS_SCHEDULE_TEXT } from '@/lib/atlas-zbe';
 import { MunicipalityServiceLinks } from '@/components/MunicipalityServiceLinks';
+import { EnforcementNotice } from '@/components/EnforcementNotice';
+import { ZbeCalendar } from '@/components/ZbeCalendar';
 import {
+  badgeFaqs,
   badgeMetaDescription,
   badgeMetaTitle,
   badgeNationalSentence,
@@ -100,6 +104,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     status: city.rules[badgeInfo.badge]?.status ?? 'allowed',
     fineAmount: city.fineAmount,
     verified: isCityVerified(city),
+    fineApplies: !city.enforcement || city.enforcement.state === 'sanciona',
   });
 
   return {
@@ -117,6 +122,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+const VERDICT_TITLE_DEFAULT = 'Normativa aplicable según ordenanza municipal';
+const VERDICT_TITLE_ATLAS = 'Normativa aplicable (fuentes oficiales)';
+const VERDICT_TITLE_MITECO = 'Estado según el inventario del MITECO';
+
+function verdictTitle(enforcement: CityEnforcement | null): string {
+  if (enforcement?.source === 'atlaszbe') return VERDICT_TITLE_ATLAS;
+  if (enforcement?.source === 'miteco') return VERDICT_TITLE_MITECO;
+  return VERDICT_TITLE_DEFAULT;
+}
+
 export default async function CityBadgePage({ params }: Props) {
   const { ciudad, etiqueta } = await params;
   const city = getCityBySlug(ciudad);
@@ -131,6 +146,7 @@ export default async function CityBadgePage({ params }: Props) {
   const accessStatus = rule?.status || 'allowed';
   const reason = rule?.reason || 'Sin restricciones reportadas.';
   const badgeMeta = getBadgeMetadata(badgeKey);
+  const enforcement = city.enforcement ?? null;
   const allCities = getAllCities();
   const nationalSentence = badgeNationalSentence(badgeKey, allCities, badgeInfo.subject);
   const citySentence = regionSentence(city, allCities, badgeKey, badgeInfo.subject);
@@ -141,19 +157,16 @@ export default async function CityBadgePage({ params }: Props) {
     allowed: {
       label: 'Acceso Permitido',
       icon: CheckCircle2,
-      cardBorder: 'border-positive-line bg-positive-soft',
       titleColor: 'text-positive',
     },
     restricted: {
       label: 'Acceso Restringido / Parking Obligatorio',
       icon: AlertTriangle,
-      cardBorder: 'border-warning-line bg-warning-soft',
       titleColor: 'text-warning',
     },
     banned: {
       label: 'Acceso Prohibido',
       icon: XCircle,
-      cardBorder: 'border-negative-line bg-negative-soft',
       titleColor: 'text-negative',
     },
   }[accessStatus];
@@ -161,30 +174,16 @@ export default async function CityBadgePage({ params }: Props) {
   const StatusIcon = statusConfig.icon;
 
   // Visible FAQs for SEO & FAQPage schema
-  const faqs = [
-    {
-      question: `¿Puede circular un coche con ${badgeInfo.label} en la ZBE de ${city.name}?`,
-      answer: `${
-        accessStatus === 'allowed'
-          ? `Sí, los vehículos con ${badgeInfo.label} tienen acceso libre a la ZBE de ${city.name}.`
-          : accessStatus === 'restricted'
-          ? `El acceso está condicionado en la ZBE de ${city.name}: ${reason}`
-          : `No, los vehículos con ${badgeInfo.label} tienen prohibido el acceso a la ZBE de ${city.name} según las normas orientativas: ${reason}`
-      }`,
-    },
-    {
-      question: `¿Cuál es el horario de la Zona de Bajas Emisiones en ${city.name}?`,
-      answer: isCityVerified(city)
-        ? `El horario de restricción fijado por el Ayuntamiento de ${city.name} es: ${city.schedule}.`
-        : `Horario orientativo, pendiente de verificar con la ordenanza municipal de ${city.name}: ${city.schedule}.`,
-    },
-    {
-      question: `¿A cuánto asciende la multa por entrar sin permiso en la ZBE de ${city.name}?`,
-      answer: isCityVerified(city)
-        ? `La sanción general en ${city.name} es de ${city.fineAmount} €, con posibilidad de reducción del 50% por pronto pago.`
-        : `Sanción orientativa de ${city.fineAmount} €, pendiente de verificar con la ordenanza municipal de ${city.name}.`,
-    },
-  ];
+  const faqs = badgeFaqs({
+    cityName: city.name,
+    badgeLabel: badgeInfo.label,
+    accessStatus,
+    reason,
+    verified: isCityVerified(city),
+    schedule: city.schedule,
+    fineAmount: city.fineAmount,
+    enforcement,
+  });
 
   const breadcrumbsJsonLd = {
     '@context': 'https://schema.org',
@@ -249,7 +248,7 @@ export default async function CityBadgePage({ params }: Props) {
       </nav>
 
       {/* Header & Verdict */}
-      <div className={`rounded-2xl border p-6 sm:p-8 ${statusConfig.cardBorder} mb-8`}>
+      <div className={`rounded-2xl border p-6 sm:p-8 ${zbeUiAccessCardClass(accessStatus)} mb-8`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-line">
           <div className="flex items-center gap-4">
             <DgtSticker badge={badgeKey} size={70} className="flex-shrink-0" />
@@ -261,10 +260,13 @@ export default async function CityBadgePage({ params }: Props) {
               <h1 className="text-2xl sm:text-3xl font-black text-fg tracking-tight mt-2 break-words">
                 ¿Puede entrar un coche con {badgeInfo.label} en la ZBE de {city.name}?
               </h1>
-              <p className="text-xs sm:text-sm text-muted mt-1">
-                {city.name} ({city.province}) &middot; Estado ZBE:{' '}
-                <strong className="text-secondary capitalize">{city.status.replace('_', ' ')}</strong>
-              </p>
+              <EnforcementNotice enforcement={enforcement} cityName={city.name} verified={isCityVerified(city)} />
+              {!enforcement && (
+                <p className="text-xs sm:text-sm text-muted mt-1">
+                  {city.name} ({city.province}) &middot; Estado ZBE:{' '}
+                  <strong className="text-secondary capitalize">{city.status.replace('_', ' ')}</strong>
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -272,7 +274,7 @@ export default async function CityBadgePage({ params }: Props) {
         {/* Veredicto Detallado */}
         <div className="mt-6">
           <h2 className="text-xs font-bold uppercase tracking-wider text-muted mb-2">
-            Normativa aplicable según ordenanza municipal
+            {verdictTitle(enforcement)}
           </h2>
           <div className="p-4 rounded-xl bg-surface/80 border border-line text-secondary text-sm leading-relaxed">
             {reason}
@@ -297,7 +299,7 @@ export default async function CityBadgePage({ params }: Props) {
               Multa
             </span>
             <span className="text-xl font-black text-fg mt-1 block">
-              {city.fineAmount} €
+              {zbeUiFineText(enforcement, city.fineAmount)}
             </span>
           </div>
 
@@ -337,6 +339,16 @@ export default async function CityBadgePage({ params }: Props) {
       </div>
 
       <AdSlot />
+
+      {enforcement?.source === 'atlaszbe' && (
+        <ZbeCalendar
+          entries={enforcement.calendar}
+          cityName={city.name}
+          importedOn={enforcement.importedOn}
+          badge={badgeKey}
+          badgeTitle={badgeInfo.groupTitle}
+        />
+      )}
 
       {/* Mapa ZBE */}
       <div className="mb-8 rounded-2xl border border-line bg-elevated/60 p-6">

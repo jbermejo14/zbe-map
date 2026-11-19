@@ -21,6 +21,8 @@ export interface AtlasEnforcement {
   confidence: 'alta' | 'media' | 'baja';
   verifiedOn: string | null;
   officialUrl: string | null;
+  /** Importe de la multa con pronto pago, de la zona principal; null si no consta. */
+  earlyPaymentAmount: number | null;
   importedOn: string;
   mainZoneName: string;
   calendar: CalendarEntry[];

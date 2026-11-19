@@ -103,6 +103,9 @@ export interface EnforcementSummary {
 }
 
 /** Ciudades que no salen por nombre pero sí por código INE, por slug. */
+/** Horario que se guarda cuando la ZBE no tiene restricciones en vigor. */
+export const NO_RESTRICTIONS_SCHEDULE_TEXT = 'Sin restricciones en vigor';
+
 export const ATLAS_INE_OVERRIDES: Record<string, string> = {
   palma: '07040',
   castellon: '12040',

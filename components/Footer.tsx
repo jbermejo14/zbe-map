@@ -10,6 +10,9 @@ const SOURCE_LINKS = [
 
 const MUNICIPAL_SOURCE_TEXT = 'Ordenanzas municipales';
 
+const ATLAS_ZBE_URL = 'https://atlaszbe.es';
+const ODBL_URL = 'https://opendatacommons.org/licenses/odbl/1-0/';
+
 const LINK_CLASS = 'text-muted hover:text-accent transition-colors';
 
 export interface FooterProps {
@@ -26,6 +29,17 @@ export function Footer({ mostrarConsentimiento = false }: FooterProps) {
         </p>
         <p className="footer-subtext">
           Sitio independiente: no es una web oficial de la DGT ni de ningún ayuntamiento. La información es orientativa y los perímetros son aproximados; manda siempre la ordenanza municipal vigente.
+        </p>
+        <p className="footer-subtext">
+          Datos de las ZBE:{' '}
+          <a href={ATLAS_ZBE_URL} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
+            Atlas ZBE
+          </a>{' '}
+          (
+          <a href={ODBL_URL} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
+            ODbL 1.0
+          </a>
+          ), DGT, MITECO y ayuntamientos.
         </p>
         <nav aria-label="Información legal" className="footer-legal">
           <Link href="/aviso-legal">Aviso legal</Link>

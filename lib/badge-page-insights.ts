@@ -1,4 +1,5 @@
-import type { CityData } from './cities-repository.ts';
+import type { CityData, CityEnforcement } from './cities-repository.ts';
+import { NO_RESTRICTIONS_SCHEDULE_TEXT } from './atlas-zbe.ts';
 import type { DgtBadgeType, ZbeAccessStatus } from './zbe-engine.ts';
 import { canonicalRegion } from './regions.ts';
 
@@ -6,6 +7,7 @@ export const SAME_REGION_LIMIT = 8;
 export const META_TITLE_MAX_LENGTH = 60;
 export const META_DESCRIPTION_MAX_LENGTH = 160;
 
+const NO_FINE_TEXT = 'Sin multa por ahora.';
 const ELLIPSIS = '…';
 const DEFAULT_STATUS: ZbeAccessStatus = 'allowed';
 const STATUS_ORDER: ZbeAccessStatus[] = ['allowed', 'restricted', 'banned'];
@@ -150,9 +152,12 @@ export interface BadgeMetaDescriptionInput {
   status: ZbeAccessStatus;
   fineAmount: number;
   verified: boolean;
+  /** Si es false, se dice que no hay multa en lugar de su importe. Por defecto, true. */
+  fineApplies?: boolean;
 }
 
-function insightsTruncate(text: string): string {
+/** Recorta una descripción SEO al máximo permitido, en el último espacio y con puntos suspensivos. */
+export function truncateMetaDescription(text: string): string {
   if (text.length <= META_DESCRIPTION_MAX_LENGTH) return text;
   const head = text.slice(0, META_DESCRIPTION_MAX_LENGTH - 1);
   const lastSpace = head.lastIndexOf(' ');
@@ -162,8 +167,88 @@ function insightsTruncate(text: string): string {
 /** Descripción SEO de la página de etiqueta, de 160 caracteres como máximo. */
 export function badgeMetaDescription(input: BadgeMetaDescriptionInput): string {
   const lead = `${insightsCapitalize(input.subject)} ${VERDICTS[input.status]} en la ZBE de ${input.cityName}.`;
+  const fineText = input.fineApplies === false ? NO_FINE_TEXT : `Multa: ${input.fineAmount} €.`;
   const tail = input.verified
-    ? `Multa: ${input.fineAmount} €. Horario, excepciones y mapa.`
+    ? `${fineText} Horario, excepciones y mapa.`
     : 'Normas orientativas: horario, excepciones y mapa.';
-  return insightsTruncate(`${lead} ${tail}`);
+  return truncateMetaDescription(`${lead} ${tail}`);
+}
+
+export interface BadgeFaq {
+  question: string;
+  answer: string;
+}
+
+export interface BadgeFaqInput {
+  cityName: string;
+  /** Nombre de la etiqueta tal como se muestra ("Etiqueta B"). */
+  badgeLabel: string;
+  accessStatus: ZbeAccessStatus;
+  /** Motivo de la regla de la etiqueta (`rule.reason`). */
+  reason: string;
+  verified: boolean;
+  schedule: string;
+  fineAmount: number;
+  enforcement: CityEnforcement | null;
+}
+
+/** Frase del estado cuando la ZBE existe pero no multa; null si multa o no hay datos de estado. */
+function faqNoFineSentence(enforcement: CityEnforcement | null): string | null {
+  return enforcement !== null && enforcement.state !== 'sanciona' ? enforcement.sentence : null;
+}
+
+function faqAccessAnswer(input: BadgeFaqInput): string {
+  const { cityName, badgeLabel, accessStatus, reason, verified, enforcement } = input;
+  if (accessStatus === 'allowed') {
+    const noFineSentence = faqNoFineSentence(enforcement);
+    return noFineSentence !== null
+      ? `Sí, ahora mismo puede entrar. ${noFineSentence}`
+      : `Sí, los vehículos con ${badgeLabel} tienen acceso libre a la ZBE de ${cityName}.`;
+  }
+  if (accessStatus === 'restricted') {
+    return `El acceso está condicionado en la ZBE de ${cityName}: ${reason}`;
+  }
+  const orientative = verified ? '' : ' según las normas orientativas';
+  return `No, los vehículos con ${badgeLabel} tienen prohibido el acceso a la ZBE de ${cityName}${orientative}: ${reason}`;
+}
+
+function faqScheduleAnswer(input: BadgeFaqInput): string {
+  const { cityName, schedule, verified, enforcement } = input;
+  if (schedule === NO_RESTRICTIONS_SCHEDULE_TEXT) {
+    return `Ahora no hay horario de restricción en ${cityName}: ${enforcement?.sentence ?? schedule}`;
+  }
+  return verified
+    ? `El horario de restricción fijado por el Ayuntamiento de ${cityName} es: ${schedule}.`
+    : `Horario orientativo, pendiente de verificar con la ordenanza municipal de ${cityName}: ${schedule}.`;
+}
+
+function faqFineAnswer(input: BadgeFaqInput): string {
+  const { cityName, fineAmount, verified, enforcement } = input;
+  const noFineSentence = faqNoFineSentence(enforcement);
+  if (noFineSentence !== null) return noFineSentence;
+  if (!verified) {
+    return `Sanción orientativa de ${fineAmount} €, pendiente de verificar con la ordenanza municipal de ${cityName}.`;
+  }
+  const earlyPayment = enforcement?.source === 'atlaszbe' ? enforcement.earlyPaymentAmount : null;
+  const earlyText = earlyPayment === null || earlyPayment === undefined ? '' : ` (${earlyPayment} € con pronto pago)`;
+  return `La sanción general en ${cityName} es de ${fineAmount} €${earlyText}.`;
+}
+
+/** Preguntas frecuentes visibles (y del JSON-LD) de la página de etiqueta. */
+export function badgeFaqs(input: BadgeFaqInput): BadgeFaq[] {
+  const { cityName, badgeLabel } = input;
+  return [
+    {
+      question: `¿Puede circular un coche con ${badgeLabel} en la ZBE de ${cityName}?`,
+      answer: faqAccessAnswer(input),
+    },
+    {
+      question: `¿Cuál es el horario de la Zona de Bajas Emisiones en ${cityName}?`,
+      answer: faqScheduleAnswer(input),
+    },
+    {
+      question: `¿A cuánto asciende la multa por entrar sin permiso en la ZBE de ${cityName}?`,
+      answer: faqFineAnswer(input),
+    },
+  ];
 }

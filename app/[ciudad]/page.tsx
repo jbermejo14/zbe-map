@@ -2,15 +2,23 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { absoluteUrl } from '@/lib/site';
-import { CITY_STATUS_ZBE_LABEL, zbeUiAccessTagClass, zbeUiCityStatusDotClass, zbeUiCityStatusTagClass } from '@/lib/zbe-ui';
+import {
+  zbeUiAccessCardClass,
+  zbeUiAccessTagClass,
+  zbeUiCityStatusChip,
+  zbeUiEnforcementColor,
+  zbeUiFineText,
+} from '@/lib/zbe-ui';
 import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
-import { DgtBadgeType } from '@/lib/zbe-engine';
+import type { DgtBadgeType, ZbeAccessStatus } from '@/lib/zbe-engine';
 import { AdSlot } from '@/components/AdSlot';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { canonicalRegion } from '@/lib/regions';
-import { SEO_CURRENT_YEAR } from '@/lib/seo';
+import { SEO_CURRENT_YEAR, cityMetaDescription, cityMetaTitle } from '@/lib/seo';
 import { MunicipalityServiceLinks } from '@/components/MunicipalityServiceLinks';
+import { EnforcementNotice } from '@/components/EnforcementNotice';
+import { ZbeCalendar } from '@/components/ZbeCalendar';
 import { getVerificationText, isCityVerified } from '@/lib/city-verification';
 import {
   ChevronRight,
@@ -52,12 +60,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const verified = isCityVerified(city);
-  const title = verified
-    ? `ZBE ${city.name} ${SEO_CURRENT_YEAR}: Mapa, Horarios, Multas y Normativa DGT`
-    : `ZBE ${city.name} ${SEO_CURRENT_YEAR}: Mapa y Normas Orientativas por Etiqueta DGT`;
-  const description = verified
-    ? `Normativa y restricciones de la Zona de Bajas Emisiones en ${city.name} (${city.province}). Horario (${city.schedule}), multa de ${city.fineAmount} €, exenciones y acceso por etiqueta DGT.`
-    : `Normas orientativas de la Zona de Bajas Emisiones en ${city.name} (${city.province}), pendientes de verificar con la ordenanza municipal. Acceso por etiqueta DGT; consulta al ayuntamiento horario y sanciones.`;
+  const title = cityMetaTitle(city, verified, SEO_CURRENT_YEAR);
+  const description = cityMetaDescription(city, verified);
 
   return {
     title,
@@ -73,6 +77,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
   };
 }
+
+const MATRIX_HOVER_CLASS: Record<ZbeAccessStatus, string> = {
+  allowed: 'hover:border-positive',
+  restricted: 'hover:border-warning',
+  banned: 'hover:border-negative',
+};
 
 export default async function CityZbeSeoPage({ params }: Props) {
   const { ciudad } = await params;
@@ -132,6 +142,11 @@ export default async function CityZbeSeoPage({ params }: Props) {
     description: city.summary,
   };
 
+  const enforcement = city.enforcement ?? null;
+  const hasNoFine = enforcement !== null && enforcement.state !== 'sanciona';
+  const statusChip = zbeUiCityStatusChip(city.status, enforcement);
+  const mapStatus = enforcement ? zbeUiEnforcementColor(enforcement.state) : 'restricted';
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <script
@@ -164,22 +179,21 @@ export default async function CityZbeSeoPage({ params }: Props) {
               <span className="rounded-full bg-elevated border border-line px-3 py-1 text-xs font-semibold text-secondary">
                 {city.province} · {canonicalRegion(city.region)}
               </span>
-              <span
-                className={`flex items-center gap-1.5 tag-lg ${zbeUiCityStatusTagClass(city.status)}`}
-              >
-                <span
-                  className={`h-2 w-2 rounded-full ${zbeUiCityStatusDotClass(city.status)}`}
-                />
-                {CITY_STATUS_ZBE_LABEL[city.status]}
+              <span className={`flex items-center gap-1.5 tag-lg ${statusChip.tagClass}`}>
+                <span className={`h-2 w-2 rounded-full ${statusChip.dotClass}`} />
+                {statusChip.label}
               </span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-fg tracking-tight flex items-center gap-3">
               <MapPin className="h-7 w-7 text-accent" />
               ZBE {city.name}
             </h1>
-            <p className="mt-2 text-xs sm:text-sm text-secondary max-w-2xl leading-relaxed">
-              {city.summary}
-            </p>
+            <EnforcementNotice enforcement={enforcement} cityName={city.name} verified={isCityVerified(city)} />
+            {city.summary !== enforcement?.sentence && (
+              <p className="mt-2 text-xs sm:text-sm text-secondary max-w-2xl leading-relaxed">
+                {city.summary}
+              </p>
+            )}
           </div>
 
           {/* Sanción y Horario */}
@@ -189,8 +203,14 @@ export default async function CityZbeSeoPage({ params }: Props) {
                 <AlertOctagon className="h-3.5 w-3.5" />
                 Sanción
               </span>
-              <span className="text-2xl font-black text-fg mt-1 block">{city.fineAmount} €</span>
-              <span className="text-[10px] text-muted">según ordenanza</span>
+              {hasNoFine ? (
+                <span className="text-2xl font-black text-fg mt-1 block">{zbeUiFineText(enforcement, city.fineAmount)}</span>
+              ) : (
+                <>
+                  <span className="text-2xl font-black text-fg mt-1 block">{city.fineAmount} €</span>
+                  <span className="text-[10px] text-muted">según ordenanza</span>
+                </>
+              )}
             </div>
 
             <div className="rounded-xl bg-surface border border-line p-3.5 text-center">
@@ -251,7 +271,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
               polygon: city.polygon,
               geoJSON: city.geoJSON,
               officialUrl: isCityVerified(city) ? city.sourceUrl : null,
-              status: 'restricted',
+              status: mapStatus,
             }}
             height="270px"
           />
@@ -289,13 +309,7 @@ export default async function CityZbeSeoPage({ params }: Props) {
                 <Link
                   key={key}
                   href={`/${city.slug}/${slug}`}
-                  className={`group rounded-xl p-4 border flex flex-col justify-between transition-all hover:scale-[1.01] ${
-                    status === 'allowed'
-                      ? 'bg-positive-soft border-positive-line hover:border-positive'
-                      : status === 'restricted'
-                      ? 'bg-warning-soft border-warning-line hover:border-warning'
-                      : 'bg-negative-soft border-negative-line hover:border-negative'
-                  }`}
+                  className={`group rounded-xl p-4 border flex flex-col justify-between transition-all hover:scale-[1.01] ${zbeUiAccessCardClass(status)} ${MATRIX_HOVER_CLASS[status]}`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
@@ -359,6 +373,10 @@ export default async function CityZbeSeoPage({ params }: Props) {
           </div>
         )}
       </div>
+
+      {enforcement?.source === 'atlaszbe' && (
+        <ZbeCalendar entries={enforcement.calendar} cityName={city.name} importedOn={enforcement.importedOn} />
+      )}
 
       <MunicipalityServiceLinks citySlug={city.slug} cityName={city.name} />
 

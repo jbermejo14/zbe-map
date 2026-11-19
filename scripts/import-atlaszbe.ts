@@ -23,6 +23,7 @@ import {
   inventorySummary,
   isRuleActive,
   matchCityToMunicipality,
+  NO_RESTRICTIONS_SCHEDULE_TEXT,
   pickMainZone,
   scheduleText,
   zonesSummary,
@@ -61,7 +62,6 @@ const STATUS_BY_STATE: Partial<Record<EnforcementState, CityData['status']>> = {
   suspendida: 'suspendida',
   sin_restricciones: 'suspendida',
 };
-const NO_RESTRICTIONS_SCHEDULE = 'Sin restricciones en vigor';
 const NO_RESTRICTIONS_REASON = 'No hay restricciones en vigor para esta etiqueta.';
 const ATLAS_HOME_URL = 'https://atlaszbe.es';
 const ATLAS_GEOMETRY_SOURCE_NAME = 'Atlas ZBE (geometría oficial)';
@@ -173,6 +173,7 @@ function buildAtlasEnforcement(
     confidence: stateZone.confianza,
     verifiedOn: stateZone.verificadoEl ?? null,
     officialUrl: stateZone.urlOficial ?? null,
+    earlyPaymentAmount: mainZone.editorial?.multa?.prontoPago ?? null,
     importedOn,
     mainZoneName: mainZone.nombre,
     calendar: calendarEntries(zones, stateZone, cityName),
@@ -181,12 +182,12 @@ function buildAtlasEnforcement(
 
 /** Horario de la primera regla en vigor que restringe alguna etiqueta, empezando por la zona del estado. */
 function zoneSchedule(zones: AtlasZone[], { stateZone }: ZonesByRole, importedOn: string): string {
-  if (ALWAYS_ALLOWED_STATES.includes(stateZone.estadoSancion)) return NO_RESTRICTIONS_SCHEDULE;
+  if (ALWAYS_ALLOWED_STATES.includes(stateZone.estadoSancion)) return NO_RESTRICTIONS_SCHEDULE_TEXT;
   const ordered = [stateZone, ...zones.filter((zone) => zone !== stateZone)];
   const rule = ordered
     .flatMap((zone) => zone.reglas)
     .find((candidate) => isRuleActive(candidate, importedOn) && candidate.condicion === 'siempre' && candidate.etiquetas?.length !== 0);
-  return rule ? scheduleText(rule.horario) : NO_RESTRICTIONS_SCHEDULE;
+  return rule ? scheduleText(rule.horario) : NO_RESTRICTIONS_SCHEDULE_TEXT;
 }
 
 function zonePolygons(zone: AtlasZone): LngLatPolygon[] {
@@ -283,7 +284,7 @@ function importCityFromInventory(city: CityData, municipality: AtlasMunicipality
   };
   city.enforcement = enforcement;
   city.status = 'en_tramitacion';
-  city.schedule = NO_RESTRICTIONS_SCHEDULE;
+  city.schedule = NO_RESTRICTIONS_SCHEDULE_TEXT;
   for (const badge of BADGES) city.rules[badge] = { status: 'allowed', reason: summary.sentence };
   city.polygon = null;
   city.geoJSON = null;

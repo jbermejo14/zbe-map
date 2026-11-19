@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import type { CityData } from '../lib/cities-repository.ts';
+import type { CityData, CityEnforcement } from '../lib/cities-repository.ts';
 import { getAllCities } from '../lib/cities-repository.ts';
 import type { DgtBadgeType, ZbeAccessStatus } from '../lib/zbe-engine.ts';
 import {
@@ -8,6 +8,7 @@ import {
   META_TITLE_MAX_LENGTH,
   SAME_REGION_LIMIT,
   badgeAccessCounts,
+  badgeFaqs,
   badgeMetaDescription,
   badgeMetaTitle,
   badgeNationalSentence,
@@ -174,6 +175,11 @@ describe('Título y descripción', () => {
     assert.equal(text, 'Un coche con etiqueta B puede entrar sin restricciones en la ZBE de Madrid. Multa: 200 €. Horario, excepciones y mapa.');
   });
 
+  it('dice que no hay multa si fineApplies es false', () => {
+    const text = badgeMetaDescription({ subject: SUBJECT, cityName: 'Gijón', status: 'allowed', fineAmount: 200, verified: true, fineApplies: false });
+    assert.equal(text, 'Un coche con etiqueta B puede entrar sin restricciones en la ZBE de Gijón. Sin multa por ahora. Horario, excepciones y mapa.');
+  });
+
   it('marca como orientativa si no está verificada', () => {
     const text = badgeMetaDescription({ subject: SUBJECT, cityName: 'Madrid', status: 'banned', fineAmount: 200, verified: false });
     assert.equal(text, 'Un coche con etiqueta B no puede entrar en la ZBE de Madrid. Normas orientativas: horario, excepciones y mapa.');
@@ -290,5 +296,80 @@ describe('Gramática de los textos', () => {
   it('la frase nacional de un solo estado empieza en mayúscula', () => {
     const all = [makeCity('a', 'A', 'R', 'allowed')];
     assert.ok(badgeNationalSentence('B', all, SUBJECTS.CERO).startsWith('Un coche con etiqueta 0 CERO'));
+  });
+});
+
+describe('badgeFaqs', () => {
+  const base = {
+    cityName: 'Madrid',
+    badgeLabel: 'Etiqueta B',
+    accessStatus: 'restricted' as ZbeAccessStatus,
+    reason: 'Motivo.',
+    verified: true,
+    schedule: 'Todos los días a todas horas',
+    fineAmount: 200,
+    enforcement: null as CityEnforcement | null,
+  };
+  const atlas = (state: 'sanciona' | 'aviso' | 'sin_restricciones', sentence: string, early: number | null): CityEnforcement => ({
+    source: 'atlaszbe',
+    state,
+    label: 'L',
+    sentence,
+    finesFrom: null,
+    warningUntil: null,
+    nextChange: null,
+    confidence: 'alta',
+    verifiedOn: null,
+    officialUrl: null,
+    earlyPaymentAmount: early,
+    importedOn: '2026-11-19',
+    mainZoneName: 'Z',
+    calendar: [],
+  });
+
+  it('madrid: multa con pronto pago y acceso condicionado', () => {
+    const faqs = badgeFaqs({ ...base, enforcement: atlas('sanciona', 'Se multa.', 100) });
+    assert.equal(faqs[0].answer, 'El acceso está condicionado en la ZBE de Madrid: Motivo.');
+    assert.equal(faqs[1].answer, 'El horario de restricción fijado por el Ayuntamiento de Madrid es: Todos los días a todas horas.');
+    assert.equal(faqs[2].answer, 'La sanción general en Madrid es de 200 € (100 € con pronto pago).');
+  });
+
+  it('madrid sin pronto pago: no menciona el 50 %', () => {
+    const faqs = badgeFaqs({ ...base, enforcement: atlas('sanciona', 'Se multa.', null) });
+    assert.equal(faqs[2].answer, 'La sanción general en Madrid es de 200 €.');
+  });
+
+  it('lugo (aviso): permitido con frase del estado y multa explicada', () => {
+    const sentence = 'Hay restricciones, pero en periodo de aviso: todavía no se multa.';
+    const faqs = badgeFaqs({ ...base, cityName: 'Lugo', accessStatus: 'allowed', enforcement: atlas('aviso', sentence, null) });
+    assert.equal(faqs[0].answer, 'Sí, ahora mismo puede entrar. ' + sentence);
+    assert.equal(faqs[2].answer, sentence);
+  });
+
+  it('malaga (suspendida): sin horario de restricción', () => {
+    const sentence = 'La ZBE está anulada o suspendida: ahora no hay restricciones.';
+    const faqs = badgeFaqs({
+      ...base,
+      cityName: 'Málaga',
+      accessStatus: 'allowed',
+      schedule: 'Sin restricciones en vigor',
+      enforcement: atlas('sin_restricciones', sentence, null),
+    });
+    assert.equal(faqs[1].answer, 'Ahora no hay horario de restricción en Málaga: ' + sentence);
+  });
+
+  it('gijon (miteco): usa la frase del inventario y no dice normas orientativas si está verificada', () => {
+    const sentence = 'Gijón tiene la ZBE en tramitación.';
+    const miteco: CityEnforcement = { source: 'miteco', state: 'en_tramite', label: 'L', sentence, inventoryUpdated: '2026-09-30', importedOn: '2026-11-19' };
+    const faqs = badgeFaqs({ ...base, cityName: 'Gijón', accessStatus: 'banned', schedule: 'Sin restricciones en vigor', enforcement: miteco });
+    assert.ok(!faqs[0].answer.includes('orientativas'));
+    assert.equal(faqs[2].answer, sentence);
+  });
+
+  it('ciudad sin verificar: respuestas orientativas', () => {
+    const faqs = badgeFaqs({ ...base, accessStatus: 'banned', verified: false });
+    assert.ok(faqs[0].answer.includes('según las normas orientativas'));
+    assert.ok(faqs[1].answer.startsWith('Horario orientativo'));
+    assert.ok(faqs[2].answer.startsWith('Sanción orientativa de 200 €'));
   });
 });
