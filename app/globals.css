@@ -95,7 +95,8 @@
   --map-allowed: #15803d;
   --map-restricted: #b45309;
   --map-banned: #b91c1c;
-  --map-neutral: var(--dgt-sin);
+  /* Sin vehículo elegido, las ZBE se pintan en verde (decisión del titular, 19/11/2026). */
+  --map-neutral: var(--map-allowed);
 
   /* Punto de la posición del usuario en el mapa. */
   --map-user: #003399;
