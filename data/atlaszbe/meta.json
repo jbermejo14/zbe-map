@@ -1,0 +1,97 @@
+{
+  "schema": "v1",
+  "dataVersion": "20261115T051627Z-7ac118b8",
+  "generatedAt": "2026-11-15T05:16:27.180Z",
+  "checkedAt": "2026-11-15T05:16:27.180Z",
+  "contentHash": "7ac118b85e32228bc03610aa3debd631871ee07d80b4123f9344ecd94ae0f38c",
+  "pipelineVersion": "0.1.0",
+  "baseUrl": "https://datos.atlaszbe.es/v1/",
+  "counts": {
+    "zones": 123,
+    "municipalities": 156,
+    "osmZones": 2
+  },
+  "sources": [
+    {
+      "name": "nap-dgt-zbe",
+      "fetchedAt": "2026-11-15T05:16:46.620Z",
+      "fromCache": false,
+      "sha256": "4102dafa62a4dac28e47c8d209f32dcd3e25e3872de0fdb2270096003ab07a21",
+      "license": "CC BY 4.0"
+    },
+    {
+      "name": "zaragoza-wfs",
+      "fetchedAt": "2026-11-15T05:16:27.783Z",
+      "fromCache": false,
+      "sha256": "f67401e103590f02312c026bef83da84f256c8c1cd45d6124da384f59ee33862",
+      "license": "Ley 37/2007 (reutilización con atribución)"
+    },
+    {
+      "name": "valencia-apr",
+      "fetchedAt": "2026-11-15T05:16:27.531Z",
+      "fromCache": false,
+      "sha256": "2791a90ed4643e064756d2bcda91a0ff9e6b47266f44b77b6ca0bd9e6696ba2e",
+      "license": "CC BY 4.0"
+    },
+    {
+      "name": "pamplona-zac",
+      "fetchedAt": "2026-11-15T05:16:27.540Z",
+      "fromCache": false,
+      "sha256": "5032dcfcd5751a9b7b90870f0e573bd77f1248e544f7f90db26e138790f8c754",
+      "license": "CC BY 3.0"
+    },
+    {
+      "name": "getafe-zbe",
+      "fetchedAt": "2026-11-15T05:16:27.727Z",
+      "fromCache": false,
+      "sha256": "b955fe34a1c7666ad34c95dd4b3cc439cfd5155f32e9e005b3936ea97262694b",
+      "license": "Ley 37/2007 (reutilización con atribución)"
+    },
+    {
+      "name": "icgc-limites",
+      "fetchedAt": "2026-11-15T05:16:27.991Z",
+      "fromCache": false,
+      "sha256": "0148485593545badcd65dbff0126fb27a27e6c8ca5665f8b3e69c22f4ad2c452",
+      "license": "Ley 37/2007 (reutilización citando al ICGC)"
+    },
+    {
+      "name": "miteco-zbe",
+      "fetchedAt": "2026-11-15T05:16:27.884Z",
+      "fromCache": false,
+      "sha256": "a0a924c98a4f2f4a78842effa2cb718f428287d56455a8bdea409add5a3cadec",
+      "license": "citando la fuente (MITECO)"
+    },
+    {
+      "name": "miteco-perimetros",
+      "fetchedAt": "2026-11-15T05:16:28.043Z",
+      "fromCache": false,
+      "sha256": "c3f46d02ea89535bee9de94d7dfd5b81813026c47082bc5b0a799f2e12d69b8f",
+      "license": "Ley 37/2007 (MITECO)"
+    },
+    {
+      "name": "osm-overpass",
+      "fetchedAt": "2026-11-15T05:18:22.166Z",
+      "fromCache": false,
+      "sha256": "2c2aa47e73d341499b017900cbb429bf4bcc721cd142177919fbc7e69c9cde1b",
+      "license": "ODbL 1.0"
+    }
+  ],
+  "attribution": [
+    "Atlas ZBE (https://atlaszbe.es), Open Database License (ODbL) 1.0",
+    "Contiene datos de la DGT, Punto de Acceso Nacional de Tráfico y Movilidad (nap.dgt.es), publicados bajo CC BY 4.0",
+    "Contiene datos del Ayuntamiento de Zaragoza (IDEZar), reutilizados según la Ley 37/2007",
+    "Contiene datos del Ajuntament de València (geoportal, datos abiertos), publicados bajo CC BY 4.0",
+    "Contiene datos del Ayuntamiento de Pamplona (GeoPamplona, datos abiertos), publicados bajo CC BY 3.0",
+    "Contiene datos del Ayuntamiento de Getafe (perímetro de la ZBE), reutilizados según la Ley 37/2007",
+    "Contiene perímetros aproximados de OpenStreetMap (© colaboradores de OpenStreetMap, ODbL 1.0) en zonas confirmadas sin perímetro oficial abierto",
+    "Contiene límites municipales del Institut Cartogràfic i Geològic de Catalunya (ICGC), reutilizados según la Ley 37/2007",
+    "Estado de los municipios y perímetros de las ZBE que no publica ninguna otra fuente: inventario de Zonas de Bajas Emisiones del MITECO (miteco.gob.es), reutilizado según la Ley 37/2007",
+    "Contiene perímetros aproximados dibujados por Atlas ZBE a partir de las ordenanzas municipales",
+    "osm-zonas.geojson: Datos © colaboradores de OpenStreetMap (https://www.openstreetmap.org/copyright), disponibles bajo la Open Database License (ODbL) 1.0"
+  ],
+  "license": {
+    "id": "ODbL-1.0",
+    "nombre": "Open Database License (ODbL) 1.0",
+    "url": "https://opendatacommons.org/licenses/odbl/1-0/"
+  }
+}

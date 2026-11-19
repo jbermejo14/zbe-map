@@ -534,3 +534,193 @@ Fuera de alcance:
 - Build:
   - `out/valencia.html` contiene "Perímetro oficial";
   - el tamaño de `out/index.html` no crece más de un 15 % respecto al anterior (indica los dos tamaños).
+
+## Z9 — Estado real de cada ZBE con Atlas ZBE (19/11/2026)
+
+### Contexto
+
+`data/zbe-cities.json` da casi todas las ciudades como ZBE activa con prohibiciones. El dataset abierto **Atlas ZBE** (https://atlaszbe.es, repositorio `marcc992/atlaszbe-datos`, licencia ODbL 1.0, contenidos DbCL 1.0) contrasta cada zona con fuentes oficiales. Cruzado con nuestras 152 ciudades:
+
+- 91 tienen zona en Atlas ZBE. De ellas solo unas 57 multan hoy; el resto están en aviso, solo restringen en episodios de contaminación, aprobadas sin aplicar o suspendidas.
+- 51 están en el inventario del MITECO **sin zona en vigor** (`en_tramite` o `pendiente`), pero nosotros les mostramos prohibiciones.
+- 10 no salen por nombre. De ellas, 3 se resuelven con el código INE: palma = 07040, castellon = 12040, siero = 33066. Las otras 7 (torrent, portugalete, santurtzi, manacor, teruel, tudela, calahorra) no están en el inventario y se quedan con nuestros datos.
+
+El titular ha aceptado la licencia, con estas condiciones:
+
+- citar "Atlas ZBE" y sus fuentes en la web;
+- `data/zbe-cities.json` pasa a ser una base de datos derivada bajo ODbL 1.0.
+
+Los textos editoriales de Atlas ZBE (`editorial.resumen`, `calendario[].hito`, `excepciones[].descripcion`, etc.) **no se copian**. Los textos se generan a partir de los campos estructurados. La única excepción es `reglas[].nota`, que se puede mostrar como matiz de la regla.
+
+Copia local de solo lectura en `data/atlaszbe/` (commit `272f81af7c`, del 15/11/2026): `zonas.json`, `municipios.json`, `meta.json`, `ATRIBUCION.md` y `LICENSE-DbCL`.
+
+- El esquema completo está en https://github.com/marcc992/atlaszbe-datos/tree/main/schema.
+- Campos que se usan de cada zona en `zonas.json` → `zonas[]`:
+  - `id`, `nombre`, `municipioIne`, `municipio`, `estado`;
+  - `estadoSancion`, con los valores sanciona | aviso | aprobada_sin_aplicar | solo_episodios | suspendida | sin_restricciones | sin_verificar;
+  - `fechas { multasDesde, avisosHasta, proximoCambio }`;
+  - `confianza`, con los valores alta | media | baja;
+  - `reglas[]`;
+  - `editorial.multa { importe, prontoPago }`;
+  - `urlOficial`, `verificadoEl`;
+  - `geometria`, en GeoJSON EPSG:4326 (MultiPolygon o Polygon) ya simplificada a unos 5 m;
+  - `geometriaPrecision`, con los valores oficial | aproximada.
+- `reglas[]`:
+  - `acceso`: prohibido | solo_autorizados | condicionado | solo_aparcamiento;
+  - `alcance`: zona | calles_senalizadas;
+  - `etiquetas`: "0" | "ECO" | "C" | "B" | "A";
+  - `perfil`: todos | no_domiciliados | domiciliados | residentes_zona;
+  - `vehiculos`: "todos" o `{ tipos?: (turismo|moto|ciclomotor|furgoneta|camion|autobus)[], combustible?: diesel|gasolina }`;
+  - `condicion`: siempre | episodio_contaminacion;
+  - `sanciona`: boolean;
+  - `desde` y `hasta`: fecha o null;
+  - `horario`: `{ dias: L-V|L-S|L-D, tramos: [{desde, hasta}], festivos: boolean }` o null;
+  - `nota`: string o null.
+- `municipios.json` → `municipios[]`: `{ ine, nombre, provincia, ccaa, estadoInventario: vigente|en_tramite|pendiente|sin_dato, zonas: string[], inventarioActualizado }`.
+
+Equivalencia de etiquetas: "0" es CERO, "ECO" es ECO, "C" es C, "B" es B y "A" es SIN_ETIQUETA.
+
+### Z9.1 `lib/atlas-zbe.ts` (funciones puras, sin E/S)
+
+Tipos `AtlasZone`, `AtlasRule` y `AtlasMunicipality`, que reflejan los campos anteriores.
+
+- `matchCityToMunicipality(cityName, municipalities, overrides): AtlasMunicipality | null`.
+  - Normaliza los nombres: sin tildes, minúsculas y solo `[a-z0-9 ]`.
+  - Las variantes de un nombre son el nombre entero, cada parte separada por "/" o " - ", y cada una de esas sin artículo inicial (el, la, los, las, a, l).
+  - Coincide si comparte alguna variante.
+  - `overrides` es `Record<citySlug, ine>` y tiene prioridad.
+  - La constante `ATLAS_INE_OVERRIDES = { palma: '07040', castellon: '12040', siero: '33066' }` se usa con el slug de la ciudad. Por eso la función recibe `{ slug, name }` en lugar de solo el nombre.
+- `isRuleActive(rule, onDate): boolean`: `desde` es null o ≤ onDate, y `hasta` es null o > onDate. Las fechas son ISO `YYYY-MM-DD` y se comparan como texto.
+- `pickMainZone(zones): AtlasZone`: la de mayor área según `ringAreaKm2` de `lib/perimeter-geometry.ts`, sumando los anillos exteriores. En caso de empate, la primera.
+- `badgeAccessFromAtlas(badge, zones, mainZone, onDate): { status: ZbeAccessStatus; rules: AtlasRule[] }`. Tiene en cuenta las reglas de todas las zonas del municipio:
+  - `rs` son las reglas activas en `onDate` con `condicion === 'siempre'` que incluyen la etiqueta.
+  - `banned` si alguna regla de `rs` de la **zona principal** cumple a la vez: `acceso` ∈ {prohibido, solo_autorizados}, `perfil` ∈ {todos, no_domiciliados} y `alcance === 'zona'`.
+  - `restricted` si `rs` no está vacía y no se da el caso anterior. Esto cubre subzonas, solo_aparcamiento, condicionado, domiciliados y calles señaladas.
+  - `allowed` si `rs` está vacía.
+  - Devuelve también las reglas que han decidido el estado, para redactar el motivo.
+- `formatSpanishDate('2025-01-01') → '1 de enero de 2025'`.
+- `scheduleText(horario): string`:
+  - L-V → "De lunes a viernes", L-S → "De lunes a sábado", L-D → "Todos los días";
+  - el tramo 00:00-24:00 → "a todas horas";
+  - los demás tramos, "de 07:00 a 20:00", unidos con " y ";
+  - si `festivos === false`, se añade ", excepto festivos";
+  - `horario` null → "Horario no especificado".
+- `ruleSentence(rule, ctx: { cityName: string; zoneName: string | null }): string`. Redacta la regla en una frase:
+  - Sujeto. Etiquetas, en el orden A, B, C, ECO, 0: A → "sin etiqueta", B → "con etiqueta B", C → "con etiqueta C", ECO → "con etiqueta ECO", 0 → "con etiqueta 0 CERO". Las partes se unen con ", " y " y ", compartiendo "con etiqueta": "con etiqueta B y C". Si hay A y otras: "sin etiqueta y con etiqueta B".
+  - Vehículos. Con `vehiculos.tipos`: turismo → "turismos", moto → "motos", ciclomotor → "ciclomotores", furgoneta → "furgonetas", camion → "camiones", autobus → "autobuses", unidos con ", " y " y ". Si no, "vehículos". Con `combustible`, se añade " diésel" o " de gasolina" tras el tipo.
+  - Perfil: no_domiciliados → " no domiciliados en {ciudad}", domiciliados → " domiciliados en {ciudad}", residentes_zona → " que no residen en la zona". Ojo: `residentes_zona` significa que la regla afecta a quienes no residen. Si al probarlo con los datos reales no encaja, se usa " según su residencia en la zona" y se avisa en el informe.
+  - Acceso: prohibido → "no pueden circular", solo_autorizados → "solo pueden entrar con autorización", condicionado → "pueden entrar con condiciones", solo_aparcamiento → "solo pueden entrar para aparcar en un aparcamiento".
+  - Lugar: con `zoneName` → " en {zoneName}"; con `alcance === 'calles_senalizadas'` → " en las calles señalizadas".
+  - Inicio: "Desde el {fecha}, " si hay `desde`.
+  - Horario: ", " + `scheduleText` en minúscula inicial.
+  - Si `sanciona === false`: " (en periodo de aviso, sin multa)".
+  - La frase termina en "." y empieza en mayúscula.
+  - Ejemplo: "Desde el 1 de enero de 2025, los turismos sin etiqueta no domiciliados en Madrid no pueden circular, todos los días a todas horas."
+- `enforcementSummary(mainZone): { state, label, sentence }`. `label` es corto, para una etiqueta visual. Las frases van con fechas formateadas:
+  - sanciona → "Se multa", "Las restricciones están en vigor y se multa{ desde el X si multasDesde}.";
+  - aviso → "Periodo de aviso", "Hay restricciones, pero en periodo de aviso: todavía no se multa{ hasta el X si avisosHasta}.";
+  - aprobada_sin_aplicar → "Aprobada, sin aplicar", "La ZBE está aprobada, pero las restricciones empiezan más adelante{: el X si proximoCambio o multasDesde}.";
+  - solo_episodios → "Solo en episodios", "Solo hay restricciones durante los episodios de alta contaminación.";
+  - suspendida → "Suspendida", "La ZBE está anulada o suspendida: ahora no hay restricciones.";
+  - sin_restricciones → "Sin restricciones", "La zona existe, pero no restringe el acceso.";
+  - sin_verificar → "Sin confirmar", "El estado de esta ZBE no está confirmado.".
+- `inventorySummary(municipality): { state, label, sentence }`:
+  - en_tramite → "En tramitación", "{Ciudad} tiene la ZBE en tramitación: todavía no hay restricciones de acceso por etiqueta.";
+  - pendiente → "Pendiente", "{Ciudad} aún no ha aprobado su ZBE: todavía no hay restricciones de acceso por etiqueta.".
+- `calendarEntries(zones, mainZone, cityName): Array<{ date: string; text: string; badges: DgtBadgeType[] }>`. Una entrada por cada regla con `desde` (texto `ruleSentence` sin el "Desde el …, " inicial y con mayúscula; `badges` = sus etiquetas convertidas). Además:
+  - `multasDesde` → "Empiezan las multas." (`badges` vacío = general);
+  - `avisosHasta` → "Termina el periodo de aviso.";
+  - `proximoCambio` → "Próximo cambio previsto en la ZBE.".
+  - Orden por fecha y sin duplicados exactos.
+
+### Z9.2 Importación: `scripts/import-atlaszbe.ts` y datos
+
+- Uso: `npx tsx scripts/import-atlaszbe.ts [--fecha YYYY-MM-DD]`. Sin `--fecha`, toma la fecha de hoy.
+  - Script npm `atlaszbe:import`.
+  - La fecha queda en cada ciudad como `enforcement.importedOn` y es la fecha con la que se evalúan las reglas.
+- Lee `data/atlaszbe/zonas.json` y `municipios.json` y modifica `data/zbe-cities.json` conservando su formato: 2 espacios y sin salto de línea final, como ahora.
+- **Ciudad con municipio y zonas** (`zonas` no vacío; solo se usan las zonas de ese municipio):
+  - `enforcement`: `{ source: 'atlaszbe', state, label, sentence, finesFrom, warningUntil, nextChange, confidence, verifiedOn, officialUrl, importedOn, mainZoneName, calendar }`.
+    - `state`, `label` y `sentence` salen de `enforcementSummary`.
+    - `calendar` sale de `calendarEntries`.
+  - `rules`: si `state` es `sin_verificar`, no se tocan. En los demás casos, para cada una de las 5 etiquetas:
+    - `status` sale de `badgeAccessFromAtlas`. Excepción: si `state` es solo_episodios, suspendida o sin_restricciones, todas quedan en `allowed`.
+    - `reason` se forma con las frases `ruleSentence` de las reglas que han decidido (como mucho 2) y la `nota` de la primera si existe.
+    - Si queda `allowed`, `reason` es "No hay restricciones en vigor para esta etiqueta." más la `sentence` del estado cuando no es sanciona ni aviso.
+  - `status`:
+    - sanciona, aviso o solo_episodios → 'activa';
+    - aprobada_sin_aplicar → 'en_tramitacion';
+    - suspendida o sin_restricciones → 'suspendida'. Es un valor nuevo del tipo: revisa sus usos con grep en `app/`, `components/` y `lib/`, y dale texto "suspendida" donde se muestre.
+  - `fineAmount`: `editorial.multa.importe` de la zona principal si no es null.
+  - `schedule`: `scheduleText` de la primera regla activa `siempre` de la zona principal que restrinja alguna etiqueta. Si no hay ninguna, "Sin restricciones en vigor".
+  - `sourceUrl`: `urlOficial` de la zona principal si existe. `sourceName`: "{mainZone.nombre} (fuente oficial, vía Atlas ZBE)".
+  - Verificación: si `confianza === 'alta'` y `verificadoEl` tiene menos de 120 días respecto a `importedOn`, se pone `verificationStatus 'verified'` y `lastVerified = verificadoEl`. Si no, 'pending' y `null`. La prueba de `tests/city-data.test.ts` ya exige esto.
+  - Geometría: si la ciudad **no** es una de Z8 (barcelona, valencia, zaragoza, malaga) y la zona principal tiene `geometriaPrecision === 'oficial'`:
+    - `geoJSON` lleva una Feature por zona del municipio, con `properties { nombre: zona.nombre, descripcion: enforcement.sentence }`;
+    - `polygon` es el anillo exterior del polígono mayor de la zona principal, en [lat,lng];
+    - `areaKm2` se calcula como en Z8;
+    - `perimeterName` es `mainZone.nombre`;
+    - `perimeterSource` es `{ name: 'Atlas ZBE (geometría oficial)', url: urlOficial ?? 'https://atlaszbe.es', retrieved: importedOn }`;
+    - se simplifica con `simplifyRing`, empezando en 5 m y con un tope de 800 vértices por ciudad, como en Z8. Reutiliza las funciones de `lib/perimeter-geometry.ts` y no dupliques el bucle: si hace falta, mueve el bucle de Z8 a una función exportada de esa librería.
+    - En los demás casos no se toca la geometría.
+- **Ciudad con municipio sin zonas** y `estadoInventario` en_tramite o pendiente:
+  - `enforcement = { source: 'miteco', state, label, sentence, inventoryUpdated: inventarioActualizado, importedOn }`, con los valores de `inventorySummary`;
+  - las 5 `rules` quedan en `allowed` y `reason` = `sentence`;
+  - `status 'en_tramitacion'`;
+  - `schedule` "Sin restricciones en vigor";
+  - `polygon`, `geoJSON`, `areaKm2`, `perimeterName` y `streets` pasan a `null`, porque no hay zona aprobada y el perímetro anterior era aproximado;
+  - `parkingCondition` pasa a `null`;
+  - `exemptions` se queda vacío;
+  - verificación: `verified` con `lastVerified = inventarioActualizado` si tiene menos de 120 días; si no, pending y null;
+  - `sourceName` = "Inventario de ZBE del MITECO (vía Atlas ZBE)" y `sourceUrl` = "https://atlaszbe.es".
+- Municipio con `sin_dato`, o ciudad sin municipio: no se toca nada y `enforcement` queda en `null`.
+- `CityData` gana `enforcement?: CityEnforcement | null`, con el tipo exportado en `lib/cities-repository.ts`. `status` admite 'suspendida'.
+- Al terminar, el script muestra un recuento por `enforcement.state`, por `source` y por etiqueta (allowed, restricted y banned), y la lista de ciudades sin municipio. Esa lista debe ser exactamente: torrent, portugalete, santurtzi, manacor, teruel, tudela, calahorra.
+- Si falta un fichero, o un override apunta a un INE inexistente, lanza un error y no escribe nada.
+- Licencia:
+  - `data/LICENSE.md` explica que `data/zbe-cities.json` es una base de datos derivada de Atlas ZBE bajo ODbL 1.0 (enlace https://opendatacommons.org/licenses/odbl/1-0/), con los contenidos bajo DbCL 1.0, y lista las fuentes de `data/atlaszbe/ATRIBUCION.md`;
+  - apartado en `README.md` con la licencia de los datos y cómo reimportar: actualizar la copia de `data/atlaszbe/` y ejecutar `npm run atlaszbe:import` y después `npm run perimeters:import`, en ese orden, para que las 4 ciudades de Z8 mantengan su geometría.
+
+### Z9.3 Interfaz
+
+- `components/EnforcementNotice.tsx` (`{ enforcement, cityName }`):
+  - tarjeta con la etiqueta `label` y `sentence`;
+  - si `source === 'atlaszbe'`: "Verificado el {fecha de verifiedOn} con fuentes oficiales" y un enlace a `officialUrl` con `rel="nofollow noopener noreferrer"` y `target="_blank"`;
+  - si `source === 'miteco'`: "Según el inventario de ZBE del MITECO (actualizado el {fecha})";
+  - colores con los tokens que ya existen: positive para suspendida, sin_restricciones, en_tramite y pendiente; warning para aviso, aprobada_sin_aplicar, solo_episodios y sin_verificar; negative para sanciona;
+  - va en `app/[ciudad]/page.tsx` y `app/[ciudad]/[etiqueta]/page.tsx`, justo debajo del `h1`;
+  - si `enforcement` es null, no se muestra.
+- `components/ZbeCalendar.tsx` (`{ entries, cityName, badge?: DgtBadgeType }`):
+  - sección "Calendario de la ZBE de {ciudad}" con una lista de fecha (`formatSpanishDate`) y texto;
+  - con `badge`, solo las entradas generales (`badges` vacío) o las que incluyen esa etiqueta, con el título "Calendario para {groupTitle en minúscula} en {ciudad}";
+  - las entradas futuras respecto a `importedOn` llevan la marca "Próximamente";
+  - sin entradas no se muestra;
+  - va en las dos páginas, después de la tarjeta de normativa o veredicto.
+- Página de etiqueta:
+  - el texto del veredicto ya sale de `rule.reason`;
+  - la tarjeta "Multa" muestra "Sin multa" si `enforcement.state` no es sanciona;
+  - la FAQ de multa, si `enforcement` existe y el estado no es sanciona, responde con `enforcement.sentence`.
+- Atribución en todas las páginas de la sección: una línea en el pie (componente del pie que ya existe) con el texto "Datos de las ZBE: Atlas ZBE (ODbL 1.0), DGT, MITECO y ayuntamientos.". "Atlas ZBE" enlaza a https://atlaszbe.es y "ODbL 1.0" a la licencia.
+- `generateMetadata` de la página de etiqueta no cambia: la descripción ya sale del estado de la regla.
+
+### Z9.4 Criterios de aceptación
+
+- `tests/atlas-zbe.test.ts`, con datos de prueba construidos en la propia prueba, que cubre:
+  - `matchCityToMunicipality` con "Alcoy / Alcoi", "El Ejido" contra "Ejido, El", y el override;
+  - `isRuleActive` en los bordes;
+  - `badgeAccessFromAtlas`: banned en la zona principal, restricted en una subzona, restricted por solo_aparcamiento, allowed por episodio, allowed por regla futura y no_domiciliados → banned;
+  - `ruleSentence` con el ejemplo de Madrid, con el plural de tipos y etiquetas, y con el aviso;
+  - `scheduleText` en sus casos;
+  - `enforcementSummary` e `inventorySummary` en todos los estados;
+  - `calendarEntries`: orden y filtro por etiqueta.
+- `tests/atlas-import.test.ts`, sobre `data/zbe-cities.json` ya importado:
+  - madrid: `enforcement.state` = 'sanciona' y `rules.SIN_ETIQUETA.status` = 'banned';
+  - ninguna ciudad con `enforcement.source === 'miteco'` tiene `polygon` ni reglas distintas de `allowed`;
+  - las 7 ciudades sin municipio tienen `enforcement` null;
+  - ningún `reason` contiene "undefined" ni "null";
+  - todas las fechas de `calendar` son ISO válidas.
+- `tests/city-data.test.ts` y el resto siguen pasando. Si alguna prueba antigua contradice los datos nuevos, por ejemplo una que espere B restringida en Madrid, se corrige la prueba para reflejar la fuente y se explica en el informe.
+- Build:
+  - `out/madrid.html` contiene "Se multa" y "Calendario de la ZBE de Madrid";
+  - `out/gijon.html` contiene "En tramitación";
+  - el pie contiene "Atlas ZBE".
