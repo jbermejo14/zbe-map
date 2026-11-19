@@ -748,3 +748,71 @@ Hoy solo se importa la geometría marcada `geometriaPrecision === 'oficial'`. Es
   - Ningún polígono nuevo es regular ni sintético (`tests/city-data.test.ts`).
   - Ninguna ciudad pasa de 800 vértices.
   - Build: `out/burgos.html` contiene "Perímetro aproximado" y `out/gijon.html` contiene "Todavía no hay perímetro aprobado".
+
+## Z10 — Mapa de la portada: ZBE en tramitación ocultas y punto en el centro del perímetro (19/11/2026)
+
+Petición del titular:
+
+- Muchas ciudades pequeñas con la ZBE en tramitación aparecen en el mapa como si tuvieran una ZBE en vigor. Por defecto deben quedar ocultas, y un botón en la parte de arriba debe permitir mostrarlas.
+- El punto de las ciudades con perímetro debe estar en el centro del perímetro, no en el centro de la ciudad.
+
+### Z10.1 Estado de la ZBE en la evaluación
+
+- `CityEvaluationResult` (`lib/zbe-engine.ts`) gana `zbeStatus: 'activa' | 'en_tramitacion' | 'suspendida'`, copiado de `city.status`.
+- Ojo: `status` ya existe y es el acceso de la etiqueta (allowed/restricted/banned). No se cambia.
+- `lib/zbe-ui.ts`: `isZbeInProgress(city: { zbeStatus }): boolean` devuelve true si `zbeStatus === 'en_tramitacion'`. Hoy son 62 ciudades: las 51 en tramitación o pendientes del MITECO, las aprobadas sin aplicar y algunas antiguas.
+
+### Z10.2 Botón "ZBE en tramitación" en la portada
+
+- `SplitDashboard` guarda el estado `showInProgress`, que empieza en `false`, y se lo pasa a `SpainZbeMap` con un callback para cambiarlo.
+- En la barra de control superior de `SpainZbeMap`, en el grupo de la derecha y antes de "Mi ubicación", va un botón conmutador:
+  - con `aria-pressed`, `min-h-11` y el mismo estilo que los botones de capa;
+  - texto: "Mostrar en tramitación ({n})" cuando están ocultas y "Ocultar en tramitación ({n})" cuando se ven;
+  - `n` es el número de ciudades en tramitación del conjunto actual.
+- Con `showInProgress === false`, las ciudades en tramitación desaparecen de:
+  - los marcadores y perímetros del mapa;
+  - los recuentos de los filtros ("Todas", "Libre", "Restringido", "Prohibido") y el texto "{n} ZBE en España";
+  - el buscador del mapa;
+  - la búsqueda de la ZBE más cercana con "Mi ubicación".
+- Excepción: si el usuario selecciona en el selector de ciudades una ciudad en tramitación (`selectedCityId`), esa ciudad se muestra aunque el conmutador esté apagado.
+- La lógica del filtrado va en una función pura: `visibleMapCities(cities, { showInProgress, selectedCityId })` en `lib/zbe-ui.ts` o en un `lib/map-cities.ts` nuevo, con pruebas. Los componentes solo la llaman.
+- Con `showInProgress === true`, los marcadores en tramitación se distinguen:
+  - el marcador es un círculo hueco (borde del color de estado y relleno transparente), con una clase CSS nueva en el CSS de los marcadores que ya existe; búscalo con grep `zbe-marker-`;
+  - la leyenda del mapa añade "Círculo hueco: ZBE en tramitación" solo cuando hay alguno visible.
+- Las demás vistas (`/ciudades`, el selector de varias ciudades y las páginas de ciudad) no cambian.
+
+### Z10.3 Punto en el centro del perímetro
+
+- Función pura `perimeterMarkerPosition(city: { lat; lng; polygon? }): [number, number]` (lat, lng) en `lib/geo.ts`, o en `lib/perimeter-geometry.ts` si encaja mejor:
+  - Si `polygon` tiene 3 puntos o más, calcula el centroide de área del anillo con la fórmula del polígono (shoelace) sobre `[lat, lng]`.
+  - Si el centroide cae dentro del polígono (punto en polígono con ray casting), devuelve el centroide.
+  - Si cae fuera (polígono cóncavo, en forma de C), traza la horizontal a la latitud del centroide, toma el tramo interior más largo y devuelve su punto medio.
+  - Si no hay intersecciones, devuelve la media de los vértices.
+  - Si el área es 0 (puntos alineados), devuelve la media de los vértices.
+  - Sin polígono, devuelve `[city.lat, city.lng]`.
+- Se usa en:
+  - `SpainZbeMap`: posición del marcador y `flyTo` al seleccionar una ciudad;
+  - `CityMiniMap`: posición del marcador.
+
+  `city.lat` y `city.lng` se siguen usando para distancias ("Mi ubicación") y para todo lo demás.
+- El `polygon` es el anillo exterior del polígono mayor de la zona principal, de modo que en ciudades con varias zonas el punto queda en la principal.
+
+### Z10.4 Criterios de aceptación
+
+- Pruebas de `perimeterMarkerPosition`:
+  - cuadrado: el centro;
+  - triángulo: el centroide;
+  - forma en C: un punto que está dentro;
+  - polígono degenerado;
+  - sin polígono: lat/lng.
+- Pruebas de `visibleMapCities`:
+  - oculta las ciudades en tramitación por defecto;
+  - las muestra con el conmutador encendido;
+  - la ciudad seleccionada se ve siempre;
+  - los recuentos que salen de ella excluyen las ocultas.
+- Con los datos reales, `perimeterMarkerPosition` cae dentro del `polygon` en todas las ciudades que lo tienen (prueba sobre `data/zbe-cities.json`).
+- `npm test`, `tsc` y `build` pasan.
+- La sesión principal lo comprueba en pantalla:
+  - en la portada no se ven las ciudades en tramitación;
+  - el botón las muestra con círculo hueco;
+  - el punto de Burgos y el de Valencia quedan dentro de su perímetro.
