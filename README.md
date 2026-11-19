@@ -161,3 +161,11 @@ Las capas están en `lib/map-config.ts`: **OpenStreetMap** por defecto (en los d
 
 - `polygon` es `null` cuando no existe un perímetro oficial real; el mapa muestra solo un marcador en el centro. La prueba `tests/city-data.test.ts` falla si algún polígono es regular o copia la forma de otra ciudad (`lib/polygon-quality.ts`).
 - `verificationStatus` es `verified` solo si `sourceUrl` es del ayuntamiento o de su boletín oficial; entonces `lastVerified` lleva fecha. Si no, es `pending`, `lastVerified` es `null` y la web muestra las normas como orientativas.
+
+## Enlaces a gasolineras y puntos de recarga
+
+`data/municipality-links.json` asocia cada ciudad con su página de gasolineras y de puntos de recarga en ododex.com. Es una foto fija y se versiona. Si cambian esas secciones, expórtalas en `../ododex-sitio` y regenera el fichero:
+
+```bash
+node scripts/build-municipality-links.mjs ../ododex-sitio/dist-gasolineras ../ododex-sitio/dist-puntos-recarga
+```

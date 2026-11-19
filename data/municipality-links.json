@@ -1,0 +1,610 @@
+{
+  "a-coruna": {
+    "fuel": "coruna-a/coruna-a",
+    "charging": "coruna-a/coruna-a"
+  },
+  "albacete": {
+    "fuel": "albacete/albacete",
+    "charging": "albacete/albacete"
+  },
+  "alcala-de-guadaira": {
+    "fuel": "sevilla/alcala-de-guadaira",
+    "charging": "sevilla/alcala-de-guadaira"
+  },
+  "alcala-de-henares": {
+    "fuel": "madrid/alcala-de-henares",
+    "charging": "madrid/alcala-de-henares"
+  },
+  "alcobendas": {
+    "fuel": "madrid/alcobendas",
+    "charging": "madrid/alcobendas"
+  },
+  "alcorcon": {
+    "fuel": "madrid/alcorcon",
+    "charging": "madrid/alcorcon"
+  },
+  "alcoy": {
+    "fuel": "alicante/alcoy-alcoi",
+    "charging": "alicante-alacant/alcoi-alcoy"
+  },
+  "algeciras": {
+    "fuel": "cadiz/algeciras",
+    "charging": "cadiz/algeciras"
+  },
+  "alicante": {
+    "fuel": "alicante/alicante-alacant",
+    "charging": "alicante-alacant/alacant-alicante"
+  },
+  "almeria": {
+    "fuel": "almeria/almeria",
+    "charging": "almeria/almeria"
+  },
+  "aranjuez": {
+    "fuel": "madrid/aranjuez",
+    "charging": "madrid/aranjuez"
+  },
+  "arganda-del-rey": {
+    "fuel": "madrid/arganda-del-rey",
+    "charging": "madrid/arganda-del-rey"
+  },
+  "arona": {
+    "fuel": "santa-cruz-de-tenerife/arona",
+    "charging": "santa-cruz-de-tenerife/arona"
+  },
+  "arrecife": {
+    "fuel": "palmas-las/arrecife",
+    "charging": "palmas-las/arrecife"
+  },
+  "avila": {
+    "fuel": "avila/avila",
+    "charging": "avila/avila"
+  },
+  "aviles": {
+    "fuel": "asturias/aviles",
+    "charging": "asturias/aviles"
+  },
+  "badajoz": {
+    "fuel": "badajoz/badajoz",
+    "charging": "badajoz/badajoz"
+  },
+  "badalona": {
+    "fuel": "barcelona/badalona",
+    "charging": "barcelona/badalona"
+  },
+  "barakaldo": {
+    "fuel": "bizkaia/barakaldo",
+    "charging": "bizkaia/barakaldo"
+  },
+  "barcelona": {
+    "fuel": "barcelona/barcelona",
+    "charging": "barcelona/barcelona"
+  },
+  "benalmadena": {
+    "fuel": "malaga/benalmadena",
+    "charging": "malaga/benalmadena"
+  },
+  "benidorm": {
+    "fuel": "alicante/benidorm",
+    "charging": "alicante-alacant/benidorm"
+  },
+  "bilbao": {
+    "fuel": "bizkaia/bilbao",
+    "charging": "bizkaia/bilbao"
+  },
+  "boadilla-del-monte": {
+    "fuel": "madrid/boadilla-del-monte",
+    "charging": "madrid/boadilla-del-monte"
+  },
+  "burgos": {
+    "fuel": "burgos/burgos",
+    "charging": "burgos/burgos"
+  },
+  "caceres": {
+    "fuel": "caceres/caceres",
+    "charging": "caceres/caceres"
+  },
+  "cadiz": {
+    "fuel": "cadiz/cadiz",
+    "charging": "cadiz/cadiz"
+  },
+  "calahorra": {
+    "fuel": "rioja-la/calahorra",
+    "charging": "rioja-la/calahorra"
+  },
+  "calvia": {
+    "fuel": "balears-illes/calvia",
+    "charging": "balears-illes/calvia"
+  },
+  "cartagena": {
+    "fuel": "murcia/cartagena",
+    "charging": "murcia/cartagena"
+  },
+  "castelldefels": {
+    "fuel": "barcelona/castelldefels",
+    "charging": "barcelona/castelldefels"
+  },
+  "castellon": {
+    "fuel": "castellon-castello/castellon-de-la-plana-castello-de-la-plana",
+    "charging": "castellon-castello/castello-de-la-plana-castellon-de-la-plana"
+  },
+  "cerdanyola-del-valles": {
+    "fuel": "barcelona/cerdanyola-del-valles",
+    "charging": "barcelona/cerdanyola-del-valles"
+  },
+  "ceuta": {
+    "fuel": "ceuta/ceuta",
+    "charging": "ceuta/ceuta"
+  },
+  "chiclana-de-la-frontera": {
+    "fuel": "cadiz/chiclana-de-la-frontera",
+    "charging": "cadiz/chiclana-de-la-frontera"
+  },
+  "ciudad-real": {
+    "fuel": "ciudad-real/ciudad-real",
+    "charging": "ciudad-real/ciudad-real"
+  },
+  "collado-villalba": {
+    "fuel": "madrid/collado-villalba",
+    "charging": "madrid/collado-villalba"
+  },
+  "colmenar-viejo": {
+    "fuel": "madrid/colmenar-viejo",
+    "charging": "madrid/colmenar-viejo"
+  },
+  "cordoba": {
+    "fuel": "cordoba/cordoba",
+    "charging": "cordoba/cordoba"
+  },
+  "cornella-de-llobregat": {
+    "fuel": "barcelona/cornella-de-llobregat",
+    "charging": "barcelona/cornella-de-llobregat"
+  },
+  "cuenca": {
+    "fuel": "cuenca/cuenca",
+    "charging": "cuenca/cuenca"
+  },
+  "dos-hermanas": {
+    "fuel": "sevilla/dos-hermanas",
+    "charging": "sevilla/dos-hermanas"
+  },
+  "el-ejido": {
+    "fuel": "almeria/ejido-el",
+    "charging": "almeria/ejido-el"
+  },
+  "el-prat-de-llobregat": {
+    "fuel": "barcelona/prat-de-llobregat-el",
+    "charging": "barcelona/prat-de-llobregat-el"
+  },
+  "el-puerto-de-santa-maria": {
+    "fuel": "cadiz/puerto-de-santa-maria-el",
+    "charging": "cadiz/puerto-de-santa-maria-el"
+  },
+  "elche": {
+    "fuel": "alicante/elche-elx",
+    "charging": "alicante-alacant/elx-elche"
+  },
+  "elda": {
+    "fuel": "alicante/elda",
+    "charging": "alicante-alacant/elda"
+  },
+  "estepona": {
+    "fuel": "malaga/estepona",
+    "charging": "malaga/estepona"
+  },
+  "ferrol": {
+    "fuel": "coruna-a/ferrol",
+    "charging": "coruna-a/ferrol"
+  },
+  "fuengirola": {
+    "fuel": "malaga/fuengirola",
+    "charging": "malaga/fuengirola"
+  },
+  "fuenlabrada": {
+    "fuel": "madrid/fuenlabrada",
+    "charging": "madrid/fuenlabrada"
+  },
+  "gandia": {
+    "fuel": "valencia-valencia/gandia",
+    "charging": "valencia-valencia/gandia"
+  },
+  "getafe": {
+    "fuel": "madrid/getafe",
+    "charging": "madrid/getafe"
+  },
+  "getxo": {
+    "fuel": "bizkaia/getxo",
+    "charging": "bizkaia/getxo"
+  },
+  "gijon": {
+    "fuel": "asturias/gijon",
+    "charging": "asturias/gijon"
+  },
+  "girona": {
+    "fuel": "girona/girona",
+    "charging": "girona/girona"
+  },
+  "granada": {
+    "fuel": "granada/granada",
+    "charging": "granada/granada"
+  },
+  "granollers": {
+    "fuel": "barcelona/granollers",
+    "charging": "barcelona/granollers"
+  },
+  "guadalajara": {
+    "fuel": "guadalajara/guadalajara",
+    "charging": "guadalajara/guadalajara"
+  },
+  "hospitalet": {
+    "fuel": "barcelona/hospitalet-de-llobregat-l",
+    "charging": "barcelona/hospitalet-de-llobregat-l"
+  },
+  "huelva": {
+    "fuel": "huelva/huelva",
+    "charging": "huelva/huelva"
+  },
+  "huesca": {
+    "fuel": "huesca/huesca",
+    "charging": "huesca/huesca"
+  },
+  "ibiza": {
+    "fuel": "balears-illes/eivissa",
+    "charging": "balears-illes/eivissa"
+  },
+  "irun": {
+    "fuel": "gipuzkoa/irun",
+    "charging": "gipuzkoa/irun"
+  },
+  "jaen": {
+    "fuel": "jaen/jaen",
+    "charging": "jaen/jaen"
+  },
+  "jerez-de-la-frontera": {
+    "fuel": "cadiz/jerez-de-la-frontera",
+    "charging": "cadiz/jerez-de-la-frontera"
+  },
+  "la-linea-de-la-concepcion": {
+    "fuel": "cadiz/linea-de-la-concepcion-la",
+    "charging": "cadiz/linea-de-la-concepcion-la"
+  },
+  "las-palmas": {
+    "fuel": "palmas-las/palmas-de-gran-canaria-las",
+    "charging": "palmas-las/palmas-de-gran-canaria-las"
+  },
+  "las-rozas": {
+    "fuel": "madrid/rozas-de-madrid-las",
+    "charging": "madrid/rozas-de-madrid-las"
+  },
+  "leganes": {
+    "fuel": "madrid/leganes",
+    "charging": "madrid/leganes"
+  },
+  "leon": {
+    "fuel": "leon/leon",
+    "charging": "leon/leon"
+  },
+  "linares": {
+    "fuel": "jaen/linares",
+    "charging": "jaen/linares"
+  },
+  "lleida": {
+    "fuel": "lleida/lleida",
+    "charging": "lleida/lleida"
+  },
+  "logrono": {
+    "fuel": "rioja-la/logrono",
+    "charging": "rioja-la/logrono"
+  },
+  "lorca": {
+    "fuel": "murcia/lorca",
+    "charging": "murcia/lorca"
+  },
+  "lugo": {
+    "fuel": "lugo/lugo",
+    "charging": "lugo/lugo"
+  },
+  "madrid": {
+    "fuel": "madrid/madrid",
+    "charging": "madrid/madrid"
+  },
+  "majadahonda": {
+    "fuel": "madrid/majadahonda",
+    "charging": "madrid/majadahonda"
+  },
+  "malaga": {
+    "fuel": "malaga/malaga",
+    "charging": "malaga/malaga"
+  },
+  "manacor": {
+    "fuel": "balears-illes/manacor",
+    "charging": "balears-illes/manacor"
+  },
+  "manresa": {
+    "fuel": "barcelona/manresa",
+    "charging": "barcelona/manresa"
+  },
+  "marbella": {
+    "fuel": "malaga/marbella",
+    "charging": "malaga/marbella"
+  },
+  "mataro": {
+    "fuel": "barcelona/mataro",
+    "charging": "barcelona/mataro"
+  },
+  "melilla": {
+    "fuel": "melilla/melilla",
+    "charging": null
+  },
+  "merida": {
+    "fuel": "badajoz/merida",
+    "charging": "badajoz/merida"
+  },
+  "mijas": {
+    "fuel": "malaga/mijas",
+    "charging": "malaga/mijas"
+  },
+  "molina-de-segura": {
+    "fuel": "murcia/molina-de-segura",
+    "charging": "murcia/molina-de-segura"
+  },
+  "mollet-del-valles": {
+    "fuel": "barcelona/mollet-del-valles",
+    "charging": "barcelona/mollet-del-valles"
+  },
+  "mostoles": {
+    "fuel": "madrid/mostoles",
+    "charging": "madrid/mostoles"
+  },
+  "motril": {
+    "fuel": "granada/motril",
+    "charging": "granada/motril"
+  },
+  "murcia": {
+    "fuel": "murcia/murcia",
+    "charging": "murcia/murcia"
+  },
+  "orihuela": {
+    "fuel": "alicante/orihuela",
+    "charging": "alicante-alacant/orihuela"
+  },
+  "ourense": {
+    "fuel": "ourense/ourense",
+    "charging": "ourense/ourense"
+  },
+  "oviedo": {
+    "fuel": "asturias/oviedo",
+    "charging": "asturias/oviedo"
+  },
+  "palencia": {
+    "fuel": "palencia/palencia",
+    "charging": "palencia/palencia"
+  },
+  "palma": {
+    "fuel": "balears-illes/palma-de-mallorca",
+    "charging": "balears-illes/palma"
+  },
+  "pamplona": {
+    "fuel": "navarra/pamplona-iruna",
+    "charging": "navarra/pamplona-iruna"
+  },
+  "parla": {
+    "fuel": "madrid/parla",
+    "charging": "madrid/parla"
+  },
+  "paterna": {
+    "fuel": "valencia-valencia/paterna",
+    "charging": "valencia-valencia/paterna"
+  },
+  "pinto": {
+    "fuel": "madrid/pinto",
+    "charging": "madrid/pinto"
+  },
+  "ponferrada": {
+    "fuel": "leon/ponferrada",
+    "charging": "leon/ponferrada"
+  },
+  "pontevedra": {
+    "fuel": "pontevedra/pontevedra",
+    "charging": "pontevedra/pontevedra"
+  },
+  "portugalete": {
+    "fuel": "bizkaia/portugalete",
+    "charging": "bizkaia/portugalete"
+  },
+  "pozuelo-de-alarcon": {
+    "fuel": "madrid/pozuelo-de-alarcon",
+    "charging": "madrid/pozuelo-de-alarcon"
+  },
+  "reus": {
+    "fuel": "tarragona/reus",
+    "charging": "tarragona/reus"
+  },
+  "rivas-vaciamadrid": {
+    "fuel": "madrid/rivas-vaciamadrid",
+    "charging": "madrid/rivas-vaciamadrid"
+  },
+  "roquetas-de-mar": {
+    "fuel": "almeria/roquetas-de-mar",
+    "charging": "almeria/roquetas-de-mar"
+  },
+  "rubi": {
+    "fuel": "barcelona/rubi",
+    "charging": "barcelona/rubi"
+  },
+  "sabadell": {
+    "fuel": "barcelona/sabadell",
+    "charging": "barcelona/sabadell"
+  },
+  "sagunto": {
+    "fuel": "valencia-valencia/sagunto-sagunt",
+    "charging": "valencia-valencia/sagunt-sagunto"
+  },
+  "salamanca": {
+    "fuel": "salamanca/salamanca",
+    "charging": "salamanca/salamanca"
+  },
+  "san-cristobal-de-la-laguna": {
+    "fuel": "santa-cruz-de-tenerife/san-cristobal-de-la-laguna",
+    "charging": "santa-cruz-de-tenerife/san-cristobal-de-la-laguna"
+  },
+  "san-fernando": {
+    "fuel": "cadiz/san-fernando",
+    "charging": "cadiz/san-fernando"
+  },
+  "san-sebastian": {
+    "fuel": "gipuzkoa/donostia-san-sebastian",
+    "charging": "gipuzkoa/donostia-san-sebastian"
+  },
+  "san-sebastian-de-los-reyes": {
+    "fuel": "madrid/san-sebastian-de-los-reyes",
+    "charging": "madrid/san-sebastian-de-los-reyes"
+  },
+  "san-vicente-del-raspeig": {
+    "fuel": "alicante/san-vicente-del-raspeig-sant-vicent-del-raspeig",
+    "charging": "alicante-alacant/sant-vicent-del-raspeig-san-vicente-del-raspeig"
+  },
+  "sanlucar-de-barrameda": {
+    "fuel": "cadiz/sanlucar-de-barrameda",
+    "charging": "cadiz/sanlucar-de-barrameda"
+  },
+  "sant-boi-de-llobregat": {
+    "fuel": "barcelona/sant-boi-de-llobregat",
+    "charging": "barcelona/sant-boi-de-llobregat"
+  },
+  "sant-cugat-del-valles": {
+    "fuel": "barcelona/sant-cugat-del-valles",
+    "charging": "barcelona/sant-cugat-del-valles"
+  },
+  "santa-coloma-de-gramenet": {
+    "fuel": "barcelona/santa-coloma-de-gramenet",
+    "charging": "barcelona/santa-coloma-de-gramenet"
+  },
+  "santa-cruz-tenerife": {
+    "fuel": "santa-cruz-de-tenerife/santa-cruz-de-tenerife",
+    "charging": "santa-cruz-de-tenerife/santa-cruz-de-tenerife"
+  },
+  "santa-lucia-de-tirajana": {
+    "fuel": "palmas-las/santa-lucia-de-tirajana",
+    "charging": "palmas-las/santa-lucia-de-tirajana"
+  },
+  "santander": {
+    "fuel": "cantabria/santander",
+    "charging": "cantabria/santander"
+  },
+  "santiago-de-compostela": {
+    "fuel": "coruna-a/santiago-de-compostela",
+    "charging": "coruna-a/santiago-de-compostela"
+  },
+  "santurtzi": {
+    "fuel": "bizkaia/santurtzi",
+    "charging": "bizkaia/santurtzi"
+  },
+  "segovia": {
+    "fuel": "segovia/segovia",
+    "charging": "segovia/segovia"
+  },
+  "sevilla": {
+    "fuel": "sevilla/sevilla",
+    "charging": "sevilla/sevilla"
+  },
+  "siero": {
+    "fuel": "asturias/siero",
+    "charging": "asturias/siero"
+  },
+  "talavera-de-la-reina": {
+    "fuel": "toledo/talavera-de-la-reina",
+    "charging": null
+  },
+  "tarragona": {
+    "fuel": "tarragona/tarragona",
+    "charging": "tarragona/tarragona"
+  },
+  "telde": {
+    "fuel": "palmas-las/telde",
+    "charging": "palmas-las/telde"
+  },
+  "terrassa": {
+    "fuel": "barcelona/terrassa",
+    "charging": "barcelona/terrassa"
+  },
+  "teruel": {
+    "fuel": "teruel/teruel",
+    "charging": "teruel/teruel"
+  },
+  "toledo": {
+    "fuel": "toledo/toledo",
+    "charging": "toledo/toledo"
+  },
+  "torrejon-de-ardoz": {
+    "fuel": "madrid/torrejon-de-ardoz",
+    "charging": "madrid/torrejon-de-ardoz"
+  },
+  "torrelavega": {
+    "fuel": "cantabria/torrelavega",
+    "charging": "cantabria/torrelavega"
+  },
+  "torremolinos": {
+    "fuel": "malaga/torremolinos",
+    "charging": "malaga/torremolinos"
+  },
+  "torrent": {
+    "fuel": "valencia-valencia/torrent",
+    "charging": "valencia-valencia/torrent"
+  },
+  "torrevieja": {
+    "fuel": "alicante/torrevieja",
+    "charging": "alicante-alacant/torrevieja"
+  },
+  "tres-cantos": {
+    "fuel": "madrid/tres-cantos",
+    "charging": "madrid/tres-cantos"
+  },
+  "tudela": {
+    "fuel": "navarra/tudela",
+    "charging": "navarra/tudela"
+  },
+  "valdemoro": {
+    "fuel": "madrid/valdemoro",
+    "charging": "madrid/valdemoro"
+  },
+  "valencia": {
+    "fuel": "valencia-valencia/valencia",
+    "charging": "valencia-valencia/valencia"
+  },
+  "valladolid": {
+    "fuel": "valladolid/valladolid",
+    "charging": "valladolid/valladolid"
+  },
+  "velez-malaga": {
+    "fuel": "malaga/velez-malaga",
+    "charging": "malaga/velez-malaga"
+  },
+  "vigo": {
+    "fuel": "pontevedra/vigo",
+    "charging": "pontevedra/vigo"
+  },
+  "viladecans": {
+    "fuel": "barcelona/viladecans",
+    "charging": null
+  },
+  "vilanova-i-la-geltru": {
+    "fuel": "barcelona/vilanova-i-la-geltru",
+    "charging": "barcelona/vilanova-i-la-geltru"
+  },
+  "villarreal": {
+    "fuel": "castellon-castello/villarreal-vila-real",
+    "charging": "castellon-castello/vila-real"
+  },
+  "vitoria-gasteiz": {
+    "fuel": "araba-alava/vitoria-gasteiz",
+    "charging": "araba-alava/vitoria-gasteiz"
+  },
+  "zamora": {
+    "fuel": "zamora/zamora",
+    "charging": "zamora/zamora"
+  },
+  "zaragoza": {
+    "fuel": "zaragoza/zaragoza",
+    "charging": "zaragoza/zaragoza"
+  }
+}

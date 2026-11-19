@@ -9,6 +9,14 @@ import { zbeUiAccessTagClass } from '@/lib/zbe-ui';
 import { AdSlot } from '@/components/AdSlot';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
+import { MunicipalityServiceLinks } from '@/components/MunicipalityServiceLinks';
+import {
+  badgeMetaDescription,
+  badgeMetaTitle,
+  badgeNationalSentence,
+  regionSentence,
+  sameRegionCities,
+} from '@/lib/badge-page-insights';
 import { getVerificationText, isCityVerified } from '@/lib/city-verification';
 import {
   ChevronRight,
@@ -34,13 +42,19 @@ interface Props {
   }>;
 }
 
-const SLUG_TO_BADGE: Record<string, { badge: DgtBadgeType; label: string }> = {
-  cero: { badge: 'CERO', label: '0 CERO' },
-  eco: { badge: 'ECO', label: 'ECO' },
-  c: { badge: 'C', label: 'Etiqueta C' },
-  b: { badge: 'B', label: 'Etiqueta B' },
-  'sin-etiqueta': { badge: 'SIN_ETIQUETA', label: 'Sin Etiqueta (Categoría A)' },
+const SLUG_TO_BADGE: Record<string, { badge: DgtBadgeType; label: string; shortLabel: string; subject: string; groupTitle: string }> = {
+  cero: { badge: 'CERO', label: '0 CERO', shortLabel: '0 CERO', subject: 'un coche con etiqueta 0 CERO', groupTitle: 'Coches con etiqueta 0 CERO' },
+  eco: { badge: 'ECO', label: 'ECO', shortLabel: 'ECO', subject: 'un coche con etiqueta ECO', groupTitle: 'Coches con etiqueta ECO' },
+  c: { badge: 'C', label: 'Etiqueta C', shortLabel: 'Etiqueta C', subject: 'un coche con etiqueta C', groupTitle: 'Coches con etiqueta C' },
+  b: { badge: 'B', label: 'Etiqueta B', shortLabel: 'Etiqueta B', subject: 'un coche con etiqueta B', groupTitle: 'Coches con etiqueta B' },
+  'sin-etiqueta': { badge: 'SIN_ETIQUETA', label: 'Sin Etiqueta (Categoría A)', shortLabel: 'Sin etiqueta', subject: 'un coche sin etiqueta', groupTitle: 'Coches sin etiqueta' },
 };
+
+const ACCESS_STATUS_TAG_LABEL = {
+  allowed: 'Permitido',
+  restricted: 'Restringido',
+  banned: 'Prohibido',
+} as const;
 
 const BADGE_TO_SLUG: Record<DgtBadgeType, string> = {
   CERO: 'cero',
@@ -79,13 +93,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `¿Puede entrar un coche con ${badgeInfo.label} en la ZBE de ${city.name}? (${SEO_CURRENT_YEAR})`;
-  const description = isCityVerified(city)
-    ? `Consulta si los vehículos con ${badgeInfo.label} pueden circular o aparcar en la Zona de Bajas Emisiones de ${city.name}. Horarios (${city.schedule}), multa de ${city.fineAmount} €, parkings y excepciones.`
-    : `Normas orientativas, pendientes de verificar con la ordenanza municipal, sobre si los vehículos con ${badgeInfo.label} pueden circular o aparcar en la Zona de Bajas Emisiones de ${city.name}. Consulta al ayuntamiento horario y sanciones.`;
+  const title = badgeMetaTitle(badgeInfo.shortLabel, city.name, SEO_CURRENT_YEAR);
+  const description = badgeMetaDescription({
+    subject: badgeInfo.subject,
+    cityName: city.name,
+    status: city.rules[badgeInfo.badge]?.status ?? 'allowed',
+    fineAmount: city.fineAmount,
+    verified: isCityVerified(city),
+  });
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: absoluteUrl(`/${city.slug}/${etiqueta}`),
@@ -113,6 +131,10 @@ export default async function CityBadgePage({ params }: Props) {
   const accessStatus = rule?.status || 'allowed';
   const reason = rule?.reason || 'Sin restricciones reportadas.';
   const badgeMeta = getBadgeMetadata(badgeKey);
+  const allCities = getAllCities();
+  const nationalSentence = badgeNationalSentence(badgeKey, allCities, badgeInfo.subject);
+  const citySentence = regionSentence(city, allCities, badgeKey, badgeInfo.subject);
+  const regionCities = sameRegionCities(city, allCities, badgeKey);
 
   // Status visual attributes
   const statusConfig = {
@@ -357,6 +379,33 @@ export default async function CityBadgePage({ params }: Props) {
         </div>
       )}
 
+      {/* Comparación con otras ZBE */}
+      <div className="mb-8 rounded-2xl border border-line bg-elevated/60 p-6">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-secondary mb-3">
+          {`${badgeInfo.groupTitle} en otras ZBE`}
+        </h2>
+        <p className="text-sm text-secondary leading-relaxed">
+          {nationalSentence}
+          {citySentence && ` ${citySentence}`}
+        </p>
+        {regionCities.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
+            {regionCities.map((other) => (
+              <Link
+                key={other.slug}
+                href={`/${other.slug}/${etiqueta}`}
+                className="flex flex-col gap-1.5 p-3 rounded-lg border border-line bg-surface/60 hover:border-accent hover:bg-elevated text-xs text-secondary transition-colors"
+              >
+                <span>{other.name}</span>
+                <span className={`${zbeUiAccessTagClass(other.status)} self-start`}>
+                  {ACCESS_STATUS_TAG_LABEL[other.status]}
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Preguntas Frecuentes (FAQ) Visibles */}
       <div className="mb-8 rounded-2xl border border-line bg-elevated/60 p-6">
         <h2 className="text-sm font-bold uppercase tracking-wider text-secondary mb-4 flex items-center gap-2">
@@ -372,6 +421,8 @@ export default async function CityBadgePage({ params }: Props) {
           ))}
         </div>
       </div>
+
+      <MunicipalityServiceLinks citySlug={city.slug} cityName={city.name} />
 
       {/* Navegación interna: Otras etiquetas en esta ciudad */}
       <div className="rounded-2xl border border-line bg-elevated/40 p-6">

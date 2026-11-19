@@ -10,6 +10,7 @@ import { AdSlot } from '@/components/AdSlot';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { canonicalRegion } from '@/lib/regions';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
+import { MunicipalityServiceLinks } from '@/components/MunicipalityServiceLinks';
 import { getVerificationText, isCityVerified } from '@/lib/city-verification';
 import {
   ChevronRight,
@@ -348,6 +349,8 @@ export default async function CityZbeSeoPage({ params }: Props) {
           </div>
         )}
       </div>
+
+      <MunicipalityServiceLinks citySlug={city.slug} cityName={city.name} />
 
       <AdSlot />
     </div>
