@@ -2,11 +2,41 @@ import citiesJson from '../data/zbe-cities.json' with { type: 'json' };
 import type { DgtBadgeType, ZbeAccessStatus, CityEvaluationResult } from './zbe-engine.ts';
 import { evaluateCitiesForBadge } from './zbe-engine.ts';
 import type { VerificationStatus } from './city-verification.ts';
+import type { CalendarEntry, EnforcementState } from './atlas-zbe.ts';
 
 export interface CityRule {
   status: ZbeAccessStatus;
   reason: string;
 }
+
+/** Estado de aplicación de la ZBE según Atlas ZBE (zona con reglas verificadas). */
+export interface AtlasEnforcement {
+  source: 'atlaszbe';
+  state: EnforcementState;
+  label: string;
+  sentence: string;
+  finesFrom: string | null;
+  warningUntil: string | null;
+  nextChange: string | null;
+  confidence: 'alta' | 'media' | 'baja';
+  verifiedOn: string | null;
+  officialUrl: string | null;
+  importedOn: string;
+  mainZoneName: string;
+  calendar: CalendarEntry[];
+}
+
+/** Estado de una ZBE que solo consta en el inventario del MITECO, sin zona en vigor. */
+export interface MitecoEnforcement {
+  source: 'miteco';
+  state: EnforcementState;
+  label: string;
+  sentence: string;
+  inventoryUpdated: string;
+  importedOn: string;
+}
+
+export type CityEnforcement = AtlasEnforcement | MitecoEnforcement;
 
 export interface CityData {
   id: string;
@@ -16,7 +46,7 @@ export interface CityData {
   region: string;
   lat: number;
   lng: number;
-  status: 'activa' | 'en_tramitacion';
+  status: 'activa' | 'en_tramitacion' | 'suspendida';
   fineAmount: number;
   schedule: string;
   summary: string;
@@ -34,6 +64,7 @@ export interface CityData {
   verificationStatus: VerificationStatus;
   lastVerified: string | null;
   noticePeriod?: string | null;
+  enforcement?: CityEnforcement | null;
 }
 
 const cities: CityData[] = citiesJson as unknown as CityData[];

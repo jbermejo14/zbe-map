@@ -4,13 +4,14 @@ import React, { useId, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { AdSlot } from './AdSlot';
 import { filterCitiesByName, groupCitiesByRegion } from '@/lib/city-search';
+import { CITY_STATUS_LABEL, zbeUiCityStatusTagClass } from '@/lib/zbe-ui';
 
 export interface DirectoryCity {
   slug: string;
   name: string;
   province: string;
   region: string;
-  status: 'activa' | 'en_tramitacion';
+  status: 'activa' | 'en_tramitacion' | 'suspendida';
 }
 
 /** Grupos de comunidades tras los que va el anuncio intermedio. */
@@ -64,8 +65,8 @@ export function CitiesDirectory({ cities }: CitiesDirectoryProps) {
                     <span className="block text-sm font-semibold text-fg break-words">{city.name}</span>
                     <span className="block text-xs text-muted">{city.province}</span>
                   </span>
-                  <span className={city.status === 'activa' ? 'tag tag-green' : 'tag tag-warning'}>
-                    {city.status === 'activa' ? 'Activa' : 'En tramitación'}
+                  <span className={zbeUiCityStatusTagClass(city.status)}>
+                    {CITY_STATUS_LABEL[city.status]}
                   </span>
                 </Link>
               </li>

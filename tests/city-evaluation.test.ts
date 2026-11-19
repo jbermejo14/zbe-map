@@ -10,7 +10,7 @@ test('Evaluación de Acceso Municipal por Etiqueta ZBE', async (t) => {
 
     const evalSin = evaluateCityAccess(madrid, 'SIN_ETIQUETA');
     assert.equal(evalSin.status, 'banned', 'Madrid prohíbe sin etiqueta');
-    assert.match(evalSin.reason, /Prohibido/i);
+    assert.match(evalSin.reason, /no pueden circular/i);
 
     const evalB = evaluateCityAccess(madrid, 'B');
     assert.equal(evalB.status, 'restricted', 'Madrid restringe etiqueta B (parking en Centro)');

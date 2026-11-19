@@ -10,6 +10,7 @@
     "prisma:push": "prisma db push",
     "db:seed": "tsx scripts/seed.ts",
     "dgt:ingest": "tsx scripts/ingest-dgt.ts",
+    "atlaszbe:import": "tsx scripts/import-atlaszbe.ts",
     "perimeters:import": "node --experimental-sqlite --import tsx scripts/import-official-perimeters.ts"
   },
   "dependencies": {

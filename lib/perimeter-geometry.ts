@@ -261,3 +261,49 @@ export function parseGpkgGeometry(blob: Uint8Array): number[][][][] {
     throw error;
   }
 }
+
+/** Polígono GeoJSON: lista de anillos [lng, lat], el primero exterior y el resto huecos. */
+export type LngLatPolygon = LngLatPoint[][];
+
+export const SIMPLIFY_TOLERANCE_METERS = 5;
+export const MAX_VERTICES_PER_CITY = 800;
+const MAX_TOLERANCE_METERS = 1000;
+const TOLERANCE_GROWTH_FACTOR = 2;
+
+/** Simplifica todos los anillos de los polígonos y redondea sus coordenadas a 6 decimales. */
+export function simplifyPolygons(polygons: LngLatPolygon[], toleranceMeters: number): LngLatPolygon[] {
+  return polygons.map((polygon) =>
+    polygon.map((ring) =>
+      simplifyRing(ring, toleranceMeters).map(([lng, lat]): LngLatPoint => [roundCoordinate(lng), roundCoordinate(lat)]),
+    ),
+  );
+}
+
+/** Área (km²) de un polígono: anillo exterior menos huecos. */
+export function polygonAreaKm2(polygon: LngLatPolygon): number {
+  const [outer, ...holes] = polygon;
+  return ringAreaKm2(outer) - holes.reduce((sum, hole) => sum + ringAreaKm2(hole), 0);
+}
+
+/**
+ * Construye una geometría con tolerancia creciente (5 m, duplicando) hasta que
+ * `countVertices` no supere el máximo por ciudad. Lanza Error si ni con 1000 m se consigue.
+ */
+export function simplifyUntilSmallEnough<T>(
+  build: (toleranceMeters: number) => T,
+  countVertices: (built: T) => number,
+): { result: T; tolerance: number } {
+  let tolerance = SIMPLIFY_TOLERANCE_METERS;
+  let result = build(tolerance);
+  while (countVertices(result) > MAX_VERTICES_PER_CITY) {
+    if (tolerance * TOLERANCE_GROWTH_FACTOR > MAX_TOLERANCE_METERS) {
+      throw new Error(`no se consigue bajar de ${MAX_VERTICES_PER_CITY} vértices con tolerancia de hasta ${tolerance} m`);
+    }
+    tolerance *= TOLERANCE_GROWTH_FACTOR;
+    result = build(tolerance);
+  }
+  return { result, tolerance };
+}
+
+/** Ciudades cuyo perímetro sale de la capa oficial del ayuntamiento (`npm run perimeters:import`). */
+export const OFFICIAL_PERIMETER_SLUGS = ['barcelona', 'valencia', 'zaragoza', 'malaga'];

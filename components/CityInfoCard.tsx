@@ -8,7 +8,7 @@ import { canonicalRegion } from '@/lib/regions';
 import { getVerificationText, isCityVerified } from '@/lib/city-verification';
 import { evaluateCitiesForBadge, getAccessStatusPresentation } from '@/lib/zbe-engine';
 import type { DgtBadgeType } from '@/lib/zbe-engine';
-import { zbeUiAccessTagClass, zbeUiBadgeSentenceLabel } from '@/lib/zbe-ui';
+import { CITY_STATUS_ZBE_LABEL, zbeUiAccessTagClass, zbeUiBadgeSentenceLabel, zbeUiCityStatusTagClass } from '@/lib/zbe-ui';
 import { ArrowRight, ExternalLink, X } from 'lucide-react';
 
 const CityMiniMap = dynamic(() => import('./CityMiniMap').then((mod) => mod.CityMiniMap), {
@@ -58,7 +58,6 @@ export function CityInfoCard({ city, badge, onRemove }: CityInfoCardProps) {
     }),
     [city, access]
   );
-  const isActive = city.status === 'activa';
 
   return (
     <article className="card card-compact min-w-0 space-y-3">
@@ -78,8 +77,8 @@ export function CityInfoCard({ city, badge, onRemove }: CityInfoCardProps) {
       </header>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className={isActive ? 'tag tag-green' : 'tag tag-warning'}>
-          {isActive ? 'ZBE activa' : 'En tramitación'}
+        <span className={zbeUiCityStatusTagClass(city.status)}>
+          {CITY_STATUS_ZBE_LABEL[city.status]}
         </span>
         {access && badge ? (
           <span className={zbeUiAccessTagClass(access.status)}>

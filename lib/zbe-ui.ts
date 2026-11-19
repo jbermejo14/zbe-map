@@ -1,4 +1,33 @@
 import type { DgtBadgeType, ZbeAccessStatus } from './zbe-engine.ts';
+import type { CityData } from './cities-repository.ts';
+
+type CityStatus = CityData['status'];
+
+/** Texto corto del estado de una ciudad, en listados. */
+export const CITY_STATUS_LABEL: Record<CityStatus, string> = {
+  activa: 'Activa',
+  suspendida: 'Suspendida',
+  en_tramitacion: 'En tramitación',
+};
+
+/** Texto del estado de una ciudad en su ficha y en la tarjeta. */
+export const CITY_STATUS_ZBE_LABEL: Record<CityStatus, string> = {
+  activa: 'ZBE activa',
+  suspendida: 'ZBE suspendida',
+  en_tramitacion: 'En tramitación',
+};
+
+const CITY_STATUS_TAG_CLASS: Record<CityStatus, string> = {
+  activa: 'tag tag-green',
+  suspendida: 'tag tag-green',
+  en_tramitacion: 'tag tag-warning',
+};
+
+const CITY_STATUS_DOT_CLASS: Record<CityStatus, string> = {
+  activa: 'bg-positive animate-pulse',
+  suspendida: 'bg-positive',
+  en_tramitacion: 'bg-warning',
+};
 
 /** Clase CSS (globals.css) de la pastilla con el color oficial de cada etiqueta DGT. */
 const ZBE_UI_BADGE_CHIP_CLASS: Record<DgtBadgeType, string> = {
@@ -56,6 +85,15 @@ export function zbeUiBadgeShortLabel(badge: DgtBadgeType): string {
 
 export function zbeUiBadgeSentenceLabel(badge: DgtBadgeType): string {
   return ZBE_UI_BADGE_SENTENCE_LABEL[badge];
+}
+
+/** Pastilla `tag` con el color del estado de una ciudad. */
+export function zbeUiCityStatusTagClass(status: CityStatus): string {
+  return CITY_STATUS_TAG_CLASS[status];
+}
+
+export function zbeUiCityStatusDotClass(status: CityStatus): string {
+  return CITY_STATUS_DOT_CLASS[status];
 }
 
 export function zbeUiAccessTagClass(status: ZbeAccessStatus): string {

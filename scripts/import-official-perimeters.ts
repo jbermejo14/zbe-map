@@ -8,8 +8,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
-import { parseGpkgGeometry, ringAreaKm2, roundCoordinate, simplifyRing, utmToWgs84 } from '../lib/perimeter-geometry.ts';
-import type { LngLatPoint } from '../lib/perimeter-geometry.ts';
+import {
+  parseGpkgGeometry,
+  OFFICIAL_PERIMETER_SLUGS,
+  polygonAreaKm2,
+  ringAreaKm2,
+  simplifyPolygons,
+  simplifyUntilSmallEnough,
+  utmToWgs84,
+} from '../lib/perimeter-geometry.ts';
+import type { LngLatPoint, LngLatPolygon } from '../lib/perimeter-geometry.ts';
 
 // @types/node 20 no declara node:sqlite: se carga con require y se tipa lo mínimo usado.
 interface SqliteDatabase {
@@ -20,10 +28,6 @@ const { DatabaseSync } = createRequire(import.meta.url)('node:sqlite') as {
   DatabaseSync: new (file: string, options: { readOnly: boolean }) => SqliteDatabase;
 };
 
-const SIMPLIFY_TOLERANCE_METERS = 5;
-const MAX_VERTICES_PER_CITY = 800;
-const MAX_TOLERANCE_METERS = 1000;
-const TOLERANCE_GROWTH_FACTOR = 2;
 const GEOJSON_POLYGON = 'Polygon';
 const GEOJSON_MULTIPOLYGON = 'MultiPolygon';
 const RETRIEVED_DATE = '2026-11-19';
@@ -34,7 +38,7 @@ const JSON_INDENT = 2;
 const MALAGA_GENERAL_TYPE = 1;
 const MALAGA_PROTECTION_TYPE = 2;
 
-type Polygon = LngLatPoint[][];
+type Polygon = LngLatPolygon;
 type FeatureProperties = Record<string, unknown>;
 
 interface EntityDescription {
@@ -201,24 +205,11 @@ function readEntities(source: PerimeterSource): RawEntity[] {
   return source.format === 'gpkg' ? readGpkgEntities(source, filePath) : readGeoJsonEntities(filePath);
 }
 
-function simplifyPolygons(polygons: Polygon[], tolerance: number): Polygon[] {
-  return polygons.map((polygon) =>
-    polygon.map((ring) =>
-      simplifyRing(ring, tolerance).map(([lng, lat]): LngLatPoint => [roundCoordinate(lng), roundCoordinate(lat)]),
-    ),
-  );
-}
-
 function countVertices(entities: Entity[]): number {
   return entities.reduce(
     (total, entity) => total + entity.polygons.reduce((sum, polygon) => sum + polygon.flat().length, 0),
     0,
   );
-}
-
-function polygonAreaKm2(polygon: Polygon): number {
-  const [outer, ...holes] = polygon;
-  return ringAreaKm2(outer) - holes.reduce((sum, hole) => sum + ringAreaKm2(hole), 0);
 }
 
 function entityAreaKm2(entity: Entity): number {
@@ -232,17 +223,12 @@ function buildEntities(source: PerimeterSource, raw: RawEntity[], tolerance: num
   }));
 }
 
-function simplifyUntilSmallEnough(source: PerimeterSource, raw: RawEntity[]) {
-  let tolerance = SIMPLIFY_TOLERANCE_METERS;
-  let entities = buildEntities(source, raw, tolerance);
-  while (countVertices(entities) > MAX_VERTICES_PER_CITY) {
-    if (tolerance * TOLERANCE_GROWTH_FACTOR > MAX_TOLERANCE_METERS) {
-      throw new Error(`no se consigue bajar de ${MAX_VERTICES_PER_CITY} vértices con tolerancia de hasta ${tolerance} m`);
-    }
-    tolerance *= TOLERANCE_GROWTH_FACTOR;
-    entities = buildEntities(source, raw, tolerance);
-  }
-  return { entities, tolerance };
+function simplifyEntities(source: PerimeterSource, raw: RawEntity[]) {
+  const { result, tolerance } = simplifyUntilSmallEnough(
+    (toleranceMeters) => buildEntities(source, raw, toleranceMeters),
+    countVertices,
+  );
+  return { entities: result, tolerance };
 }
 
 function validateEntities(source: PerimeterSource, raw: RawEntity[]): void {
@@ -299,7 +285,7 @@ function importCity(cities: CityRecord[], source: PerimeterSource): void {
     if (!city) throw new Error('la ciudad no está en data/zbe-cities.json');
     const raw = readEntities(source);
     validateEntities(source, raw);
-    const { entities, tolerance } = simplifyUntilSmallEnough(source, raw);
+    const { entities, tolerance } = simplifyEntities(source, raw);
     applySourceToCity(city, source, entities);
     console.log(
       `${source.slug}: tolerancia ${tolerance} m, ${countVertices(entities)} vértices, ${city.areaKm2} km², ${entities.length} entidades`,
@@ -309,7 +295,16 @@ function importCity(cities: CityRecord[], source: PerimeterSource): void {
   }
 }
 
+/** La lista de ciudades vive en lib/perimeter-geometry.ts, que también lee scripts/import-atlaszbe.ts. */
+function assertSourcesMatchSharedSlugs(): void {
+  const sourceSlugs = PERIMETER_SOURCES.map((source) => source.slug);
+  if (sourceSlugs.join() !== OFFICIAL_PERIMETER_SLUGS.join()) {
+    throw new Error(`PERIMETER_SOURCES (${sourceSlugs.join()}) no coincide con OFFICIAL_PERIMETER_SLUGS (${OFFICIAL_PERIMETER_SLUGS.join()})`);
+  }
+}
+
 function main(): void {
+  assertSourcesMatchSharedSlugs();
   const cities = JSON.parse(fs.readFileSync(CITIES_FILE, 'utf8')) as CityRecord[];
   for (const source of PERIMETER_SOURCES) importCity(cities, source);
   fs.writeFileSync(CITIES_FILE, JSON.stringify(cities, null, JSON_INDENT));

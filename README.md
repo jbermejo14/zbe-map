@@ -177,3 +177,20 @@ Los perímetros de Barcelona, Valencia, Zaragoza y Málaga salen de las capas of
 ```bash
 npm run perimeters:import
 ```
+
+## Estado de cada ZBE y licencia de los datos
+
+El estado real de cada ZBE (si multa, si está en aviso, aprobada sin aplicar, suspendida o solo en tramitación), sus reglas por etiqueta y el calendario salen de [Atlas ZBE](https://atlaszbe.es), que los contrasta con fuentes oficiales. La copia local, de solo lectura, está en `data/atlaszbe/`.
+
+`data/zbe-cities.json` es una base de datos derivada de Atlas ZBE y se publica bajo la [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/); sus contenidos, bajo la DbCL 1.0. Las fuentes y la atribución completa están en `data/LICENSE.md`. Los textos editoriales de Atlas ZBE no se copian: las frases se generan a partir de campos estructurados.
+
+Para reimportar, actualiza la copia de `data/atlaszbe/` y ejecuta los dos scripts en este orden:
+
+```bash
+npm run atlaszbe:import -- --fecha AAAA-MM-DD
+npm run perimeters:import
+```
+
+`atlaszbe:import` no toca la geometría de Barcelona, Valencia, Zaragoza y Málaga (sale de `data/official-perimeters/`), pero sí reescribe su `summary`. `perimeters:import` usa ese `summary` como `descripcion` del GeoJSON de esas cuatro ciudades, así que debe ir después. Si se ejecutan al revés, la geometría queda igual, pero esa descripción conserva el resumen antiguo hasta la siguiente ejecución de `perimeters:import`.
+
+Sin `--fecha`, el script usa la fecha de hoy. Esa fecha es la de evaluación de las reglas y queda en `enforcement.importedOn` de cada ciudad.

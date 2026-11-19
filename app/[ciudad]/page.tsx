@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { absoluteUrl } from '@/lib/site';
-import { zbeUiAccessTagClass } from '@/lib/zbe-ui';
+import { CITY_STATUS_ZBE_LABEL, zbeUiAccessTagClass, zbeUiCityStatusDotClass, zbeUiCityStatusTagClass } from '@/lib/zbe-ui';
 import { getAllCities, getCityBySlug } from '@/lib/cities-repository';
 import { CityMiniMap } from '@/components/CityMiniMap';
 import { DgtBadgeType } from '@/lib/zbe-engine';
@@ -165,16 +165,12 @@ export default async function CityZbeSeoPage({ params }: Props) {
                 {city.province} · {canonicalRegion(city.region)}
               </span>
               <span
-                className={`flex items-center gap-1.5 tag-lg ${
-                  city.status === 'activa' ? 'tag tag-green' : 'tag tag-warning'
-                }`}
+                className={`flex items-center gap-1.5 tag-lg ${zbeUiCityStatusTagClass(city.status)}`}
               >
                 <span
-                  className={`h-2 w-2 rounded-full ${
-                    city.status === 'activa' ? 'bg-positive animate-pulse' : 'bg-warning'
-                  }`}
+                  className={`h-2 w-2 rounded-full ${zbeUiCityStatusDotClass(city.status)}`}
                 />
-                {city.status === 'activa' ? 'ZBE Activa' : 'En tramitación / Pruebas'}
+                {CITY_STATUS_ZBE_LABEL[city.status]}
               </span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-fg tracking-tight flex items-center gap-3">
