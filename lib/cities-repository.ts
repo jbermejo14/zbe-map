@@ -28,6 +28,7 @@ export interface CityData {
   polygon?: [number, number][] | null;
   streets?: string[] | null;
   geoJSON?: any;
+  perimeterSource?: { name: string; url: string; retrieved: string } | null;
   sourceUrl: string;
   sourceName: string;
   verificationStatus: VerificationStatus;

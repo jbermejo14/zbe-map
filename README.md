@@ -169,3 +169,11 @@ Las capas están en `lib/map-config.ts`: **OpenStreetMap** por defecto (en los d
 ```bash
 node scripts/build-municipality-links.mjs ../ododex-sitio/dist-gasolineras ../ododex-sitio/dist-puntos-recarga
 ```
+
+## Perímetros oficiales
+
+Los perímetros de Barcelona, Valencia, Zaragoza y Málaga salen de las capas oficiales de cada ayuntamiento guardadas en `data/official-perimeters/`. Para regenerar sus campos en `data/zbe-cities.json`:
+
+```bash
+npm run perimeters:import
+```

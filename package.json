@@ -9,7 +9,8 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "db:seed": "tsx scripts/seed.ts",
-    "dgt:ingest": "tsx scripts/ingest-dgt.ts"
+    "dgt:ingest": "tsx scripts/ingest-dgt.ts",
+    "perimeters:import": "node --experimental-sqlite --import tsx scripts/import-official-perimeters.ts"
   },
   "dependencies": {
     "leaflet": "1.9.4",

@@ -101,4 +101,17 @@ describe('Verificación de Datos Municipales ZBE (Requisito 5)', () => {
       }
     }
   });
+
+  it('El geoJSON de una sola entidad Polygon tiene los mismos vértices que polygon (±1 por el cierre)', () => {
+    for (const city of cities) {
+      const features = city.geoJSON?.features ?? [];
+      if (features.length !== 1 || features[0].geometry.type !== 'Polygon') continue;
+      const outerRing = features[0].geometry.coordinates[0];
+      const difference = Math.abs(outerRing.length - (city.polygon?.length ?? 0));
+      assert.ok(
+        difference <= 1,
+        `${city.name}: geoJSON tiene ${outerRing.length} vértices y polygon ${city.polygon?.length ?? 0}`
+      );
+    }
+  });
 });

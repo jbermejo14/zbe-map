@@ -253,11 +253,25 @@ export default async function CityZbeSeoPage({ params }: Props) {
               name: city.name,
               cityName: city.name,
               polygon: city.polygon,
+              geoJSON: city.geoJSON,
               officialUrl: isCityVerified(city) ? city.sourceUrl : null,
               status: 'restricted',
             }}
             height="270px"
           />
+          {city.perimeterSource && (
+            <p className="mt-2 text-[11px] text-muted">
+              Perímetro oficial:{' '}
+              <a
+                href={city.perimeterSource.url}
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+                className="text-accent hover:text-accent-hover underline"
+              >
+                {city.perimeterSource.name}
+              </a>
+            </p>
+          )}
         </div>
 
         <AdSlot />
