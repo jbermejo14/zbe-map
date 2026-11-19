@@ -3,7 +3,10 @@
  * Lógica oficial de deducción de Distintivo Ambiental DGT y evaluación de acceso municipal.
  */
 
-import type { CityEnforcement, PerimeterSource } from './cities-repository.ts';
+import type { CityData, CityEnforcement, PerimeterSource } from './cities-repository.ts';
+
+/** Estado de la ZBE de una ciudad (no el acceso de la etiqueta). */
+export type ZbeStatus = CityData['status'];
 
 export type DgtBadgeType = 'CERO' | 'ECO' | 'C' | 'B' | 'SIN_ETIQUETA';
 
@@ -36,6 +39,8 @@ export interface CityEvaluationResult {
   lat: number;
   lng: number;
   status: ZbeAccessStatus;
+  /** Estado de la ZBE de la ciudad (no el acceso de la etiqueta, que es `status`). */
+  zbeStatus: ZbeStatus;
   statusLabel: string;
   statusColor: string;
   reason: string;
@@ -411,6 +416,7 @@ export function evaluateCitiesForBadge(
     region: string;
     lat: number;
     lng: number;
+    status: ZbeStatus;
     fineAmount: number;
     schedule: string;
     summary: string;
@@ -508,6 +514,7 @@ export function evaluateCitiesForBadge(
       lat: city.lat,
       lng: city.lng,
       status,
+      zbeStatus: city.status,
       statusLabel: pres.label,
       statusColor: pres.dotColor,
       reason,

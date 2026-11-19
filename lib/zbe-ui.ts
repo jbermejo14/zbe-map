@@ -194,3 +194,11 @@ export const MAP_RESTRICTED_DASH_ARRAY = '5, 5';
 export const MAP_APPROXIMATE_DASH_ARRAY = '2, 6';
 /** Nota de leyenda bajo los mapas con algún perímetro aproximado. */
 export const MAP_APPROXIMATE_LEGEND_TEXT = 'Línea de puntos: perímetro aproximado';
+
+/** Una ZBE en tramitación aún no está en vigor: la portada la oculta salvo que se pida. */
+export function isZbeInProgress(city: { zbeStatus: string }): boolean {
+  return city.zbeStatus === 'en_tramitacion';
+}
+
+/** Texto de leyenda del marcador hueco de las ZBE en tramitación. */
+export const MAP_IN_PROGRESS_LEGEND_TEXT = 'Círculo hueco: ZBE en tramitación';

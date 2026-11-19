@@ -769,6 +769,29 @@ main {
   .zbe-marker-user .marker-core {
     background: var(--map-user);
   }
+
+  /* ZBE en tramitación: círculo hueco con el borde del color de estado. */
+  .zbe-marker-in-progress .marker-core {
+    background: transparent;
+    border-width: 3px;
+    box-shadow: none;
+  }
+
+  .zbe-marker-in-progress.zbe-marker-allowed .marker-core {
+    border-color: var(--map-allowed);
+  }
+
+  .zbe-marker-in-progress.zbe-marker-restricted .marker-core {
+    border-color: var(--map-restricted);
+  }
+
+  .zbe-marker-in-progress.zbe-marker-banned .marker-core {
+    border-color: var(--map-banned);
+  }
+
+  .zbe-marker-in-progress.zbe-marker-neutral .marker-core {
+    border-color: var(--map-neutral);
+  }
 }
 
 @media print {

@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import { MAP_TILE_SOURCES, getTileLayerOptions } from '@/lib/map-config';
 import type { PerimeterSource } from '@/lib/cities-repository';
 import { isApproximatePerimeter, perimeterUnavailableText } from '@/lib/city-verification';
+import { perimeterMarkerPosition } from '@/lib/geo';
 import { parsePolygonPoints } from '@/lib/polygon-quality';
 import { MAP_APPROXIMATE_DASH_ARRAY, MAP_APPROXIMATE_LEGEND_TEXT, zbeUiReadMapColor } from '@/lib/zbe-ui';
 import type { ZbeMapColorKey } from '@/lib/zbe-ui';
@@ -116,7 +117,9 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
         iconAnchor: [8, 8],
       });
 
-      const marker = L.marker([city.lat, city.lng], { icon: markerIcon }).addTo(map);
+      const marker = L.marker(perimeterMarkerPosition({ lat: city.lat, lng: city.lng, polygon: polygonCoords }), {
+        icon: markerIcon,
+      }).addTo(map);
       if (!city.geoJSON && polygonCoords.length <= 2) {
         marker.bindPopup(buildUnavailablePopupHtml(unavailableText, officialUrl)).openPopup();
       }

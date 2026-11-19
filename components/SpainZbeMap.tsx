@@ -10,16 +10,24 @@ import {
   type MapLayerType,
 } from '@/lib/map-config';
 import { isApproximatePerimeter } from '@/lib/city-verification';
+import { perimeterMarkerPosition } from '@/lib/geo';
+import { visibleMapCities } from '@/lib/map-cities';
 import {
   MAP_APPROXIMATE_DASH_ARRAY,
   MAP_APPROXIMATE_LEGEND_TEXT,
+  MAP_IN_PROGRESS_LEGEND_TEXT,
   MAP_RESTRICTED_DASH_ARRAY,
+  isZbeInProgress,
   zbeUiReadMapColor,
 } from '@/lib/zbe-ui';
 import { MapLocationNotice, useMapUserLocation } from './MapLocation';
 import { Search, RotateCcw, LocateFixed } from 'lucide-react';
 
+/** Nombre accesible fijo del conmutador: el estado lo anuncia `aria-pressed`. */
+const IN_PROGRESS_BUTTON_LABEL = 'Ciudades con la ZBE en tramitación';
+
 interface SpainZbeMapProps {
+  /** Ciudades ya filtradas con `visibleMapCities`; el mapa no vuelve a filtrar por tramitación. */
   cities: CityEvaluationResult[];
   /** Etiqueta elegida; sin ella los perímetros se pintan en el color neutro, sin estado de acceso. */
   badge: DgtBadgeType | null;
@@ -27,6 +35,11 @@ interface SpainZbeMapProps {
   onCitySelect: (city: CityEvaluationResult) => void;
   statusFilter: 'all' | ZbeAccessStatus;
   onFilterChange: (filter: 'all' | ZbeAccessStatus) => void;
+  /** Si es true, se muestran también las ciudades con la ZBE en tramitación. */
+  showInProgress: boolean;
+  /** Ciudades en tramitación del conjunto completo (también las ocultas): es el número del botón. La barra de recuentos solo cuenta las visibles. */
+  inProgressCount: number;
+  onShowInProgressChange: (show: boolean) => void;
 }
 
 /** Un perímetro aproximado se dibuja con puntos aunque la ciudad esté restringida. */
@@ -42,6 +55,9 @@ export function SpainZbeMap({
   onCitySelect,
   statusFilter,
   onFilterChange,
+  showInProgress,
+  inProgressCount,
+  onShowInProgressChange,
 }: SpainZbeMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -53,7 +69,9 @@ export function SpainZbeMap({
   const [mapLayer, setMapLayer] = useState<MapLayerType>(MAP_DEFAULT_LAYER);
   const accessKnown = badge !== null;
   const activeFilter = accessKnown ? statusFilter : 'all';
-  const { state: locationState, locate } = useMapUserLocation(mapInstanceRef, cities);
+  // "Mi ubicación" solo mira el conmutador: la ciudad seleccionada no cuenta como ZBE más cercana.
+  const locationCities = visibleMapCities(cities, { showInProgress, selectedCityId: null });
+  const { state: locationState, locate } = useMapUserLocation(mapInstanceRef, locationCities);
 
   // Filtrar ciudades
   const filteredCities = cities.filter((c) => {
@@ -70,6 +88,7 @@ export function SpainZbeMap({
   });
 
   const hasApproximatePerimeter = filteredCities.some((c) => isApproximatePerimeter(c.perimeterSource));
+  const hasInProgressMarker = filteredCities.some(isZbeInProgress);
 
   // Renderizar marcadores y perímetros
   const renderMapElements = useCallback(
@@ -92,7 +111,9 @@ export function SpainZbeMap({
         const strokeColor = zbeUiReadMapColor(colorKey);
 
         // A. Marcador central
-        const markerClass = `zbe-marker-${colorKey}`;
+        const markerClass = isZbeInProgress(city)
+          ? `zbe-marker-${colorKey} zbe-marker-in-progress`
+          : `zbe-marker-${colorKey}`;
 
         const customIcon = L.divIcon({
           className: markerClass,
@@ -101,7 +122,7 @@ export function SpainZbeMap({
           iconAnchor: [8, 8],
         });
 
-        const marker = L.marker([city.lat, city.lng], {
+        const marker = L.marker(perimeterMarkerPosition(city), {
           icon: customIcon,
           title: city.cityName,
           alt: city.cityName,
@@ -129,7 +150,7 @@ export function SpainZbeMap({
           } else if (city.polygon && city.polygon.length > 0) {
             map.fitBounds(L.latLngBounds(city.polygon), { padding: [60, 60], maxZoom: 13 });
           } else {
-            map.flyTo([city.lat, city.lng], 13, { duration: 0.8 });
+            map.flyTo(perimeterMarkerPosition(city), 13, { duration: 0.8 });
           }
         });
 
@@ -303,7 +324,7 @@ export function SpainZbeMap({
           const bounds = L.latLngBounds(selectedCity.polygon);
           mapInstanceRef.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 13 });
         } else {
-          mapInstanceRef.current.flyTo([selectedCity.lat, selectedCity.lng], 13, { duration: 0.8 });
+          mapInstanceRef.current.flyTo(perimeterMarkerPosition(selectedCity), 13, { duration: 0.8 });
         }
       });
     }
@@ -376,6 +397,18 @@ export function SpainZbeMap({
 
         {/* Accesos directos de prueba y controles */}
         <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => onShowInProgressChange(!showInProgress)}
+            aria-pressed={showInProgress}
+            aria-label={`${IN_PROGRESS_BUTTON_LABEL} (${inProgressCount})`}
+            className={`min-h-11 px-3 rounded text-xs font-medium transition-colors ${
+              showInProgress ? 'bg-fg text-bg' : 'bg-elevated text-muted hover:text-fg border border-line'
+            }`}
+          >
+            {showInProgress ? 'Ocultar' : 'Mostrar'} en tramitación ({inProgressCount})
+          </button>
+
           <button
             type="button"
             onClick={locate}
@@ -466,6 +499,9 @@ export function SpainZbeMap({
               <span className="h-2 w-4 rounded-sm border border-line bg-elevated inline-block" />
               <span>Elige tu vehículo para ver el acceso</span>
             </div>
+          )}
+          {hasInProgressMarker && (
+            <div className="mt-1.5 text-[11px] text-secondary">{MAP_IN_PROGRESS_LEGEND_TEXT}</div>
           )}
           {hasApproximatePerimeter && (
             <div className="mt-1.5 text-[11px] text-secondary">{MAP_APPROXIMATE_LEGEND_TEXT}</div>

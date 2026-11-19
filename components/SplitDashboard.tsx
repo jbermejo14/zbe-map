@@ -5,7 +5,8 @@ import dynamic from 'next/dynamic';
 import { evaluateCitiesForBadge } from '@/lib/zbe-engine';
 import type { CityEvaluationResult, DgtBadgeType, ZbeAccessStatus } from '@/lib/zbe-engine';
 import type { CityData } from '@/lib/cities-repository';
-import { zbeUiBadgeChipClass, zbeUiBadgeSentenceLabel } from '@/lib/zbe-ui';
+import { isZbeInProgress, zbeUiBadgeChipClass, zbeUiBadgeSentenceLabel } from '@/lib/zbe-ui';
+import { visibleMapCities } from '@/lib/map-cities';
 import {
   EMPTY_VEHICLE_SELECTION,
   FUEL_QUESTION,
@@ -67,6 +68,7 @@ export function SplitDashboard() {
   const [citiesError, setCitiesError] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | ZbeAccessStatus>('all');
+  const [showInProgress, setShowInProgress] = useState(false);
 
   const result = useMemo(() => evaluateVehicleSelection(selection), [selection]);
   const currentBadge = result?.badge ?? null;
@@ -93,10 +95,15 @@ export function SplitDashboard() {
     [allCities, currentBadge]
   );
   const selectedCity = cities.find((city) => city.cityId === selectedCityId) ?? null;
+  const visibleCities = useMemo(
+    () => visibleMapCities(cities, { showInProgress, selectedCityId }),
+    [cities, showInProgress, selectedCityId]
+  );
+  const inProgressCount = useMemo(() => cities.filter(isZbeInProgress).length, [cities]);
 
   const countOf = (status: ZbeAccessStatus) => {
     if (!currentBadge || !allCities) return COUNT_PLACEHOLDER;
-    return cities.filter((c) => c.status === status).length;
+    return visibleCities.filter((c) => c.status === status).length;
   };
 
   return (
@@ -177,12 +184,15 @@ export function SplitDashboard() {
         {/* PANEL DERECHO: mapa de España con los perímetros ZBE */}
         <div id="mapa" className="anchor-target lg:col-span-7 flex flex-col h-full min-h-[580px] min-w-0">
           <SpainZbeMap
-            cities={cities}
+            cities={visibleCities}
+            inProgressCount={inProgressCount}
             badge={currentBadge}
             selectedCity={selectedCity}
             onCitySelect={(city) => setSelectedCityId(city.cityId)}
             statusFilter={statusFilter}
             onFilterChange={setStatusFilter}
+            showInProgress={showInProgress}
+            onShowInProgressChange={setShowInProgress}
           />
 
           <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[11px] text-muted px-1">
