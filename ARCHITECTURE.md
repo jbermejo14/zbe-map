@@ -272,3 +272,138 @@ Hoy el botón "Etiqueta DGT" de la cabecera lleva a `/etiqueta-dgt/gasolina/2018
   - la calculadora rápida da la misma etiqueta que `getOfficialDgtBadge` en dos casos;
   - las de `AdSlot` de la sección 8.5.
 - Build: `out/etiqueta-dgt.html` existe y está en el sitemap; `out/index.html` no contiene "Tasación".
+
+## Z7 — Páginas ciudad y etiqueta menos repetidas (19/11/2026)
+
+La auditoría SEO (`../ododex-sitio/docs/09-auditoria-seo-2026-11.md`) mide un 67 % de texto común entre las ~760 páginas `/[ciudad]/[etiqueta]`: solo cambian el nombre de la ciudad y la frase de la regla. Además, las descripciones tienen entre 185 y 240 caracteres y algunos títulos pasan de 90.
+
+`data/zbe-cities.json` no trae calendario de fases ni aparcamientos disuasorios, y no se inventan. El texto nuevo sale de datos que sí existen: la comparación con otras ZBE y los enlaces a las secciones de gasolineras y puntos de recarga de ododex.com. Todas las páginas siguen siendo indexables.
+
+### Z7.1 Enlaces a gasolineras y puntos de recarga del municipio
+
+- Script `scripts/build-municipality-links.mjs`, en Node y sin dependencias:
+  - Uso: `node scripts/build-municipality-links.mjs <dist-gasolineras> <dist-puntos-recarga>`. Los argumentos son las carpetas exportadas de `../ododex-sitio`.
+  - Para cada ciudad de `data/zbe-cities.json` busca `<dist-gasolineras>/es/gasolineras/provincia/<provincia>/<municipio>.html` y `<dist-puntos-recarga>/es/puntos-recarga/provincia/<provincia>/<municipio>.html`.
+  - Primero mira la tabla `MUNICIPALITY_LINK_OVERRIDES` (abajo). Si la ciudad no está en ella, prueba `<slug(province)>/<city.slug>`. `slug` quita las tildes, pasa a minúsculas, cambia por `-` cada tramo que no sea `[a-z0-9]` y quita los `-` de los extremos.
+  - Si el fichero no existe, el valor es `null` y se avisa por consola con el slug y la ruta probada.
+  - Escribe `data/municipality-links.json` así: `{ "<city.slug>": { "fuel": "<provincia>/<municipio>" | null, "charging": "<provincia>/<municipio>" | null } }`. Las claves van ordenadas por slug, con 2 espacios de sangría y salto de línea final.
+  - Al terminar muestra cuántas ciudades tienen cada enlace.
+- `MUNICIPALITY_LINK_OVERRIDES` (`slug → { fuel, charging }`; `null` significa que no hay página):
+
+  | slug | fuel | charging |
+  |---|---|---|
+  | valencia | valencia-valencia/valencia | valencia-valencia/valencia |
+  | alicante | alicante/alicante-alacant | alicante-alacant/alacant-alicante |
+  | palma | balears-illes/palma-de-mallorca | balears-illes/palma |
+  | las-palmas | palmas-las/palmas-de-gran-canaria-las | palmas-las/palmas-de-gran-canaria-las |
+  | san-sebastian | gipuzkoa/donostia-san-sebastian | gipuzkoa/donostia-san-sebastian |
+  | a-coruna | coruna-a/coruna-a | coruna-a/coruna-a |
+  | hospitalet | barcelona/hospitalet-de-llobregat-l | barcelona/hospitalet-de-llobregat-l |
+  | pamplona | navarra/pamplona-iruna | navarra/pamplona-iruna |
+  | castellon | castellon-castello/castellon-de-la-plana-castello-de-la-plana | castellon-castello/castello-de-la-plana-castellon-de-la-plana |
+  | elche | alicante/elche-elx | alicante-alacant/elx-elche |
+  | santa-cruz-tenerife | santa-cruz-de-tenerife/santa-cruz-de-tenerife | santa-cruz-de-tenerife/santa-cruz-de-tenerife |
+  | logrono | rioja-la/logrono | rioja-la/logrono |
+  | las-rozas | madrid/rozas-de-madrid-las | madrid/rozas-de-madrid-las |
+  | viladecans | barcelona/viladecans | null |
+  | el-prat-de-llobregat | barcelona/prat-de-llobregat-el | barcelona/prat-de-llobregat-el |
+  | el-puerto-de-santa-maria | cadiz/puerto-de-santa-maria-el | cadiz/puerto-de-santa-maria-el |
+  | la-linea-de-la-concepcion | cadiz/linea-de-la-concepcion-la | cadiz/linea-de-la-concepcion-la |
+  | el-ejido | almeria/ejido-el | almeria/ejido-el |
+  | torrevieja | alicante/torrevieja | alicante-alacant/torrevieja |
+  | orihuela | alicante/orihuela | alicante-alacant/orihuela |
+  | torrent | valencia-valencia/torrent | valencia-valencia/torrent |
+  | gandia | valencia-valencia/gandia | valencia-valencia/gandia |
+  | paterna | valencia-valencia/paterna | valencia-valencia/paterna |
+  | benidorm | alicante/benidorm | alicante-alacant/benidorm |
+  | sagunto | valencia-valencia/sagunto-sagunt | valencia-valencia/sagunt-sagunto |
+  | alcoy | alicante/alcoy-alcoi | alicante-alacant/alcoi-alcoy |
+  | san-vicente-del-raspeig | alicante/san-vicente-del-raspeig-sant-vicent-del-raspeig | alicante-alacant/sant-vicent-del-raspeig-san-vicente-del-raspeig |
+  | elda | alicante/elda | alicante-alacant/elda |
+  | villarreal | castellon-castello/villarreal-vila-real | castellon-castello/vila-real |
+  | vitoria-gasteiz | araba-alava/vitoria-gasteiz | araba-alava/vitoria-gasteiz |
+  | santiago-de-compostela | coruna-a/santiago-de-compostela | coruna-a/santiago-de-compostela |
+  | ferrol | coruna-a/ferrol | coruna-a/ferrol |
+  | talavera-de-la-reina | toledo/talavera-de-la-reina | null |
+  | telde | palmas-las/telde | palmas-las/telde |
+  | santa-lucia-de-tirajana | palmas-las/santa-lucia-de-tirajana | palmas-las/santa-lucia-de-tirajana |
+  | arrecife | palmas-las/arrecife | palmas-las/arrecife |
+  | calvia | balears-illes/calvia | balears-illes/calvia |
+  | ibiza | balears-illes/eivissa | balears-illes/eivissa |
+  | manacor | balears-illes/manacor | balears-illes/manacor |
+  | calahorra | rioja-la/calahorra | rioja-la/calahorra |
+  | melilla | melilla/melilla | null |
+
+- `data/municipality-links.json` se versiona. Es una foto fija: si cambian las secciones, se vuelve a generar a mano. El procedimiento está en `README.md`.
+- `lib/municipality-links.ts`:
+  - Constantes `FUEL_SECTION_PATH = '/es/gasolineras/provincia'` y `CHARGING_SECTION_PATH = '/es/puntos-recarga/provincia'`.
+  - `getMunicipalityLinks(citySlug: string): { fuelHref: string | null; chargingHref: string | null }`. Devuelve rutas desde la raíz del dominio (`/es/gasolineras/provincia/madrid/madrid`), o `null` si no hay página o la ciudad no está en el JSON. No lanza errores.
+- Estas rutas están fuera de `basePath`. Se enlazan con `<a href>` normal y nunca con `next/link`, que les añadiría `/es/zbe` delante.
+
+### Z7.2 Textos de comparación: `lib/badge-page-insights.ts`
+
+Funciones puras, sin JSX, que reciben la lista de ciudades (`CityData[]`). El estado de una ciudad para una etiqueta es `city.rules[badge]?.status ?? 'allowed'`, igual que en la página.
+
+Palabras de estado, comunes a todas las frases:
+
+- `allowed` → "puede entrar sin restricciones";
+- `restricted` → "tiene restricciones";
+- `banned` → "tiene prohibido el acceso".
+
+Funciones:
+
+- `badgeAccessCounts(badge, cities): { allowed: number; restricted: number; banned: number; total: number }`.
+- `badgeNationalSentence(badge, cities, badgeLabel): string`.
+  - Ejemplo: "De las 152 ZBE de España, la Etiqueta B puede entrar sin restricciones en 30, tiene restricciones en 121 y tiene prohibido el acceso en 1."
+  - Solo nombra las categorías mayores que 0, en el orden allowed, restricted, banned, unidas con ", " y " y ".
+  - Si todas son de un solo estado: "La Etiqueta X {palabras} en las 152 ZBE de España."
+- `sameRegionCities(city, cities, badge, limit = SAME_REGION_LIMIT): Array<{ slug: string; name: string; status: ZbeAccessStatus }>`.
+  - Devuelve las ciudades de la misma comunidad, sin la propia. La comunidad se compara con `canonicalRegion(region)` de `lib/regions.ts`.
+  - Ordenadas por nombre con `localeCompare(…, 'es')`.
+  - `SAME_REGION_LIMIT = 8`.
+- `regionSentence(city, cities, badge, badgeLabel): string | null`.
+  - Ejemplo: "En Comunidad de Madrid hay 14 ZBE en el mapa. En 12 de las otras 13, la Etiqueta B tiene restricciones, igual que en Madrid."
+  - Si ninguna otra lo comparte, la segunda frase es: "En ninguna de las otras 13, la Etiqueta B tiene restricciones como en Madrid."
+  - Si todas lo comparten: "En todas las demás, la Etiqueta B tiene restricciones, igual que en Madrid."
+  - Con una sola ciudad más, "las otras 1" no vale. La frase queda: "En la otra ZBE de la comunidad, {Ciudad}, la Etiqueta B también {palabras}" o "…, la Etiqueta B no {palabras}".
+  - Devuelve `null` si la ciudad es la única de su comunidad.
+  - La comunidad se escribe tal como la devuelve `canonicalRegion`.
+- `badgeMetaTitle(badgeShortLabel, cityName, year): string`.
+  - Formato: "Etiqueta B en la ZBE de Madrid: ¿puede entrar? (2026)".
+  - `badgeShortLabel` vale "0 CERO", "ECO", "Etiqueta C", "Etiqueta B" o "Sin etiqueta".
+  - Si pasa de `META_TITLE_MAX_LENGTH = 60` caracteres, se quita " (año)". Si aun así pasa, queda "Etiqueta B en la ZBE de {ciudad}".
+- `badgeMetaDescription(input: { badgeLabel: string; cityName: string; status: ZbeAccessStatus; fineAmount: number; verified: boolean }): string`.
+  - Máximo `META_DESCRIPTION_MAX_LENGTH = 160` caracteres.
+  - Verificada: "{Veredicto} con {badgeLabel} en la ZBE de {ciudad}. Multa: {fineAmount} €. Horario, excepciones y mapa."
+  - Sin verificar: "{Veredicto} con {badgeLabel} en la ZBE de {ciudad}. Normas orientativas: horario, excepciones y mapa."
+  - El veredicto es "Sí se puede entrar", "Se puede entrar con condiciones" o "No se puede entrar".
+  - Si pasa del límite, se recorta en el último espacio antes de 159 caracteres y se añade "…".
+
+### Z7.3 Cambios en `app/[ciudad]/[etiqueta]/page.tsx`
+
+- `SLUG_TO_BADGE` incorpora `shortLabel` (los valores de Z7.2).
+- `generateMetadata` usa `badgeMetaTitle(shortLabel, …, SEO_CURRENT_YEAR)` y `badgeMetaDescription` para `title`, `description` y `openGraph`. No cambian ni el `h1` ni las preguntas frecuentes.
+- Sección nueva "La {label} en otras ZBE", con el texto exacto `La {badgeInfo.label} en otras ZBE`. Va después de las excepciones y antes de las preguntas frecuentes. Contiene:
+  - un párrafo con `badgeNationalSentence` y, si no es `null`, `regionSentence`;
+  - una rejilla con `sameRegionCities`. Cada elemento enlaza con `next/link` a `/{slug}/{etiqueta}` y muestra el nombre y una etiqueta de estado con la clase de `zbeUiAccessTagClass(status)` y los textos "Permitido", "Restringido" o "Prohibido";
+  - si la lista está vacía, no hay rejilla.
+- Sección nueva "Repostar y recargar en {ciudad}" (componente `components/MunicipalityServiceLinks.tsx`, props `{ citySlug, cityName }`), colocada justo antes de la sección "Comprobar otras etiquetas…". Contiene:
+  - "Precios de las gasolineras de {ciudad} hoy" (`fuelHref`) y "Puntos de recarga en {ciudad}" (`chargingHref`), con `<a>` normal. Si falta uno, se omite ese enlace;
+  - una línea con un enlace `next/link` a `/etiqueta-dgt`: "¿No sabes qué etiqueta tiene tu coche? Calcúlala";
+  - si no hay ni `fuelHref` ni `chargingHref`, se muestra solo la línea de la etiqueta.
+- Se mantienen los estilos de tarjeta que ya existen (`rounded-2xl border border-line bg-elevated/60 p-6`), sin colores nuevos.
+
+### Z7.4 Cambios en `app/[ciudad]/page.tsx`
+
+- El mismo `MunicipalityServiceLinks`, colocado antes del último bloque de enlaces o de la última `AdSlot`.
+
+### Z7.5 Criterios de aceptación
+
+- `npm test` pasa con `tests/badge-page-insights.test.ts`, que cubre:
+  - recuentos y frase nacional: varias categorías, una sola y todas `allowed`;
+  - comunidad: excluye la propia, orden, límite, `null` si es la única, "ninguna", "todas" y el caso de una sola ciudad más;
+  - título: los tres niveles de recorte;
+  - descripción: como máximo 160 caracteres en las 152 ciudades por 5 etiquetas con los datos reales, y sin "undefined";
+  - `getMunicipalityLinks`: Madrid tiene los dos enlaces; un slug inexistente devuelve `null` y `null`; todas las rutas no nulas empiezan por `/es/gasolineras/provincia/` o por `/es/puntos-recarga/provincia/` y tienen exactamente dos segmentos después.
+- `data/municipality-links.json` tiene las 152 ciudades. Al menos 145 tienen `fuel` y al menos 140 tienen `charging`.
+- Build: `out/madrid/b.html` contiene "La Etiqueta B en otras ZBE", `href="/es/gasolineras/provincia/madrid/madrid"` y un `<title>` de 60 caracteres o menos.
