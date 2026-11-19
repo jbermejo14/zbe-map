@@ -344,6 +344,8 @@ La auditoría SEO (`../ododex-sitio/docs/09-auditoria-seo-2026-11.md`) mide un 6
 
 Funciones puras, sin JSX, que reciben la lista de ciudades (`CityData[]`). El estado de una ciudad para una etiqueta es `city.rules[badge]?.status ?? 'allowed'`, igual que en la página.
 
+`subject` es el sujeto sin artículo: "un coche con etiqueta B", "un coche con etiqueta 0 CERO" o "un coche sin etiqueta". Lo define `SLUG_TO_BADGE.subject` en la página, y el título de la sección sale de `SLUG_TO_BADGE.groupTitle`: "Coches con etiqueta B en otras ZBE".
+
 Palabras de estado, comunes a todas las frases:
 
 - `allowed` → "puede entrar sin restricciones";
@@ -353,37 +355,37 @@ Palabras de estado, comunes a todas las frases:
 Funciones:
 
 - `badgeAccessCounts(badge, cities): { allowed: number; restricted: number; banned: number; total: number }`.
-- `badgeNationalSentence(badge, cities, badgeLabel): string`.
-  - Ejemplo: "De las 152 ZBE de España, la Etiqueta B puede entrar sin restricciones en 30, tiene restricciones en 121 y tiene prohibido el acceso en 1."
+- `badgeNationalSentence(badge, cities, subject): string`.
+  - Ejemplo: "De las 152 ZBE de España, un coche con etiqueta B puede entrar sin restricciones en 30, tiene restricciones en 121 y tiene prohibido el acceso en 1."
   - Solo nombra las categorías mayores que 0, en el orden allowed, restricted, banned, unidas con ", " y " y ".
-  - Si todas son de un solo estado: "La Etiqueta X {palabras} en las 152 ZBE de España."
+  - Si todas son de un solo estado: "{Subject con mayúscula} {palabras} en las 152 ZBE de España."
 - `sameRegionCities(city, cities, badge, limit = SAME_REGION_LIMIT): Array<{ slug: string; name: string; status: ZbeAccessStatus }>`.
   - Devuelve las ciudades de la misma comunidad, sin la propia. La comunidad se compara con `canonicalRegion(region)` de `lib/regions.ts`.
   - Ordenadas por nombre con `localeCompare(…, 'es')`.
   - `SAME_REGION_LIMIT = 8`.
-- `regionSentence(city, cities, badge, badgeLabel): string | null`.
-  - Ejemplo: "En Comunidad de Madrid hay 14 ZBE en el mapa. En 12 de las otras 13, la Etiqueta B tiene restricciones, igual que en Madrid."
-  - Si ninguna otra lo comparte, la segunda frase es: "En ninguna de las otras 13, la Etiqueta B tiene restricciones como en Madrid."
-  - Si todas lo comparten: "En todas las demás, la Etiqueta B tiene restricciones, igual que en Madrid."
-  - Con una sola ciudad más, "las otras 1" no vale. La frase queda: "En la otra ZBE de la comunidad, {Ciudad}, la Etiqueta B también {palabras}" o "…, la Etiqueta B no {palabras}".
+- `regionSentence(city, cities, badge, subject): string | null`.
+  - Ejemplo: "En Comunidad de Madrid hay 14 ZBE en el mapa. En 12 de las otras 13, un coche con etiqueta B tiene restricciones, igual que en Madrid."
+  - Si ninguna otra lo comparte, la segunda frase es: "En ninguna de las otras 13, un coche con etiqueta B tiene restricciones como en Madrid."
+  - Si todas lo comparten: "En todas las demás, un coche con etiqueta B tiene restricciones, igual que en Madrid."
+  - Con una sola ciudad más, "las otras 1" no vale. La frase queda: "En la otra ZBE de la comunidad, {Ciudad}, un coche con etiqueta B también {palabras}" o "…, un coche con etiqueta B no {palabras}".
   - Devuelve `null` si la ciudad es la única de su comunidad.
   - La comunidad se escribe tal como la devuelve `canonicalRegion`.
 - `badgeMetaTitle(badgeShortLabel, cityName, year): string`.
   - Formato: "Etiqueta B en la ZBE de Madrid: ¿puede entrar? (2026)".
   - `badgeShortLabel` vale "0 CERO", "ECO", "Etiqueta C", "Etiqueta B" o "Sin etiqueta".
   - Si pasa de `META_TITLE_MAX_LENGTH = 60` caracteres, se quita " (año)". Si aun así pasa, queda "Etiqueta B en la ZBE de {ciudad}".
-- `badgeMetaDescription(input: { badgeLabel: string; cityName: string; status: ZbeAccessStatus; fineAmount: number; verified: boolean }): string`.
+- `badgeMetaDescription(input: { subject: string; cityName: string; status: ZbeAccessStatus; fineAmount: number; verified: boolean }): string`.
   - Máximo `META_DESCRIPTION_MAX_LENGTH = 160` caracteres.
-  - Verificada: "{Veredicto} con {badgeLabel} en la ZBE de {ciudad}. Multa: {fineAmount} €. Horario, excepciones y mapa."
-  - Sin verificar: "{Veredicto} con {badgeLabel} en la ZBE de {ciudad}. Normas orientativas: horario, excepciones y mapa."
-  - El veredicto es "Sí se puede entrar", "Se puede entrar con condiciones" o "No se puede entrar".
+  - Verificada: "{Subject con mayúscula} {veredicto} en la ZBE de {ciudad}. Multa: {fineAmount} €. Horario, excepciones y mapa."
+  - Sin verificar: "{Subject con mayúscula} {veredicto} en la ZBE de {ciudad}. Normas orientativas: horario, excepciones y mapa."
+  - Veredictos: "puede entrar sin restricciones", "puede entrar con condiciones" o "no puede entrar".
   - Si pasa del límite, se recorta en el último espacio antes de 159 caracteres y se añade "…".
 
 ### Z7.3 Cambios en `app/[ciudad]/[etiqueta]/page.tsx`
 
 - `SLUG_TO_BADGE` incorpora `shortLabel` (los valores de Z7.2).
 - `generateMetadata` usa `badgeMetaTitle(shortLabel, …, SEO_CURRENT_YEAR)` y `badgeMetaDescription` para `title`, `description` y `openGraph`. No cambian ni el `h1` ni las preguntas frecuentes.
-- Sección nueva "La {label} en otras ZBE", con el texto exacto `La {badgeInfo.label} en otras ZBE`. Va después de las excepciones y antes de las preguntas frecuentes. Contiene:
+- Sección nueva "{groupTitle} en otras ZBE" (por ejemplo, "Coches con etiqueta B en otras ZBE"). Va después de las excepciones y antes de las preguntas frecuentes. Contiene:
   - un párrafo con `badgeNationalSentence` y, si no es `null`, `regionSentence`;
   - una rejilla con `sameRegionCities`. Cada elemento enlaza con `next/link` a `/{slug}/{etiqueta}` y muestra el nombre y una etiqueta de estado con la clase de `zbeUiAccessTagClass(status)` y los textos "Permitido", "Restringido" o "Prohibido";
   - si la lista está vacía, no hay rejilla.
@@ -406,4 +408,129 @@ Funciones:
   - descripción: como máximo 160 caracteres en las 152 ciudades por 5 etiquetas con los datos reales, y sin "undefined";
   - `getMunicipalityLinks`: Madrid tiene los dos enlaces; un slug inexistente devuelve `null` y `null`; todas las rutas no nulas empiezan por `/es/gasolineras/provincia/` o por `/es/puntos-recarga/provincia/` y tienen exactamente dos segmentos después.
 - `data/municipality-links.json` tiene las 152 ciudades. Al menos 145 tienen `fuel` y al menos 140 tienen `charging`.
-- Build: `out/madrid/b.html` contiene "La Etiqueta B en otras ZBE", `href="/es/gasolineras/provincia/madrid/madrid"` y un `<title>` de 60 caracteres o menos.
+- Build: `out/madrid/b.html` contiene "Coches con etiqueta B en otras ZBE", `href="/es/gasolineras/provincia/madrid/madrid"` y un `<title>` de 60 caracteres o menos.
+
+## Z8 — Perímetros oficiales de las grandes ciudades (19/11/2026)
+
+Los perímetros de Barcelona, Valencia, Zaragoza y Málaga en `data/zbe-cities.json` son aproximados. Por ejemplo, Valencia figura con 3,2 km², pero su capa oficial tiene 27,4 km². Se sustituyen por las capas oficiales de cada ayuntamiento.
+
+Las fuentes originales se versionan en `data/official-perimeters/`; la sesión principal ya las ha descargado:
+
+| Ciudad (slug) | Fichero | Formato y CRS | Origen |
+|---|---|---|---|
+| barcelona | `barcelona.gpkg` | GeoPackage, tabla `2023_Ambit_ZBE_Barcelona`, columna `geom` MULTIPOLYGON, EPSG:25831 (UTM 31N, ETRS89); columnas `Ambit`, `Perimetre` y `Area` (m², 77 518 354,93) | Open Data BCN, "Àmbit ZBE Barcelona 2023" |
+| valencia | `valencia.geojson` | GeoJSON EPSG:4326, 1 Polygon (`zona_zbe` = "València ZBE") | Geoportal de València, capa OPENDATA/Trafico/MapServer/240 |
+| zaragoza | `zaragoza.geojson` | GeoJSON EPSG:4326, 2 MultiPolygon (`fase` = "FASE 1" y "FASE 2") que se solapan solo en parte | IDEZar, WFS `movilidad:MU1_ZBE_Zona_Bajas_Emisiones` |
+| malaga | `malaga.geojson` | GeoJSON EPSG:4326, 4 entidades: `TIPZBE` 1 = ZBE general (`NOMZBE` "ZBE"); `TIPZBE` 2 = zonas de especial protección "CENTRO HISTORICO", "CAC" y "SOHO" | Datos abiertos de Málaga, `da_cartografiaZonaBajasEmisiones-4326.geojson` |
+
+Las coordenadas pueden traer una tercera componente (altura), que se descarta. ETRS89 se trata como igual a WGS84: la diferencia, por debajo de un metro, no importa para este mapa.
+
+Fuera de alcance:
+
+- Madrid: el CSV de cámaras que hay no es un perímetro.
+- Los textos de cada ciudad (`summary`, `rules`, `streets`, `schedule`), que no se tocan.
+
+### Z8.1 `lib/perimeter-geometry.ts` (funciones puras, sin dependencias)
+
+- `utmToWgs84(zone: number, easting: number, northing: number): { lat: number; lng: number }`:
+  - Inversa de la proyección UTM, hemisferio norte, elipsoide GRS80 (a = 6378137, 1/f = 298.257222101).
+  - Precisión mejor que 1e-6 grados.
+  - Constantes con nombre (`UTM_SCALE_FACTOR = 0.9996`, `UTM_FALSE_EASTING = 500000`…).
+- `parseGpkgGeometry(blob: Uint8Array): number[][][][]`:
+  - Lee la cabecera GeoPackage: "GP", versión, flags, srs_id, y una envoltura cuyo tamaño depende de los bits 1-3 de flags (0, 32, 48, 48 o 64 bytes).
+  - Después lee el WKB, respetando el orden de bytes de cada geometría.
+  - Admite Polygon (3) y MultiPolygon (6), y siempre devuelve una lista de polígonos, cada uno como lista de anillos `[x, y][]`.
+  - Cualquier otro tipo, o una cabecera que no empiece por "GP", lanza `Error` con un mensaje que diga qué se encontró.
+- `simplifyRing(ring: [number, number][], toleranceMeters: number): [number, number][]`:
+  - Douglas-Peucker sobre `[lng, lat]`, con las distancias en metros mediante una proyección equirectangular local.
+  - Conserva el cierre (el primer punto igual al último) y nunca devuelve menos de 4 puntos.
+- `ringAreaKm2(ring: [number, number][]): number`:
+  - Área geodésica aproximada de un anillo `[lng, lat]`, con la misma fórmula esférica que Leaflet/Turf (radio 6 371 008,8 m).
+  - Valor absoluto.
+- `roundCoordinate(value: number): number`: 6 decimales.
+
+### Z8.2 Script `scripts/import-official-perimeters.ts`
+
+- Uso: `node --experimental-sqlite --import tsx scripts/import-official-perimeters.ts`.
+  - Node 22.12 necesita la opción para `node:sqlite`.
+  - Se añade el script npm `perimeters:import` con ese comando.
+- Tabla `PERIMETER_SOURCES` (una entrada por ciudad) con:
+  - `slug`;
+  - `file`;
+  - `format` ('geojson' | 'gpkg');
+  - `utmZone` (solo gpkg: 31);
+  - `perimeterName`;
+  - `sourceName`;
+  - `sourceUrl`;
+  - una función o regla para nombrar cada entidad;
+  - cuál es la entidad principal.
+
+  Valores:
+
+  - barcelona:
+    - `perimeterName` "ZBE Rondes de Barcelona";
+    - `sourceName` "Open Data BCN (Ajuntament de Barcelona)";
+    - `sourceUrl` "https://opendata-ajuntament.barcelona.cat/data/es/dataset/zbe-ambit";
+    - una entidad, de nombre "ZBE Rondes de Barcelona".
+  - valencia:
+    - `perimeterName` "ZBE de València";
+    - `sourceName` "Geoportal del Ajuntament de València";
+    - `sourceUrl` "https://geoportal.valencia.es/";
+    - una entidad, de nombre "ZBE de València".
+  - zaragoza:
+    - `perimeterName` "ZBE de Zaragoza (fases 1 y 2)";
+    - `sourceName` "IDEZar (Ayuntamiento de Zaragoza)";
+    - `sourceUrl` "https://idezar-sig.zaragoza.es/servicios/geoserver/movilidad/wfs?service=WFS&version=2.0.0&request=GetCapabilities";
+    - entidades "ZBE Zaragoza · Fase 1" y "ZBE Zaragoza · Fase 2";
+    - la principal es la de mayor área (Fase 2).
+  - malaga:
+    - `perimeterName` "ZBE de Málaga";
+    - `sourceName` "Datos Abiertos del Ayuntamiento de Málaga";
+    - `sourceUrl` "https://datosabiertos.malaga.eu/dataset/sistema-de-informacion-cartografica-zona-bajas-emisiones";
+    - la entidad principal es la de `TIPZBE` 1, con nombre "ZBE de Málaga";
+    - las de `TIPZBE` 2 se llaman "Zona de especial protección: Centro Histórico", "…: CAC" y "…: Soho".
+- Por cada ciudad:
+  1. Lee las entidades. Si son GPKG, las pasa a `[lng, lat]` con `utmToWgs84`.
+  2. Simplifica cada anillo con `SIMPLIFY_TOLERANCE_METERS = 5` y redondea con `roundCoordinate`.
+  3. Si la ciudad pasa de `MAX_VERTICES_PER_CITY = 800` vértices en total, repite la simplificación duplicando la tolerancia hasta quedar por debajo. Informa por consola de la tolerancia final y de los vértices de cada ciudad.
+  4. Sustituye en `data/zbe-cities.json`:
+     - `geoJSON`: una FeatureCollection con una Feature por entidad, de tipo Polygon o MultiPolygon, con `properties: { nombre, descripcion }`. En `descripcion` va `city.summary` en la principal y el nombre de la zona en las demás.
+     - `polygon`: el anillo exterior del polígono más grande de la entidad principal, como `[lat, lng][]`.
+     - `areaKm2`: la suma de `ringAreaKm2` de los anillos exteriores de la entidad principal, menos los huecos, redondeada a 1 decimal.
+     - `perimeterName`.
+     - `perimeterSource`: `{ name, url, retrieved: '2026-11-19' }`.
+  5. No toca ningún otro campo ni ninguna otra ciudad.
+- El JSON se escribe con el mismo formato que tiene ahora (sangría, orden de claves y salto de línea final), para que el diff solo muestre los campos cambiados. Compruébalo con `git diff --stat`.
+- Si falta un fichero, o una entidad esperada (por ejemplo, Málaga sin `TIPZBE` 1), el script lanza un error con la ciudad y el motivo, y no escribe nada.
+
+### Z8.3 Tipo y mapas
+
+- `CityData` (`lib/cities-repository.ts`) gana `perimeterSource?: { name: string; url: string; retrieved: string } | null`.
+- `components/CityMiniMap.tsx`:
+  - Acepta una prop opcional `geoJSON`. Si la recibe, dibuja todas sus entidades con `L.geoJSON`, con el mismo estilo que el polígono actual, y encuadra el mapa en sus límites.
+  - Si no la recibe, mantiene el comportamiento actual con `polygon`.
+  - `app/[ciudad]/page.tsx` y `app/[ciudad]/[etiqueta]/page.tsx` le pasan `city.geoJSON`.
+- Debajo del mini mapa de las dos páginas, si hay `perimeterSource`, se muestra la línea "Perímetro oficial: {name}", con un enlace `<a rel="nofollow noopener noreferrer" target="_blank">` a `url`.
+- `SpainZbeMap` ya pinta `geoJSON`: no se cambia.
+
+### Z8.4 Criterios de aceptación
+
+- `tests/perimeter-geometry.test.ts`:
+  - `utmToWgs84(30, 729254.0972, 4372169.142)` da lat 39.468590647 y lng -0.334989633, con un error menor que 1e-6. Es el primer vértice de Valencia en EPSG:25830 y en EPSG:4326, publicado por la misma fuente.
+  - `parseGpkgGeometry`:
+    - con un blob construido en la prueba (cabecera sin envoltura y un Polygon WKB little-endian) devuelve los puntos;
+    - con una cabecera "XX" lanza un error.
+  - `simplifyRing` conserva el cierre, no baja de 4 puntos y quita un punto colineal.
+  - `ringAreaKm2` de un cuadrado de 0,01° en el ecuador da ≈ 1,2364 km² (±0,1 %).
+- `tests/city-data.test.ts` sigue pasando. En particular, ningún polígono es regular ni sintético.
+- Prueba nueva en `tests/official-perimeters.test.ts`, sobre `data/zbe-cities.json`:
+  - las cuatro ciudades tienen `perimeterSource`;
+  - Barcelona tiene un `areaKm2` entre 76 y 79 (el GPKG dice 77,5);
+  - Valencia, entre 26 y 29;
+  - Málaga, entre 3,5 y 4,5;
+  - Zaragoza tiene 2 entidades y Málaga 4;
+  - ninguna ciudad pasa de 800 vértices;
+  - todas las coordenadas están dentro de España (lat entre 27 y 44, lng entre -19 y 5).
+- Build:
+  - `out/valencia.html` contiene "Perímetro oficial";
+  - el tamaño de `out/index.html` no crece más de un 15 % respecto al anterior (indica los dos tamaños).
