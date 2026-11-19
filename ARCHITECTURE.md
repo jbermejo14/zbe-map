@@ -590,8 +590,9 @@ Tipos `AtlasZone`, `AtlasRule` y `AtlasMunicipality`, que reflejan los campos an
   - Coincide si comparte alguna variante.
   - `overrides` es `Record<citySlug, ine>` y tiene prioridad.
   - La constante `ATLAS_INE_OVERRIDES = { palma: '07040', castellon: '12040', siero: '33066' }` se usa con el slug de la ciudad. Por eso la función recibe `{ slug, name }` en lugar de solo el nombre.
-- `isRuleActive(rule, onDate): boolean`: `desde` es null o ≤ onDate, y `hasta` es null o > onDate. Las fechas son ISO `YYYY-MM-DD` y se comparan como texto.
-- `pickMainZone(zones): AtlasZone`: la de mayor área según `ringAreaKm2` de `lib/perimeter-geometry.ts`, sumando los anillos exteriores. En caso de empate, la primera.
+- `isRuleActive(rule, onDate): boolean`: `desde` es null o ≤ onDate, y `hasta` es null o ≥ onDate (`hasta` es el último día en vigor, inclusive: en los datos, la regla siguiente empieza al día siguiente). Las fechas son ISO `YYYY-MM-DD` y se comparan como texto.
+- `pickMainZone(zones): AtlasZone`: la de mayor área según `ringAreaKm2` de `lib/perimeter-geometry.ts`, sumando los anillos exteriores. En caso de empate, la primera. Solo decide la geometría, la multa y el nombre de la zona principal; el estado de la ciudad sale de `cityEnforcementZone`.
+- `cityEnforcementZone(zones): AtlasZone`: la zona con el `estadoSancion` más severo, con esta prioridad: sanciona > aviso > aprobada_sin_aplicar > solo_episodios > sin_restricciones > suspendida > sin_verificar. Si hay empate, gana la principal y después la primera. Con ella se calculan el estado, `status`, `enforcement` y la excepción de "todas allowed". Así se evita que una zona grande sin restricciones tape a una subzona que multa (Valencia, Alicante, Zaragoza, Salamanca, Ciudad Real, Jerez).
 - `badgeAccessFromAtlas(badge, zones, mainZone, onDate): { status: ZbeAccessStatus; rules: AtlasRule[] }`. Tiene en cuenta las reglas de todas las zonas del municipio:
   - `rs` son las reglas activas en `onDate` con `condicion === 'siempre'` que incluyen la etiqueta.
   - `banned` si alguna regla de `rs` de la **zona principal** cumple a la vez: `acceso` ∈ {prohibido, solo_autorizados}, `perfil` ∈ {todos, no_domiciliados} y `alcance === 'zona'`.
@@ -652,7 +653,7 @@ Tipos `AtlasZone`, `AtlasRule` y `AtlasMunicipality`, que reflejan los campos an
     - aprobada_sin_aplicar → 'en_tramitacion';
     - suspendida o sin_restricciones → 'suspendida'. Es un valor nuevo del tipo: revisa sus usos con grep en `app/`, `components/` y `lib/`, y dale texto "suspendida" donde se muestre.
   - `fineAmount`: `editorial.multa.importe` de la zona principal si no es null.
-  - `schedule`: `scheduleText` de la primera regla activa `siempre` de la zona principal que restrinja alguna etiqueta. Si no hay ninguna, "Sin restricciones en vigor".
+  - `schedule`: `scheduleText` de la primera regla activa `siempre` de cualquier zona del municipio (primero la de `cityEnforcementZone`) que restrinja alguna etiqueta. Si no hay ninguna, "Sin restricciones en vigor".
   - `sourceUrl`: `urlOficial` de la zona principal si existe. `sourceName`: "{mainZone.nombre} (fuente oficial, vía Atlas ZBE)".
   - Verificación: si `confianza === 'alta'` y `verificadoEl` tiene menos de 120 días respecto a `importedOn`, se pone `verificationStatus 'verified'` y `lastVerified = verificadoEl`. Si no, 'pending' y `null`. La prueba de `tests/city-data.test.ts` ya exige esto.
   - Geometría: si la ciudad **no** es una de Z8 (barcelona, valencia, zaragoza, malaga) y la zona principal tiene `geometriaPrecision === 'oficial'`:
