@@ -816,3 +816,9 @@ Petición del titular:
   - en la portada no se ven las ciudades en tramitación;
   - el botón las muestra con círculo hueco;
   - el punto de Burgos y el de Valencia quedan dentro de su perímetro.
+
+## Enlaces de red de Ododex (2026-11-19)
+
+- `lib/network.ts` lee en compilación el JSON de `ODODEX_RED_ENLACES` (formato en `../ododex-sitio/ARCHITECTURE.md` §10), con caché por ruta. Sin variable o sin fichero devuelve `null`; JSON inválido o `version !== 1` lanza un `Error` en español.
+- Esta web solo recibe el pie: `components/Footer.tsx` (parámetro `redSecciones`, que pasa `app/layout.tsx`) pinta « Otras webs de Ododex » con las secciones sin la propia, con `<a href>` tal cual (son de otra sección: sin `next/link` ni `assetPath`). Sin red no se pinta.
+- Pruebas: `tests/network.test.ts` (módulo) y `tests/network-footer.test.tsx` (pie).

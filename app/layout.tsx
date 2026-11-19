@@ -4,6 +4,7 @@ import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { AdSenseScript, getAdSenseClient } from '@/components/AdSenseScript';
+import { getNetworkSections } from '@/lib/network';
 import { assetPath, getSiteUrl, SITE_NAME } from '@/lib/site';
 
 const inter = Inter({
@@ -105,7 +106,7 @@ export default function RootLayout({
       <body>
         <Header />
         <main className="flex-1">{children}</main>
-        <Footer mostrarConsentimiento={getAdSenseClient() !== null} />
+        <Footer mostrarConsentimiento={getAdSenseClient() !== null} redSecciones={getNetworkSections()} />
         <AdSenseScript />
       </body>
     </html>
