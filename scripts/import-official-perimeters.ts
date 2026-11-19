@@ -18,6 +18,7 @@ import {
   utmToWgs84,
 } from '../lib/perimeter-geometry.ts';
 import type { LngLatPoint, LngLatPolygon } from '../lib/perimeter-geometry.ts';
+import type { PerimeterPrecision } from '../lib/cities-repository.ts';
 
 // @types/node 20 no declara node:sqlite: se carga con require y se tipa lo mínimo usado.
 interface SqliteDatabase {
@@ -31,6 +32,7 @@ const { DatabaseSync } = createRequire(import.meta.url)('node:sqlite') as {
 const GEOJSON_POLYGON = 'Polygon';
 const GEOJSON_MULTIPOLYGON = 'MultiPolygon';
 const RETRIEVED_DATE = '2026-11-19';
+const OFFICIAL_PRECISION: PerimeterPrecision = 'oficial';
 const AREA_DECIMALS = 1;
 const SOURCES_DIRECTORY = path.join(process.cwd(), 'data/official-perimeters');
 const CITIES_FILE = path.join(process.cwd(), 'data/zbe-cities.json');
@@ -276,7 +278,7 @@ function applySourceToCity(city: CityRecord, source: PerimeterSource, entities: 
   city.polygon = largestOuterRingAsLatLng(mainEntity);
   city.areaKm2 = Number(entityAreaKm2(mainEntity).toFixed(AREA_DECIMALS));
   city.perimeterName = source.perimeterName;
-  city.perimeterSource = { name: source.sourceName, url: source.sourceUrl, retrieved: RETRIEVED_DATE };
+  city.perimeterSource = { name: source.sourceName, url: source.sourceUrl, retrieved: RETRIEVED_DATE, precision: OFFICIAL_PRECISION };
 }
 
 function importCity(cities: CityRecord[], source: PerimeterSource): void {

@@ -187,3 +187,10 @@ export function zbeUiFineText(enforcement: CityEnforcement | null, fineAmount: n
   if (enforcement === null || enforcement.state === 'sanciona') return `${fineAmount} €`;
   return enforcement.state === 'sin_verificar' ? 'Sin confirmar' : 'Sin multa';
 }
+
+/** Trazo discontinuo de los perímetros de zonas restringidas. */
+export const MAP_RESTRICTED_DASH_ARRAY = '5, 5';
+/** Trazo punteado de los perímetros aproximados (contorno de la DGT). */
+export const MAP_APPROXIMATE_DASH_ARRAY = '2, 6';
+/** Nota de leyenda bajo los mapas con algún perímetro aproximado. */
+export const MAP_APPROXIMATE_LEGEND_TEXT = 'Línea de puntos: perímetro aproximado';

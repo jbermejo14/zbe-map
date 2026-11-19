@@ -9,7 +9,13 @@ import {
   getTileLayerOptions,
   type MapLayerType,
 } from '@/lib/map-config';
-import { zbeUiReadMapColor } from '@/lib/zbe-ui';
+import { isApproximatePerimeter } from '@/lib/city-verification';
+import {
+  MAP_APPROXIMATE_DASH_ARRAY,
+  MAP_APPROXIMATE_LEGEND_TEXT,
+  MAP_RESTRICTED_DASH_ARRAY,
+  zbeUiReadMapColor,
+} from '@/lib/zbe-ui';
 import { MapLocationNotice, useMapUserLocation } from './MapLocation';
 import { Search, RotateCcw, LocateFixed } from 'lucide-react';
 
@@ -21,6 +27,12 @@ interface SpainZbeMapProps {
   onCitySelect: (city: CityEvaluationResult) => void;
   statusFilter: 'all' | ZbeAccessStatus;
   onFilterChange: (filter: 'all' | ZbeAccessStatus) => void;
+}
+
+/** Un perímetro aproximado se dibuja con puntos aunque la ciudad esté restringida. */
+function dashArrayForCity(isRestricted: boolean, isApproximate: boolean): string | undefined {
+  if (isApproximate) return MAP_APPROXIMATE_DASH_ARRAY;
+  return isRestricted ? MAP_RESTRICTED_DASH_ARRAY : undefined;
 }
 
 export function SpainZbeMap({
@@ -57,6 +69,8 @@ export function SpainZbeMap({
     return true;
   });
 
+  const hasApproximatePerimeter = filteredCities.some((c) => isApproximatePerimeter(c.perimeterSource));
+
   // Renderizar marcadores y perímetros
   const renderMapElements = useCallback(
     (map: any, L: any, list: CityEvaluationResult[]) => {
@@ -74,7 +88,7 @@ export function SpainZbeMap({
 
       list.forEach((city) => {
         const colorKey = accessKnown ? city.status : 'neutral';
-        const isRestricted = colorKey === 'restricted';
+        const dashArray = dashArrayForCity(colorKey === 'restricted', isApproximatePerimeter(city.perimeterSource));
         const strokeColor = zbeUiReadMapColor(colorKey);
 
         // A. Marcador central
@@ -160,7 +174,7 @@ export function SpainZbeMap({
                 opacity: 0.9,
                 fillColor: strokeColor,
                 fillOpacity: 0.22, // Transparencia para leer las calles debajo
-                dashArray: isRestricted ? '5, 5' : undefined, // Línea discontinua opcional
+                dashArray, // Punteada si es aproximada; discontinua si está restringida
               },
               onEachFeature: function (feature: any, layer: any) {
                 const nombre = feature.properties?.nombre || `ZBE ${city.cityName}`;
@@ -452,6 +466,9 @@ export function SpainZbeMap({
               <span className="h-2 w-4 rounded-sm border border-line bg-elevated inline-block" />
               <span>Elige tu vehículo para ver el acceso</span>
             </div>
+          )}
+          {hasApproximatePerimeter && (
+            <div className="mt-1.5 text-[11px] text-secondary">{MAP_APPROXIMATE_LEGEND_TEXT}</div>
           )}
         </div>
       </div>

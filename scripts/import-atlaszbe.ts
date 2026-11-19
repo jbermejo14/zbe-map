@@ -37,7 +37,14 @@ import {
   simplifyUntilSmallEnough,
 } from '../lib/perimeter-geometry.ts';
 import type { LngLatPoint, LngLatPolygon } from '../lib/perimeter-geometry.ts';
-import type { AtlasEnforcement, CityData, CityEnforcement, CityRule, MitecoEnforcement } from '../lib/cities-repository.ts';
+import type {
+  AtlasEnforcement,
+  CityData,
+  CityEnforcement,
+  CityRule,
+  MitecoEnforcement,
+  PerimeterPrecision,
+} from '../lib/cities-repository.ts';
 import type { DgtBadgeType, ZbeAccessStatus } from '../lib/zbe-engine.ts';
 
 const DATA_DIRECTORY = path.join(process.cwd(), 'data');
@@ -64,7 +71,10 @@ const STATUS_BY_STATE: Partial<Record<EnforcementState, CityData['status']>> = {
 };
 const NO_RESTRICTIONS_REASON = 'No hay restricciones en vigor para esta etiqueta.';
 const ATLAS_HOME_URL = 'https://atlaszbe.es';
-const ATLAS_GEOMETRY_SOURCE_NAME = 'Atlas ZBE (geometría oficial)';
+const ATLAS_GEOMETRY_SOURCE_NAMES: Record<PerimeterPrecision, string> = {
+  oficial: 'Atlas ZBE (geometría oficial)',
+  aproximada: 'Atlas ZBE (contorno de la DGT)',
+};
 const MITECO_SOURCE_NAME = 'Inventario de ZBE del MITECO (vía Atlas ZBE)';
 const INVENTORY_STATES = ['en_tramite', 'pendiente'];
 
@@ -230,9 +240,10 @@ function applyAtlasGeometry(city: CityData, zones: AtlasZone[], mainZone: AtlasZ
   city.areaKm2 = Number(mainPolygons.reduce((sum, polygon) => sum + polygonAreaKm2(polygon), 0).toFixed(AREA_DECIMALS));
   city.perimeterName = mainZone.nombre;
   city.perimeterSource = {
-    name: ATLAS_GEOMETRY_SOURCE_NAME,
+    name: ATLAS_GEOMETRY_SOURCE_NAMES[mainZone.geometriaPrecision],
     url: mainZone.urlOficial ?? ATLAS_HOME_URL,
     retrieved: enforcement.importedOn,
+    precision: mainZone.geometriaPrecision,
   };
   console.log(`${city.slug}: geometría Atlas ZBE, tolerancia ${tolerance} m, ${countVertices(result)} vértices`);
 }
@@ -251,12 +262,20 @@ function applyAtlasSource(city: CityData, { mainZone, stateZone }: ZonesByRole, 
   applyVerification(city, stateZone.verificadoEl, stateZone.confianza === 'alta', importedOn);
 }
 
+/** Las calles antiguas no describen el polígono nuevo; las 4 ciudades de Z8 conservan su geometría oficial. */
+function applyGeometryUnlessOfficial(city: CityData, zones: AtlasZone[], mainZone: AtlasZone, enforcement: AtlasEnforcement): void {
+  if (!OFFICIAL_PERIMETER_SLUGS.includes(city.slug)) applyAtlasGeometry(city, zones, mainZone, enforcement);
+  city.streets = null;
+}
+
 function importCityWithZones(city: CityData, zones: AtlasZone[], importedOn: string): void {
   const zonesByRole: ZonesByRole = { mainZone: pickMainZone(zones), stateZone: cityEnforcementZone(zones) };
   const { mainZone } = zonesByRole;
   const enforcement = buildAtlasEnforcement(zones, zonesByRole, city.name, importedOn);
   city.enforcement = enforcement;
-  // Sin verificar no se sabe qué reglas rigen: se conserva todo lo anterior y solo se añade `enforcement`.
+  // La geometría no depende de las reglas: también se importa para las ZBE sin verificar.
+  applyGeometryUnlessOfficial(city, zones, mainZone, enforcement);
+  // Sin verificar no se sabe qué reglas rigen: se conservan reglas y textos anteriores.
   if (enforcement.state === 'sin_verificar') return;
   const mappedStatus = STATUS_BY_STATE[enforcement.state];
   if (mappedStatus) city.status = mappedStatus;
@@ -266,12 +285,6 @@ function importCityWithZones(city: CityData, zones: AtlasZone[], importedOn: str
   city.schedule = zoneSchedule(zones, zonesByRole, importedOn);
   applyAtlasSource(city, zonesByRole, importedOn);
   applyDescriptiveTexts(city, zones, mainZone, enforcement);
-  const isOfficialPerimeterCity = OFFICIAL_PERIMETER_SLUGS.includes(city.slug);
-  if (isOfficialPerimeterCity) city.streets = null;
-  if (!isOfficialPerimeterCity && mainZone.geometriaPrecision === 'oficial') {
-    applyAtlasGeometry(city, zones, mainZone, enforcement);
-    city.streets = null;
-  }
 }
 
 function importCityFromInventory(city: CityData, municipality: AtlasMunicipality, importedOn: string): void {

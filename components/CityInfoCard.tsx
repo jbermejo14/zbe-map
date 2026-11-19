@@ -55,6 +55,8 @@ export function CityInfoCard({ city, badge, onRemove }: CityInfoCardProps) {
       polygon: city.polygon,
       status: access?.status ?? ('neutral' as const),
       officialUrl: isCityVerified(city) ? city.sourceUrl : null,
+      perimeterSource: city.perimeterSource,
+      enforcement: city.enforcement,
     }),
     [city, access]
   );

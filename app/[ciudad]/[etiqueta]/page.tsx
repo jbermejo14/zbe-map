@@ -22,6 +22,7 @@ import {
   sameRegionCities,
 } from '@/lib/badge-page-insights';
 import { getVerificationText, isCityVerified } from '@/lib/city-verification';
+import { PerimeterSourceNote } from '@/components/PerimeterSourceNote';
 import {
   ChevronRight,
   MapPin,
@@ -365,23 +366,13 @@ export default async function CityBadgePage({ params }: Props) {
             polygon: city.polygon,
             geoJSON: city.geoJSON,
             officialUrl: isCityVerified(city) ? city.sourceUrl : null,
+            perimeterSource: city.perimeterSource,
+            enforcement: city.enforcement,
             status: accessStatus,
           }}
           height="280px"
         />
-        {city.perimeterSource && (
-          <p className="mt-2 text-[11px] text-muted">
-            Perímetro oficial:{' '}
-            <a
-              href={city.perimeterSource.url}
-              target="_blank"
-              rel="nofollow noopener noreferrer"
-              className="text-accent hover:text-accent-hover underline"
-            >
-              {city.perimeterSource.name}
-            </a>
-          </p>
-        )}
+        <PerimeterSourceNote perimeterSource={city.perimeterSource} />
       </div>
 
       {/* Exenciones si aplican */}

@@ -5,8 +5,15 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { EnforcementNotice } from '../components/EnforcementNotice.tsx';
 import { ZbeCalendar } from '../components/ZbeCalendar.tsx';
 import { Footer } from '../components/Footer.tsx';
+import { PerimeterSourceNote } from '../components/PerimeterSourceNote.tsx';
 import type { AtlasEnforcement, MitecoEnforcement } from '../lib/cities-repository.ts';
 import type { CalendarEntry } from '../lib/atlas-zbe.ts';
+import {
+  PERIMETER_NOT_APPROVED_TEXT,
+  PERIMETER_UNAVAILABLE_TEXT,
+  isApproximatePerimeter,
+  perimeterUnavailableText,
+} from '../lib/city-verification.ts';
 
 const Z9_IMPORTED_ON = '2026-11-19';
 const Z9_OFFICIAL_URL = 'https://example.org/zbe';
@@ -149,4 +156,42 @@ test('Footer: los enlaces de atribución abren en pestaña nueva con rel seguro'
     assert.match(anchor, /target="_blank"/);
     assert.match(anchor, /rel="noopener noreferrer"/);
   }
+});
+
+test('perímetro: aproximado solo si precision es aproximada; sin precisión se trata como oficial', () => {
+  const source = { name: 'x', url: 'https://example.org', retrieved: '2026-11-19' };
+  assert.equal(isApproximatePerimeter({ ...source, precision: 'aproximada' }), true);
+  assert.equal(isApproximatePerimeter({ ...source, precision: 'oficial' }), false);
+  assert.equal(isApproximatePerimeter(source), false);
+  assert.equal(isApproximatePerimeter(null), false);
+});
+
+test('texto sin perímetro: aviso de tramitación solo para las ciudades del inventario del MITECO', () => {
+  assert.equal(perimeterUnavailableText('miteco'), PERIMETER_NOT_APPROVED_TEXT);
+  assert.equal(perimeterUnavailableText('atlaszbe'), PERIMETER_UNAVAILABLE_TEXT);
+  assert.equal(perimeterUnavailableText(undefined), PERIMETER_UNAVAILABLE_TEXT);
+});
+
+const Z9_PERIMETER_SOURCE = { name: 'Fuente', url: Z9_OFFICIAL_URL, retrieved: Z9_IMPORTED_ON };
+
+test('PerimeterSourceNote oficial: etiqueta oficial, enlace y sin aviso', () => {
+  const html = renderToStaticMarkup(<PerimeterSourceNote perimeterSource={{ ...Z9_PERIMETER_SOURCE, precision: 'oficial' }} />);
+  assert.match(html, /Perímetro oficial:/);
+  assert.ok(html.includes(`href="${Z9_OFFICIAL_URL}"`));
+  assert.ok(html.includes('rel="nofollow noopener noreferrer"'));
+  assert.doesNotMatch(html, /antes de entrar/);
+});
+
+test('PerimeterSourceNote sin precisión se trata como oficial', () => {
+  assert.match(renderToStaticMarkup(<PerimeterSourceNote perimeterSource={Z9_PERIMETER_SOURCE} />), /Perímetro oficial:/);
+});
+
+test('PerimeterSourceNote aproximado: etiqueta aproximada y aviso del plano oficial', () => {
+  const html = renderToStaticMarkup(<PerimeterSourceNote perimeterSource={{ ...Z9_PERIMETER_SOURCE, precision: 'aproximada' }} />);
+  assert.match(html, /Perímetro aproximado:/);
+  assert.ok(html.includes('Consulta el plano oficial del ayuntamiento antes de entrar.'));
+});
+
+test('PerimeterSourceNote sin fuente no renderiza nada', () => {
+  assert.equal(renderToStaticMarkup(<PerimeterSourceNote perimeterSource={null} />), '');
 });

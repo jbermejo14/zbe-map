@@ -3,6 +3,8 @@
  * Lógica oficial de deducción de Distintivo Ambiental DGT y evaluación de acceso municipal.
  */
 
+import type { CityEnforcement, PerimeterSource } from './cities-repository.ts';
+
 export type DgtBadgeType = 'CERO' | 'ECO' | 'C' | 'B' | 'SIN_ETIQUETA';
 
 export type ZbeAccessStatus = 'allowed' | 'restricted' | 'banned';
@@ -47,6 +49,8 @@ export interface CityEvaluationResult {
   polygon?: [number, number][] | null;
   streets?: string[] | null;
   geoJSON?: any;
+  perimeterSource?: PerimeterSource | null;
+  enforcement?: CityEnforcement | null;
   sourceUrl?: string | null;
   sourceName?: string | null;
   verificationStatus?: 'verified' | 'pending' | null;
@@ -417,6 +421,8 @@ export function evaluateCitiesForBadge(
     polygon?: any;
     streets?: any;
     geoJSON?: any;
+    perimeterSource?: PerimeterSource | null;
+    enforcement?: CityEnforcement | null;
     rules?: any;
     sourceUrl?: string | null;
     sourceName?: string | null;
@@ -515,6 +521,8 @@ export function evaluateCitiesForBadge(
       polygon: parsedPolygon,
       streets: parsedStreets,
       geoJSON: parsedGeoJSON,
+      perimeterSource: city.perimeterSource ?? null,
+      enforcement: city.enforcement ?? null,
       sourceUrl: city.sourceUrl ?? null,
       sourceName: city.sourceName ?? null,
       verificationStatus: city.verificationStatus ?? null,

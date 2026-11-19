@@ -3,9 +3,10 @@
 import React, { useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MAP_TILE_SOURCES, getTileLayerOptions } from '@/lib/map-config';
-import { PERIMETER_UNAVAILABLE_TEXT } from '@/lib/city-verification';
+import type { PerimeterSource } from '@/lib/cities-repository';
+import { isApproximatePerimeter, perimeterUnavailableText } from '@/lib/city-verification';
 import { parsePolygonPoints } from '@/lib/polygon-quality';
-import { zbeUiReadMapColor } from '@/lib/zbe-ui';
+import { MAP_APPROXIMATE_DASH_ARRAY, MAP_APPROXIMATE_LEGEND_TEXT, zbeUiReadMapColor } from '@/lib/zbe-ui';
 import type { ZbeMapColorKey } from '@/lib/zbe-ui';
 
 interface CityMiniMapProps {
@@ -23,6 +24,10 @@ interface CityMiniMapProps {
     officialUrl?: string | null;
     sourceUrl?: string | null;
     verificationStatus?: 'verified' | 'pending' | null;
+    /** Fuente del perímetro: si es aproximado se dibuja punteado y se avisa bajo el mapa. */
+    perimeterSource?: PerimeterSource | null;
+    /** Si la ZBE solo está en tramitación, el texto sin perímetro lo indica. */
+    enforcement?: { source: string } | null;
   };
   height?: string;
   className?: string;
@@ -34,17 +39,19 @@ const MINI_MAP_NO_PERIMETER_ZOOM = 13;
 const HTTP_URL_PATTERN = new RegExp('^https?://', 'i');
 
 /** Enlaces solo http(s): evita inyectar esquemas como javascript: en el popup. */
-function buildUnavailablePopupHtml(officialUrl: string | null): string {
+function buildUnavailablePopupHtml(text: string, officialUrl: string | null): string {
   const link =
     officialUrl && HTTP_URL_PATTERN.test(officialUrl)
       ? `<br/><a href="${encodeURI(officialUrl)}" target="_blank" rel="nofollow noopener noreferrer">Ver fuente municipal</a>`
       : '';
-  return `${PERIMETER_UNAVAILABLE_TEXT}${link}`;
+  return `${text}${link}`;
 }
 
 export function CityMiniMap({ city, height = '260px', className = '' }: CityMiniMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
+  const unavailableText = perimeterUnavailableText(city.enforcement?.source);
+  const isApproximate = isApproximatePerimeter(city.perimeterSource);
   const officialUrl =
     city.officialUrl ?? (city.verificationStatus === 'verified' ? (city.sourceUrl ?? null) : null);
 
@@ -83,6 +90,7 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
         opacity: 0.9,
         fillColor: color,
         fillOpacity: 0.2,
+        dashArray: isApproximate ? MAP_APPROXIMATE_DASH_ARRAY : undefined,
       };
 
       // Si tiene geoJSON o polígono, dibujarlo y ajustar vista
@@ -110,7 +118,7 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
 
       const marker = L.marker([city.lat, city.lng], { icon: markerIcon }).addTo(map);
       if (!city.geoJSON && polygonCoords.length <= 2) {
-        marker.bindPopup(buildUnavailablePopupHtml(officialUrl)).openPopup();
+        marker.bindPopup(buildUnavailablePopupHtml(unavailableText, officialUrl)).openPopup();
       }
 
       mapInstanceRef.current = map;
@@ -135,8 +143,13 @@ export function CityMiniMap({ city, height = '260px', className = '' }: CityMini
     >
       <div ref={mapContainerRef} className="w-full h-full" />
       <div className="absolute bottom-2 left-2 z-[400] bg-surface/90 backdrop-blur px-2 py-0.5 rounded text-[10px] font-semibold text-secondary border border-line pointer-events-none">
-        {hasPolygon ? `Perímetro ZBE ${cityLabel}` : PERIMETER_UNAVAILABLE_TEXT}
+        {hasPolygon ? `Perímetro ZBE ${cityLabel}` : unavailableText}
       </div>
+      {hasPolygon && isApproximate && (
+        <div className="absolute bottom-2 right-2 z-[400] bg-surface/90 backdrop-blur px-2 py-0.5 rounded text-[10px] text-secondary border border-line pointer-events-none">
+          {MAP_APPROXIMATE_LEGEND_TEXT}
+        </div>
+      )}
     </div>
   );
 }

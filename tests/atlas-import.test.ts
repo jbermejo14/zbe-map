@@ -97,3 +97,59 @@ describe('Cobertura de enforcement y estado por zona más severa', () => {
     }
   });
 });
+
+const APPROXIMATE_SOURCE_NAME = 'Atlas ZBE (contorno de la DGT)';
+const APPROXIMATE_CITIES_COUNT = 49;
+const MAX_VERTICES_PER_CITY = 800;
+/** Estado de las ZBE sin verificar antes de importar su geometría: reglas y textos no deben cambiar. */
+const UNVERIFIED_CITIES_WITH_GEOMETRY: Record<string, { status: string; schedule: string }> = {
+  'rivas-vaciamadrid': { status: 'activa', schedule: 'De lunes a viernes de 08:30 a 09:15 y de 13:30 a 14:15, excepto festivos' },
+  majadahonda: { status: 'en_tramitacion', schedule: 'Todos los días a todas horas' },
+  estepona: { status: 'activa', schedule: 'Todos los días de 08:00 a 21:00' },
+};
+
+
+describe('Perímetros aproximados de Atlas ZBE (Z9.5)', () => {
+  it('las ciudades con perímetro aproximado lo marcan con precision y nombre de fuente', () => {
+    const approximate = cities.filter((city) => city.perimeterSource?.precision === 'aproximada');
+    assert.equal(approximate.length, APPROXIMATE_CITIES_COUNT);
+    for (const city of approximate) {
+      assert.ok(city.polygon && city.polygon.length > 0, `${city.slug} debe tener polygon`);
+      assert.equal(city.perimeterSource?.name, APPROXIMATE_SOURCE_NAME, city.slug);
+    }
+  });
+
+  it('las cuatro ciudades de Z8 tienen precision oficial', () => {
+    for (const slug of ['barcelona', 'valencia', 'zaragoza', 'malaga']) {
+      assert.equal(cityBySlug(slug).perimeterSource?.precision, 'oficial', slug);
+    }
+  });
+
+  it('toda ciudad de Atlas ZBE tiene polygon', () => {
+    const withoutPolygon = cities
+      .filter((city) => city.enforcement?.source === 'atlaszbe' && !city.polygon)
+      .map((city) => city.slug);
+    assert.deepEqual(withoutPolygon, []);
+  });
+
+  it('ninguna ciudad supera los 800 vértices', () => {
+    for (const city of cities) {
+      assert.ok((city.polygon?.length ?? 0) <= MAX_VERTICES_PER_CITY, `${city.slug}: ${city.polygon?.length} vértices`);
+    }
+  });
+});
+
+describe('ZBE sin verificar con geometría', () => {
+  it('reciben polígono y conservan sus reglas y textos anteriores', () => {
+    for (const [slug, expected] of Object.entries(UNVERIFIED_CITIES_WITH_GEOMETRY)) {
+      const city = cityBySlug(slug);
+      assert.equal(city.enforcement?.state, 'sin_verificar', slug);
+      assert.ok(city.polygon && city.polygon.length > 0, slug + ' debe tener polygon');
+      assert.equal(city.status, expected.status, slug);
+      assert.equal(city.schedule, expected.schedule, slug);
+      assert.equal(city.rules.SIN_ETIQUETA.status, 'banned', slug);
+      assert.match(city.rules.SIN_ETIQUETA.reason, /^Prohibido el acceso y circulación en la ZBE de /, slug);
+      assert.equal(city.sourceName, 'ZBE ' + city.name + ' (fuente oficial, vía Atlas ZBE)', slug);
+    }
+  });
+});

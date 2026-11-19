@@ -40,6 +40,17 @@ export interface MitecoEnforcement {
 
 export type CityEnforcement = AtlasEnforcement | MitecoEnforcement;
 
+/** Precisión del perímetro: 'oficial' viene del ayuntamiento; 'aproximada' es un contorno de la DGT vía Atlas ZBE. */
+export type PerimeterPrecision = 'oficial' | 'aproximada';
+
+export interface PerimeterSource {
+  name: string;
+  url: string;
+  retrieved: string;
+  /** Si falta en datos antiguos se trata como 'oficial'. */
+  precision?: PerimeterPrecision;
+}
+
 export interface CityData {
   id: string;
   slug: string;
@@ -60,7 +71,7 @@ export interface CityData {
   polygon?: [number, number][] | null;
   streets?: string[] | null;
   geoJSON?: any;
-  perimeterSource?: { name: string; url: string; retrieved: string } | null;
+  perimeterSource?: PerimeterSource | null;
   sourceUrl: string;
   sourceName: string;
   verificationStatus: VerificationStatus;

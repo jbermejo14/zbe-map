@@ -82,7 +82,13 @@ describe('Verificación de Datos Municipales ZBE (Requisito 5)', () => {
       const angle = (i / 9) * 2 * Math.PI;
       return [40 + 0.01 * Math.sin(angle), -3 + (0.01 * Math.cos(angle)) / Math.cos((40 * Math.PI) / 180)];
     });
-    assert.ok(isRegularPolygon(ringPoints as [number, number][], 40, -3));
+    assert.ok(isRegularPolygon(ringPoints as [number, number][]));
+  });
+
+  it('El polígono real de Rivas-Vaciamadrid no se marca como regular', () => {
+    const rivas = cities.find((city: { slug: string }) => city.slug === 'rivas-vaciamadrid');
+    assert.ok(rivas?.polygon, 'Rivas debe tener polygon');
+    assert.equal(isRegularPolygon(rivas.polygon), false);
   });
 
   it('Cada ciudad tiene reglas definidas para todas las 5 etiquetas DGT', () => {

@@ -7,7 +7,7 @@ export type LatLngPoint = [number, number];
 
 /** Mínimo de vértices para considerar que un polígono tiene forma analizable. */
 const POLYGON_QUALITY_MIN_VERTICES = 5;
-/** Coeficiente de variación máximo de la distancia al centro para considerarlo regular. */
+/** Coeficiente de variación máximo de la distancia al centroide para considerarlo regular. */
 const POLYGON_QUALITY_MAX_REGULAR_CV = 0.05;
 /** Metros por grado de latitud. */
 const POLYGON_QUALITY_METERS_PER_DEGREE = 111320;
@@ -28,8 +28,10 @@ export function parsePolygonPoints(polygon: unknown): LatLngPoint[] {
   return Array.isArray(polygon) ? (polygon as LatLngPoint[]) : [];
 }
 
-/** Coeficiente de variación de la distancia de los vértices al centro (0 = polígono regular perfecto). */
-export function polygonRadiusVariation(points: LatLngPoint[], centerLat: number, centerLng: number): number {
+/** Coeficiente de variación de la distancia de los vértices a su centroide (0 = polígono regular perfecto). */
+function polygonRadiusVariation(points: LatLngPoint[]): number {
+  const centerLat = points.reduce((sum, [lat]) => sum + lat, 0) / points.length;
+  const centerLng = points.reduce((sum, [, lng]) => sum + lng, 0) / points.length;
   const lngScale = Math.cos((centerLat * Math.PI) / 180);
   const distances = points.map(([lat, lng]) => Math.hypot(lat - centerLat, (lng - centerLng) * lngScale));
   const mean = distances.reduce((sum, d) => sum + d, 0) / distances.length;
@@ -37,10 +39,10 @@ export function polygonRadiusVariation(points: LatLngPoint[], centerLat: number,
   return Math.sqrt(variance) / mean;
 }
 
-/** Indica si casi todos los vértices están a la misma distancia del centro (polígono generado). */
-export function isRegularPolygon(points: LatLngPoint[], centerLat: number, centerLng: number): boolean {
+/** Indica si casi todos los vértices están a la misma distancia de su centroide (polígono generado). */
+export function isRegularPolygon(points: LatLngPoint[]): boolean {
   if (points.length < POLYGON_QUALITY_MIN_VERTICES) return false;
-  return polygonRadiusVariation(points, centerLat, centerLng) < POLYGON_QUALITY_MAX_REGULAR_CV;
+  return polygonRadiusVariation(points) < POLYGON_QUALITY_MAX_REGULAR_CV;
 }
 
 /**
@@ -63,8 +65,6 @@ export function polygonShapeSignature(points: LatLngPoint[]): string {
 
 interface PolygonQualityCity {
   slug: string;
-  lat: number;
-  lng: number;
   polygon?: unknown;
 }
 
@@ -76,7 +76,7 @@ export function findSyntheticPolygonSlugs(cities: PolygonQualityCity[]): string[
   for (const city of cities) {
     const points = parsePolygonPoints(city.polygon);
     if (points.length === 0) continue;
-    if (isRegularPolygon(points, city.lat, city.lng)) synthetic.add(city.slug);
+    if (isRegularPolygon(points)) synthetic.add(city.slug);
     const signature = polygonShapeSignature(points);
     slugsBySignature.set(signature, [...(slugsBySignature.get(signature) ?? []), city.slug]);
   }
