@@ -725,3 +725,26 @@ Tipos `AtlasZone`, `AtlasRule` y `AtlasMunicipality`, que reflejan los campos an
   - `out/madrid.html` contiene "Se multa" y "Calendario de la ZBE de Madrid";
   - `out/gijon.html` contiene "En tramitación";
   - el pie contiene "Atlas ZBE".
+
+### Z9.5 Perímetros aproximados de Atlas ZBE (19/11/2026)
+
+Hoy solo se importa la geometría marcada `geometriaPrecision === 'oficial'`. Eso deja sin perímetro a 45 ciudades que sí tienen ZBE en Atlas ZBE. Su geometría `aproximada` (contornos de la DGT, de 12 a 180 vértices) es real, no una plantilla, y es mejor mostrarla avisando de que es aproximada que no mostrar nada.
+
+- `perimeterSource` gana el campo `precision: 'oficial' | 'aproximada'`.
+  - Lo rellenan los dos scripts: Z8 siempre 'oficial'; Z9 según `geometriaPrecision`.
+  - Si falta en datos antiguos, se trata como 'oficial'.
+- `scripts/import-atlaszbe.ts`: la regla de geometría de Z9.2 se aplica también si la zona principal tiene `geometriaPrecision === 'aproximada'`. En ese caso:
+  - `perimeterSource.name` es 'Atlas ZBE (perímetro aproximado de la DGT)';
+  - `precision` es 'aproximada'.
+  - Si en un mismo municipio hay zonas oficiales y aproximadas, la precisión es la de la zona principal.
+  - Las ciudades de Z8 y las ciudades miteco siguen igual.
+- Interfaz, en las dos páginas, debajo del mini mapa:
+  - con 'oficial', "Perímetro oficial: {enlace}", como ahora;
+  - con 'aproximada', "Perímetro aproximado: {enlace}. Consulta el plano oficial del ayuntamiento antes de entrar.".
+- `CityMiniMap` y `SpainZbeMap` dibujan los perímetros aproximados con línea discontinua (`dashArray`, como constante con nombre) y el mismo color. `SpainZbeMap` necesita el dato: lee `perimeterSource.precision` de la ciudad. Si ese dato no llega al componente, se añade a las props que ya recibe.
+- Las ciudades miteco (ZBE en tramitación o pendiente) siguen sin perímetro, porque todavía no hay zona aprobada. El texto "Perímetro no disponible" de esas páginas pasa a "Todavía no hay perímetro aprobado: la ZBE está en tramitación." cuando `enforcement.source === 'miteco'`.
+- Criterios de aceptación:
+  - `tests/atlas-import.test.ts`: las 45 ciudades tienen `polygon` y `precision` 'aproximada'. Todas las ciudades con `enforcement.source === 'atlaszbe'` tienen `polygon`, salvo las que Atlas ZBE deja sin geometría (que se listan en la prueba).
+  - Ningún polígono nuevo es regular ni sintético (`tests/city-data.test.ts`).
+  - Ninguna ciudad pasa de 800 vértices.
+  - Build: `out/burgos.html` contiene "Perímetro aproximado" y `out/gijon.html` contiene "Todavía no hay perímetro aprobado".
