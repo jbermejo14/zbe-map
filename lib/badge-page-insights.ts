@@ -252,3 +252,17 @@ export function badgeFaqs(input: BadgeFaqInput): BadgeFaq[] {
     },
   ];
 }
+
+/**
+ * Determina si la página de etiqueta de una ciudad debe marcarse con noindex.
+ * Las páginas CERO y ECO en ciudades cuya ZBE está en tramitación o pendiente según Atlas ZBE
+ * no tienen restricciones vigentes y presentan un 64-73% de similitud Jaccard respecto a la ficha de la ciudad.
+ */
+export function isBadgePageNoIndex(city: CityData, badgeSlug: string): boolean {
+  const normalized = badgeSlug.toLowerCase();
+  if (normalized !== 'cero' && normalized !== 'eco') {
+    return false;
+  }
+  const state = city.enforcement?.state;
+  return state === 'en_tramite' || state === 'pendiente';
+}

@@ -4,7 +4,7 @@ import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { AdSenseScript, getAdSenseClient } from '@/components/AdSenseScript';
-import { getSiteUrl, SITE_NAME } from '@/lib/site';
+import { assetPath, getSiteUrl, SITE_NAME } from '@/lib/site';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -66,9 +66,18 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     locale: 'es_ES',
     type: 'website',
+    images: [
+      {
+        url: assetPath('/brand/ododex-og.png'),
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME} · Zonas de Bajas Emisiones`,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
+    images: [assetPath('/brand/ododex-og.png')],
   },
   // Sin `robots` global: indexar es el valor por defecto, y un `index, follow` aquí
   // se sumaría al `noindex` que Next pone en la página 404.

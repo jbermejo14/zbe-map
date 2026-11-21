@@ -3,6 +3,8 @@ import { getAllCities } from '../lib/cities-repository.ts';
 import { absoluteUrl } from '../lib/site.ts';
 import { ETIQUETA_FUEL_SLUGS, ETIQUETA_YEARS } from '../lib/etiqueta-routes.ts';
 
+import { isBadgePageNoIndex } from '../lib/badge-page-insights.ts';
+
 // Exportación estática: el sitemap se genera en el build.
 export const dynamic = 'force-static';
 
@@ -47,6 +49,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // 3. Páginas ciudad x etiqueta (/[ciudad]/[etiqueta])
     for (const badge of badges) {
+      if (isBadgePageNoIndex(city, badge)) {
+        continue;
+      }
       routes.push({
         url: absoluteUrl(`/${city.slug}/${badge}`),
         lastModified: new Date(city.lastVerified || lastModified),

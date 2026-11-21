@@ -67,6 +67,15 @@ export async function generateStaticParams() {
   return params;
 }
 
+const SHORT_FUEL_LABEL: Record<string, string> = {
+  gasolina: 'gasolina',
+  diesel: 'diésel',
+  hibrido: 'híbrido',
+  'hibrido-enchufable': 'híbrido enchufable',
+  electrico: 'eléctrico',
+  'glp-gnc': 'Gas (GLP/GNC)',
+};
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { combustible, anio } = await params;
   const fuelInfo = VALID_FUELS[combustible.toLowerCase()];
@@ -79,8 +88,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const dgtEval = getOfficialDgtBadge({ fuel: fuelInfo.category, year: yearNumber });
-  const title = `Etiqueta DGT de un coche ${fuelInfo.label} de ${yearNumber}: ¿Qué distintivo le corresponde?`;
-  const description = `Descubre qué distintivo ambiental DGT le corresponde a un vehículo ${fuelInfo.label} matriculado en ${yearNumber} (${dgtEval.badgeName}). Consulta en qué ZBE puede entrar sin multa.`;
+  const shortFuel = SHORT_FUEL_LABEL[combustible.toLowerCase()] || fuelInfo.label;
+  const title = `Etiqueta DGT coche ${shortFuel} de ${yearNumber}`;
+  const description = `Descubre qué distintivo ambiental DGT le corresponde a un coche ${shortFuel} de ${yearNumber} (${dgtEval.badgeName}). Consulta en qué ZBE puede entrar sin multa.`;
 
   return {
     title,

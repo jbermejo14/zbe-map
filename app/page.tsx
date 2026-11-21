@@ -9,14 +9,14 @@ const homeUrl = absoluteUrl('/');
 export const metadata: Metadata = {
   title: `Zonas de bajas emisiones (ZBE) ${SEO_CURRENT_YEAR}: mapa y restricciones por etiqueta DGT`,
   description:
-    'Comprueba si tu vehículo puede circular o aparcar en las 152 Zonas de Bajas Emisiones (ZBE) de España según su distintivo DGT. Perímetros oficiales cuando están disponibles; el resto de datos, orientativos hasta su verificación.',
+    'Comprueba si tu coche puede entrar en las ZBE de cada ciudad de España según su etiqueta DGT. Mapa interactivo, ordenanzas, multas y excepciones.',
   alternates: {
     canonical: homeUrl,
   },
   openGraph: {
     title: `Zonas de bajas emisiones (ZBE) ${SEO_CURRENT_YEAR}: mapa y restricciones por etiqueta DGT`,
     description:
-      'Comprueba si tu vehículo puede circular o aparcar en las 152 Zonas de Bajas Emisiones (ZBE) de España según su distintivo DGT.',
+      'Comprueba si tu coche puede entrar en las ZBE de cada ciudad de España según su etiqueta DGT. Mapa interactivo, ordenanzas, multas y excepciones.',
     url: homeUrl,
     siteName: SITE_NAME,
     type: 'website',

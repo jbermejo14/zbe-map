@@ -12,6 +12,7 @@ import {
   badgeMetaDescription,
   badgeMetaTitle,
   badgeNationalSentence,
+  isBadgePageNoIndex,
   regionSentence,
   sameRegionCities,
 } from '../lib/badge-page-insights.ts';
@@ -371,5 +372,40 @@ describe('badgeFaqs', () => {
     assert.ok(faqs[0].answer.includes('según las normas orientativas'));
     assert.ok(faqs[1].answer.startsWith('Horario orientativo'));
     assert.ok(faqs[2].answer.startsWith('Sanción orientativa de 200 €'));
+  });
+});
+
+describe('isBadgePageNoIndex (Estrategia anti-canibalización)', () => {
+  const cities = getAllCities();
+
+  it('ciudades con ZBE activa (Madrid, Barcelona) indexan todas las etiquetas', () => {
+    const madrid = cities.find((c) => c.slug === 'madrid')!;
+    assert.equal(isBadgePageNoIndex(madrid, 'cero'), false);
+    assert.equal(isBadgePageNoIndex(madrid, 'eco'), false);
+    assert.equal(isBadgePageNoIndex(madrid, 'b'), false);
+    assert.equal(isBadgePageNoIndex(madrid, 'c'), false);
+    assert.equal(isBadgePageNoIndex(madrid, 'sin-etiqueta'), false);
+  });
+
+  it('ciudades en tramitación marcan noindex solo en CERO y ECO', () => {
+    const lasPalmas = cities.find((c) => c.slug === 'las-palmas')!;
+    assert.equal(isBadgePageNoIndex(lasPalmas, 'cero'), true);
+    assert.equal(isBadgePageNoIndex(lasPalmas, 'eco'), true);
+    assert.equal(isBadgePageNoIndex(lasPalmas, 'b'), false);
+    assert.equal(isBadgePageNoIndex(lasPalmas, 'c'), false);
+    assert.equal(isBadgePageNoIndex(lasPalmas, 'sin-etiqueta'), false);
+  });
+
+  it('protege exactamente 102 páginas CERO y ECO de las 51 ciudades en tramitación', () => {
+    let noIndexCount = 0;
+    const badgeSlugs = ['cero', 'eco', 'c', 'b', 'sin-etiqueta'];
+    for (const city of cities) {
+      for (const b of badgeSlugs) {
+        if (isBadgePageNoIndex(city, b)) {
+          noIndexCount++;
+        }
+      }
+    }
+    assert.equal(noIndexCount, 102, `Se esperaban 102 páginas con noindex (51 x 2), obtenidas: ${noIndexCount}`);
   });
 });

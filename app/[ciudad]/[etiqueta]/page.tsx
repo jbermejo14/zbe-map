@@ -18,6 +18,7 @@ import {
   badgeMetaDescription,
   badgeMetaTitle,
   badgeNationalSentence,
+  isBadgePageNoIndex,
   regionSentence,
   sameRegionCities,
 } from '@/lib/badge-page-insights';
@@ -108,9 +109,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     fineApplies: !city.enforcement || city.enforcement.state === 'sanciona',
   });
 
+  const isNoIndex = isBadgePageNoIndex(city, etiqueta);
+
   return {
     title: { absolute: title },
     description,
+    ...(isNoIndex ? { robots: { index: false, follow: true } } : {}),
     alternates: {
       canonical: absoluteUrl(`/${city.slug}/${etiqueta}`),
     },
