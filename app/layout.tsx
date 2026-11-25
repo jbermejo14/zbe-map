@@ -5,7 +5,8 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { AdSenseScript, getAdSenseClient } from '@/components/AdSenseScript';
 import { getNetworkSections } from '@/lib/network';
-import { assetPath, getSiteUrl, SITE_NAME } from '@/lib/site';
+import { fitTitle, socialMetadata } from '@/lib/seo-metadata';
+import { getSiteUrl, SITE_NAME } from '@/lib/site';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -42,14 +43,21 @@ const THEME_SCRIPT = `
   })();
 `;
 
+const DEFAULT_TITLE = fitTitle([
+  'Zonas de bajas emisiones (ZBE) en España: mapa y etiqueta DGT',
+  'Zonas de bajas emisiones en España: mapa y etiqueta DGT',
+  'ZBE en España: mapa y etiqueta DGT',
+]);
+const DEFAULT_DESCRIPTION =
+  'Comprueba en qué ciudades de España puede circular tu vehículo según su etiqueta ambiental de la DGT (0, ECO, C, B o sin etiqueta). Mapa interactivo de ZBE.';
+
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: 'Zonas de bajas emisiones (ZBE) en España: mapa y etiqueta DGT',
+    default: DEFAULT_TITLE,
     template: `%s | ${SITE_NAME}`,
   },
-  description:
-    'Comprueba en qué ciudades y zonas de bajas emisiones (ZBE) puede circular tu vehículo según su etiqueta ambiental de la DGT (0, ECO, C, B o sin etiqueta). Mapa interactivo de España.',
+  description: DEFAULT_DESCRIPTION,
   keywords: [
     'ZBE España',
     'zonas de bajas emisiones',
@@ -63,23 +71,12 @@ export const metadata: Metadata = {
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
   publisher: SITE_NAME,
-  openGraph: {
-    siteName: SITE_NAME,
-    locale: 'es_ES',
-    type: 'website',
-    images: [
-      {
-        url: assetPath('/brand/ododex-og.png'),
-        width: 1200,
-        height: 630,
-        alt: `${SITE_NAME} · Zonas de Bajas Emisiones`,
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    images: [assetPath('/brand/ododex-og.png')],
-  },
+  ...socialMetadata({
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    path: '/',
+    imageAlt: `${SITE_NAME} · Zonas de Bajas Emisiones`,
+  }),
   // Sin `robots` global: indexar es el valor por defecto, y un `index, follow` aquí
   // se sumaría al `noindex` que Next pone en la página 404.
 };

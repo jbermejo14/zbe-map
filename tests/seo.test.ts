@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { cityMetaDescription, cityMetaTitle } from '../lib/seo.ts';
 import { META_DESCRIPTION_MAX_LENGTH } from '../lib/badge-page-insights.ts';
+import { TITLE_MAX_LENGTH } from '../lib/seo-metadata.ts';
 import type { CityEnforcement } from '../lib/cities-repository.ts';
 
 type SeoTestCity = Parameters<typeof cityMetaDescription>[0];
@@ -58,10 +59,10 @@ describe('cityMetaDescription', () => {
 
   it('atlaszbe sin restricciones: omite el horario', () => {
     const text = cityMetaDescription(seoCity(seoAtlas('aviso', 'Suspendida'), 'Sin restricciones en vigor'), true);
-    assert.equal(text, 'Zona de Bajas Emisiones de Lugo (Lugo): suspendida. Exenciones y acceso por etiqueta DGT.');
+    assert.equal(text, 'Zona de Bajas Emisiones de Lugo (Lugo): suspendida. Exenciones y acceso por etiqueta DGT, con el mapa y la normativa de la zona.');
   });
 
-  it('miteco: texto corto de acceso', () => {
+  it('miteco: texto de acceso con cierre largo para llegar a 120 caracteres', () => {
     const miteco: CityEnforcement = {
       source: 'miteco',
       state: 'en_tramite',
@@ -72,7 +73,7 @@ describe('cityMetaDescription', () => {
     };
     assert.equal(
       cityMetaDescription(seoCity(miteco), true),
-      'Zona de Bajas Emisiones de Lugo (Lugo): en tramitación. Acceso por etiqueta DGT.',
+      'Zona de Bajas Emisiones de Lugo (Lugo): en tramitación. Consulta el acceso por etiqueta DGT, las exenciones y el mapa de la zona.',
     );
   });
 
@@ -90,7 +91,15 @@ describe('cityMetaTitle', () => {
 
   it('sin multa usa la variante neutra', () => {
     const title = cityMetaTitle(seoCity(seoAtlas('aviso', 'x')), true, SEO_YEAR);
-    assert.equal(title, 'ZBE Lugo 2026: Mapa, Horarios y Normativa DGT');
+    assert.equal(title, 'ZBE Lugo 2026: Mapa, Horarios y Normativa DGT | Ododex');
+  });
+
+  it('cede variantes en vez de truncar cuando el nombre es largo', () => {
+    const long = { ...seoCity(null), name: 'San Vicente del Raspeig de la Frontera' };
+    const title = cityMetaTitle(long, true, SEO_YEAR);
+    assert.ok(title.length <= TITLE_MAX_LENGTH, title);
+    assert.ok(title.startsWith('ZBE San Vicente del Raspeig de la Frontera 2026'), title);
+    assert.ok(title.endsWith(' | Ododex'), title);
   });
 
   it('no verificada no menciona multas', () => {

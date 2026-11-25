@@ -9,6 +9,7 @@ import { zbeUiAccessCardClass, zbeUiAccessTagClass, zbeUiFineText } from '@/lib/
 import { AdSlot } from '@/components/AdSlot';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
+import { socialMetadata } from '@/lib/seo-metadata';
 import { NO_RESTRICTIONS_SCHEDULE_TEXT } from '@/lib/atlas-zbe';
 import { MunicipalityServiceLinks } from '@/components/MunicipalityServiceLinks';
 import { EnforcementNotice } from '@/components/EnforcementNotice';
@@ -110,20 +111,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 
   const isNoIndex = isBadgePageNoIndex(city, etiqueta);
+  const path = `/${city.slug}/${etiqueta}`;
 
   return {
     title: { absolute: title },
     description,
     ...(isNoIndex ? { robots: { index: false, follow: true } } : {}),
     alternates: {
-      canonical: absoluteUrl(`/${city.slug}/${etiqueta}`),
+      canonical: absoluteUrl(path),
     },
-    openGraph: {
+    ...socialMetadata({
       title,
       description,
-      url: absoluteUrl(`/${city.slug}/${etiqueta}`),
+      path,
       type: 'article',
-    },
+      imageAlt: `${badgeInfo.shortLabel} en la ZBE de ${city.name} · Ododex`,
+    }),
   };
 }
 

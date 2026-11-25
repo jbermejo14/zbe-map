@@ -8,25 +8,31 @@ import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { ETIQUETA_CRITERIA } from '@/lib/etiqueta-criteria';
 import { ETIQUETA_YEARS } from '@/lib/etiqueta-routes';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
+import { fitDescription, fitTitle, socialMetadata } from '@/lib/seo-metadata';
 import { absoluteUrl } from '@/lib/site';
 import { FUEL_CHOICES } from '@/lib/vehicle-selection';
 
 const ETIQUETA_ROUTE = '/etiqueta-dgt';
-const ETIQUETA_TITLE = `Etiqueta ambiental de la DGT ${SEO_CURRENT_YEAR}: qué etiqueta tiene tu coche`;
-const ETIQUETA_DESCRIPTION =
-  'Consulta las cinco etiquetas ambientales de la DGT (0, ECO, C, B y sin etiqueta), sus criterios por combustible y año, y calcula la de tu coche en un momento.';
+const ETIQUETA_TITLE = fitTitle([
+  `Etiqueta ambiental de la DGT ${SEO_CURRENT_YEAR}: qué etiqueta tiene tu coche`,
+  `Etiqueta ambiental DGT ${SEO_CURRENT_YEAR}: qué etiqueta tiene tu coche`,
+  `Etiqueta ambiental DGT ${SEO_CURRENT_YEAR}: calcula la de tu coche`,
+]);
+const ETIQUETA_DESCRIPTION = fitDescription([
+  'Consulta las cinco etiquetas ambientales de la DGT (0, ECO, C, B y sin etiqueta), sus criterios por combustible y año, y calcula la de tu coche en un momento.',
+]);
 const CRITERIA_STICKER_SIZE = 72;
 
 export const metadata: Metadata = {
-  title: ETIQUETA_TITLE,
+  title: { absolute: ETIQUETA_TITLE },
   description: ETIQUETA_DESCRIPTION,
   alternates: { canonical: absoluteUrl(ETIQUETA_ROUTE) },
-  openGraph: {
+  ...socialMetadata({
     title: ETIQUETA_TITLE,
     description: ETIQUETA_DESCRIPTION,
-    url: absoluteUrl(ETIQUETA_ROUTE),
-    type: 'website',
-  },
+    path: ETIQUETA_ROUTE,
+    imageAlt: 'Etiqueta ambiental de la DGT · Ododex',
+  }),
 };
 
 function EtiquetaCriteriaList() {

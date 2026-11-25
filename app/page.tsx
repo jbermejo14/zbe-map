@@ -3,24 +3,31 @@ import { AdSlot } from '@/components/AdSlot';
 import { SplitDashboard } from '@/components/SplitDashboard';
 import { absoluteUrl, SECTION_NAME, SITE_NAME } from '@/lib/site';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
+import { fitDescription, fitTitle, socialMetadata } from '@/lib/seo-metadata';
 
 const homeUrl = absoluteUrl('/');
 
+const HOME_TITLE = fitTitle([
+  `Zonas de bajas emisiones (ZBE) ${SEO_CURRENT_YEAR}: mapa y restricciones por etiqueta DGT`,
+  `Zonas de bajas emisiones ${SEO_CURRENT_YEAR}: mapa y etiqueta DGT`,
+  `ZBE ${SEO_CURRENT_YEAR}: mapa y restricciones por etiqueta DGT`,
+]);
+const HOME_DESCRIPTION = fitDescription([
+  'Comprueba si tu coche puede entrar en las ZBE de cada ciudad de España según su etiqueta DGT. Mapa interactivo, ordenanzas, multas y excepciones.',
+]);
+
 export const metadata: Metadata = {
-  title: `Zonas de bajas emisiones (ZBE) ${SEO_CURRENT_YEAR}: mapa y restricciones por etiqueta DGT`,
-  description:
-    'Comprueba si tu coche puede entrar en las ZBE de cada ciudad de España según su etiqueta DGT. Mapa interactivo, ordenanzas, multas y excepciones.',
+  title: { absolute: HOME_TITLE },
+  description: HOME_DESCRIPTION,
   alternates: {
     canonical: homeUrl,
   },
-  openGraph: {
-    title: `Zonas de bajas emisiones (ZBE) ${SEO_CURRENT_YEAR}: mapa y restricciones por etiqueta DGT`,
-    description:
-      'Comprueba si tu coche puede entrar en las ZBE de cada ciudad de España según su etiqueta DGT. Mapa interactivo, ordenanzas, multas y excepciones.',
-    url: homeUrl,
-    siteName: SITE_NAME,
-    type: 'website',
-  },
+  ...socialMetadata({
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    path: '/',
+    imageAlt: `${SITE_NAME} · Zonas de Bajas Emisiones`,
+  }),
 };
 
 export default function HomePage() {

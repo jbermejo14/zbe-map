@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { fitDescription, fitTitle, socialMetadata } from '@/lib/seo-metadata';
 import { absoluteUrl } from '@/lib/site';
 import { getOfficialDgtBadge, normalizeFuel, FuelCategory, DGT_LEGAL_SOURCE } from '@/lib/dgt-rules';
 import { evaluateAllCities } from '@/lib/cities-repository';
@@ -89,21 +90,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const dgtEval = getOfficialDgtBadge({ fuel: fuelInfo.category, year: yearNumber });
   const shortFuel = SHORT_FUEL_LABEL[combustible.toLowerCase()] || fuelInfo.label;
-  const title = `Etiqueta DGT coche ${shortFuel} de ${yearNumber}`;
-  const description = `Descubre qué distintivo ambiental DGT le corresponde a un coche ${shortFuel} de ${yearNumber} (${dgtEval.badgeName}). Consulta en qué ZBE puede entrar sin multa.`;
+  const title = fitTitle([`Etiqueta DGT coche ${shortFuel} de ${yearNumber}`]);
+  const lead = `Descubre qué distintivo ambiental DGT le corresponde a un coche ${shortFuel} de ${yearNumber} (${dgtEval.badgeName}).`;
+  const description = fitDescription([
+    `${lead} Consulta en qué ZBE puede entrar sin multa.`,
+    `${lead} Consulta en qué ZBE puede entrar.`,
+  ]);
+  const path = `/etiqueta-dgt/${combustible}/${yearNumber}`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
-      canonical: absoluteUrl(`/etiqueta-dgt/${combustible}/${yearNumber}`),
+      canonical: absoluteUrl(path),
     },
-    openGraph: {
+    ...socialMetadata({
       title,
       description,
-      url: absoluteUrl(`/etiqueta-dgt/${combustible}/${yearNumber}`),
+      path,
       type: 'article',
-    },
+      imageAlt: `Etiqueta DGT coche ${shortFuel} de ${yearNumber} · Ododex`,
+    }),
   };
 }
 

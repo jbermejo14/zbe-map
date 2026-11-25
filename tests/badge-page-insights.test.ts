@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import type { CityData, CityEnforcement } from '../lib/cities-repository.ts';
 import { getAllCities } from '../lib/cities-repository.ts';
 import type { DgtBadgeType, ZbeAccessStatus } from '../lib/zbe-engine.ts';
+import { DESCRIPTION_MIN_LENGTH, TITLE_MAX_LENGTH } from '../lib/seo-metadata.ts';
 import {
   META_DESCRIPTION_MAX_LENGTH,
-  META_TITLE_MAX_LENGTH,
   SAME_REGION_LIMIT,
   badgeAccessCounts,
   badgeFaqs,
@@ -154,36 +154,40 @@ describe('Comunidad', () => {
 });
 
 describe('Título y descripción', () => {
-  it('usa el formato completo si cabe', () => {
-    assert.equal(badgeMetaTitle('Etiqueta B', 'Madrid', 2026), 'Etiqueta B en la ZBE de Madrid: ¿puede entrar? (2026)');
+  it('usa el formato con pregunta y marca si cabe en 60 caracteres', () => {
+    assert.equal(badgeMetaTitle('Etiqueta B', 'Madrid', 2026), 'Etiqueta B en la ZBE de Madrid: ¿puede entrar? | Ododex');
   });
 
-  it('quita el año si no cabe', () => {
+  it('conserva el año si el título con marca cabe en 60 caracteres', () => {
+    assert.equal(badgeMetaTitle('ECO', 'Gijón', 2026), 'ECO en la ZBE de Gijón: ¿puede entrar? (2026) | Ododex');
+  });
+
+  it('quita el año y luego la pregunta si no caben', () => {
     const title = badgeMetaTitle('Etiqueta B', 'Alcalá de Henares', 2026);
-    assert.equal(title, 'Etiqueta B en la ZBE de Alcalá de Henares: ¿puede entrar?');
-    assert.ok(title.length <= META_TITLE_MAX_LENGTH);
+    assert.equal(title, 'Etiqueta B en la ZBE de Alcalá de Henares | Ododex');
+    assert.ok(title.length <= TITLE_MAX_LENGTH);
   });
 
   it('queda en la forma mínima si aún no cabe', () => {
     assert.equal(
       badgeMetaTitle('Sin etiqueta', 'San Vicente del Raspeig', 2026),
-      'Sin etiqueta en la ZBE de San Vicente del Raspeig',
+      'Sin etiqueta en la ZBE de San Vicente del Raspeig | Ododex',
     );
   });
 
   it('compone el veredicto y la multa si está verificada', () => {
     const text = badgeMetaDescription({ subject: SUBJECT, cityName: 'Madrid', status: 'allowed', fineAmount: 200, verified: true });
-    assert.equal(text, 'Un coche con etiqueta B puede entrar sin restricciones en la ZBE de Madrid. Multa: 200 €. Horario, excepciones y mapa.');
+    assert.equal(text, 'Un coche con etiqueta B puede entrar sin restricciones en la ZBE de Madrid. Multa: 200 €. Consulta el horario, las excepciones y el mapa de la zona.');
   });
 
   it('dice que no hay multa si fineApplies es false', () => {
     const text = badgeMetaDescription({ subject: SUBJECT, cityName: 'Gijón', status: 'allowed', fineAmount: 200, verified: true, fineApplies: false });
-    assert.equal(text, 'Un coche con etiqueta B puede entrar sin restricciones en la ZBE de Gijón. Sin multa por ahora. Horario, excepciones y mapa.');
+    assert.equal(text, 'Un coche con etiqueta B puede entrar sin restricciones en la ZBE de Gijón. Sin multa por ahora. Consulta el horario, las excepciones y el mapa de la zona.');
   });
 
   it('marca como orientativa si no está verificada', () => {
     const text = badgeMetaDescription({ subject: SUBJECT, cityName: 'Madrid', status: 'banned', fineAmount: 200, verified: false });
-    assert.equal(text, 'Un coche con etiqueta B no puede entrar en la ZBE de Madrid. Normas orientativas: horario, excepciones y mapa.');
+    assert.equal(text, 'Un coche con etiqueta B no puede entrar en la ZBE de Madrid. Normas orientativas: consulta el horario, las excepciones y el mapa.');
   });
 
   it('recorta en el último espacio y añade puntos suspensivos', () => {
@@ -216,6 +220,7 @@ describe('Título y descripción', () => {
           });
           const context = `${city.slug}/${badge}/${verified}: ${text}`;
           assert.ok(text.length <= META_DESCRIPTION_MAX_LENGTH, context);
+          assert.ok(text.length >= DESCRIPTION_MIN_LENGTH, context);
           assert.ok(!text.includes('undefined'), context);
           assert.ok(!text.includes(' …'), context);
         }

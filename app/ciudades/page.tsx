@@ -6,23 +6,30 @@ import type { DirectoryCity } from '@/components/CitiesDirectory';
 import { getAllCities } from '@/lib/cities-repository';
 import { canonicalRegion } from '@/lib/regions';
 import { SEO_CURRENT_YEAR } from '@/lib/seo';
+import { fitDescription, fitTitle, socialMetadata } from '@/lib/seo-metadata';
 import { absoluteUrl } from '@/lib/site';
 
 const CITIES_ROUTE = '/ciudades';
-const CITIES_TITLE = `Ciudades con zona de bajas emisiones (ZBE) en España ${SEO_CURRENT_YEAR}`;
-const CITIES_DESCRIPTION =
-  'Lista de las ciudades españolas con zona de bajas emisiones (ZBE), agrupadas por comunidad autónoma, con su estado (activa o en tramitación) y enlace a las restricciones de cada una.';
+const CITIES_TITLE = fitTitle([
+  `Ciudades con zona de bajas emisiones (ZBE) en España ${SEO_CURRENT_YEAR}`,
+  `Ciudades con zona de bajas emisiones en España ${SEO_CURRENT_YEAR}`,
+  `Ciudades con ZBE en España ${SEO_CURRENT_YEAR}`,
+]);
+const CITIES_DESCRIPTION = fitDescription([
+  'Lista de las ciudades españolas con zona de bajas emisiones (ZBE), por comunidad autónoma, con su estado (activa o en tramitación) y las restricciones de cada una.',
+  'Lista de las ciudades españolas con zona de bajas emisiones (ZBE), por comunidad autónoma, con su estado y las restricciones de cada una.',
+]);
 
 export const metadata: Metadata = {
-  title: CITIES_TITLE,
+  title: { absolute: CITIES_TITLE },
   description: CITIES_DESCRIPTION,
   alternates: { canonical: absoluteUrl(CITIES_ROUTE) },
-  openGraph: {
+  ...socialMetadata({
     title: CITIES_TITLE,
     description: CITIES_DESCRIPTION,
-    url: absoluteUrl(CITIES_ROUTE),
-    type: 'website',
-  },
+    path: CITIES_ROUTE,
+    imageAlt: 'Ciudades con zona de bajas emisiones en España · Ododex',
+  }),
 };
 
 export default function CitiesPage() {

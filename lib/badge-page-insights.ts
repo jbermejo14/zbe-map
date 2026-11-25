@@ -2,12 +2,16 @@ import type { CityData, CityEnforcement } from './cities-repository.ts';
 import { NO_RESTRICTIONS_SCHEDULE_TEXT } from './atlas-zbe.ts';
 import type { DgtBadgeType, ZbeAccessStatus } from './zbe-engine.ts';
 import { canonicalRegion } from './regions.ts';
+import { fitDescription, fitTitle } from './seo-metadata.ts';
 
 export const SAME_REGION_LIMIT = 8;
-export const META_TITLE_MAX_LENGTH = 60;
 export const META_DESCRIPTION_MAX_LENGTH = 160;
 
 const NO_FINE_TEXT = 'Sin multa por ahora.';
+const BADGE_LONG_TAIL = 'Consulta el horario, las excepciones y el mapa de la zona.';
+const BADGE_SHORT_TAIL = 'Horario, excepciones y mapa.';
+const BADGE_UNVERIFIED_LONG_TAIL = 'Normas orientativas: consulta el horario, las excepciones y el mapa.';
+const BADGE_UNVERIFIED_SHORT_TAIL = 'Normas orientativas: horario, excepciones y mapa.';
 const ELLIPSIS = '…';
 const DEFAULT_STATUS: ZbeAccessStatus = 'allowed';
 const STATUS_ORDER: ZbeAccessStatus[] = ['allowed', 'restricted', 'banned'];
@@ -137,13 +141,13 @@ export function regionSentence(
   return `${intro} ${detail}`;
 }
 
-/** Título SEO de la página de etiqueta, de 60 caracteres como máximo cuando es posible. */
+/**
+ * Título SEO completo (con marca) de la página de etiqueta. Prefiere el formato con año y pregunta;
+ * cede ante el límite de longitud antes que truncar.
+ */
 export function badgeMetaTitle(badgeShortLabel: string, cityName: string, year: number): string {
   const base = `${badgeShortLabel} en la ZBE de ${cityName}`;
-  const withYear = `${base}: ¿puede entrar? (${year})`;
-  if (withYear.length <= META_TITLE_MAX_LENGTH) return withYear;
-  const withoutYear = `${base}: ¿puede entrar?`;
-  return withoutYear.length <= META_TITLE_MAX_LENGTH ? withoutYear : base;
+  return fitTitle([`${base}: ¿puede entrar? (${year})`, `${base}: ¿puede entrar?`, base, `${badgeShortLabel} en ZBE ${cityName}`]);
 }
 
 export interface BadgeMetaDescriptionInput {
@@ -164,14 +168,18 @@ export function truncateMetaDescription(text: string): string {
   return `${(lastSpace > 0 ? head.slice(0, lastSpace) : head).trimEnd()}${ELLIPSIS}`;
 }
 
-/** Descripción SEO de la página de etiqueta, de 160 caracteres como máximo. */
+/**
+ * Descripción SEO de la página de etiqueta, de 120 a 160 caracteres: la versión con cierre largo
+ * si cabe; si no, la corta; y, con un nombre de ciudad desmesurado, la corta recortada.
+ */
 export function badgeMetaDescription(input: BadgeMetaDescriptionInput): string {
   const lead = `${insightsCapitalize(input.subject)} ${VERDICTS[input.status]} en la ZBE de ${input.cityName}.`;
   const fineText = input.fineApplies === false ? NO_FINE_TEXT : `Multa: ${input.fineAmount} €.`;
-  const tail = input.verified
-    ? `${fineText} Horario, excepciones y mapa.`
-    : 'Normas orientativas: horario, excepciones y mapa.';
-  return truncateMetaDescription(`${lead} ${tail}`);
+  const tails = input.verified
+    ? [`${fineText} ${BADGE_LONG_TAIL}`, `${fineText} ${BADGE_SHORT_TAIL}`]
+    : [BADGE_UNVERIFIED_LONG_TAIL, BADGE_UNVERIFIED_SHORT_TAIL];
+  const candidates = tails.map((tail) => `${lead} ${tail}`);
+  return fitDescription([...candidates, truncateMetaDescription(candidates[candidates.length - 1])]);
 }
 
 export interface BadgeFaq {

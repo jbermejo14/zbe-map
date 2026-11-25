@@ -16,6 +16,7 @@ import { AdSlot } from '@/components/AdSlot';
 import { DgtSticker } from '@/lib/dgt-svg-badges';
 import { canonicalRegion } from '@/lib/regions';
 import { SEO_CURRENT_YEAR, cityMetaDescription, cityMetaTitle } from '@/lib/seo';
+import { socialMetadata } from '@/lib/seo-metadata';
 import { MunicipalityServiceLinks } from '@/components/MunicipalityServiceLinks';
 import { EnforcementNotice } from '@/components/EnforcementNotice';
 import { ZbeCalendar } from '@/components/ZbeCalendar';
@@ -64,18 +65,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = cityMetaTitle(city, verified, SEO_CURRENT_YEAR);
   const description = cityMetaDescription(city, verified);
 
+  const path = `/${city.slug}`;
+
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
-      canonical: absoluteUrl(`/${city.slug}`),
+      canonical: absoluteUrl(path),
     },
-    openGraph: {
-      title,
-      description,
-      url: absoluteUrl(`/${city.slug}`),
-      type: 'article',
-    },
+    ...socialMetadata({ title, description, path, type: 'article', imageAlt: `ZBE ${city.name} · Ododex` }),
   };
 }
 
