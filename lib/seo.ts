@@ -22,16 +22,16 @@ function seoCityHasNoFine(city: SeoCity): boolean {
 
 /** Sufijos del título de ciudad, del más completo al más corto; el nombre y el año van siempre. */
 const SEO_TITLE_SUFFIXES_WITH_FINE = [
-  ': Mapa, Horarios, Multas y Normativa DGT',
-  ': Mapa, Horarios y Multas',
-  ': Mapa y Multas',
+  ': mapa, horarios, multas y normativa DGT',
+  ': mapa, horarios y multas',
+  ': mapa y multas',
   '',
 ];
-const SEO_TITLE_SUFFIXES_NO_FINE = [': Mapa, Horarios y Normativa DGT', ': Mapa y Horarios', ': Mapa y Normativa', ''];
+const SEO_TITLE_SUFFIXES_NO_FINE = [': mapa, horarios y normativa DGT', ': mapa y horarios', ': mapa y normativa', ''];
 const SEO_TITLE_SUFFIXES_UNVERIFIED = [
-  ': Mapa y Normas Orientativas por Etiqueta DGT',
-  ': Mapa y Normas Orientativas',
-  ': Mapa y Normas',
+  ': mapa y normas orientativas por etiqueta DGT',
+  ': mapa y normas orientativas',
+  ': mapa y normas',
   '',
 ];
 

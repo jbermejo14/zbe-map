@@ -84,14 +84,14 @@ describe('cityMetaDescription', () => {
 });
 
 describe('cityMetaTitle', () => {
-  it('con multa dice Multas', () => {
-    assert.match(cityMetaTitle(seoCity(null), true, SEO_YEAR), /Multas/);
-    assert.match(cityMetaTitle(seoCity(seoAtlas('sanciona', 'x')), true, SEO_YEAR), /Multas/);
+  it('con multa dice multas', () => {
+    assert.match(cityMetaTitle(seoCity(null), true, SEO_YEAR), /multas/);
+    assert.match(cityMetaTitle(seoCity(seoAtlas('sanciona', 'x')), true, SEO_YEAR), /multas/);
   });
 
   it('sin multa usa la variante neutra', () => {
     const title = cityMetaTitle(seoCity(seoAtlas('aviso', 'x')), true, SEO_YEAR);
-    assert.equal(title, 'ZBE Lugo 2026: Mapa, Horarios y Normativa DGT | Ododex');
+    assert.equal(title, 'ZBE Lugo 2026: mapa, horarios y normativa DGT | Ododex');
   });
 
   it('cede variantes en vez de truncar cuando el nombre es largo', () => {
@@ -103,6 +103,6 @@ describe('cityMetaTitle', () => {
   });
 
   it('no verificada no menciona multas', () => {
-    assert.doesNotMatch(cityMetaTitle(seoCity(null), false, SEO_YEAR), /Multas/);
+    assert.doesNotMatch(cityMetaTitle(seoCity(null), false, SEO_YEAR), /multas/);
   });
 });
